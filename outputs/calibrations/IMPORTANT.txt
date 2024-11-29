@@ -1,0 +1,1 @@
+Remember to change units on y-axis from voltage [V] to Analog read unit [1/1024 * 5V]

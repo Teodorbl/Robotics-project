@@ -8,47 +8,89 @@ import signal
 import threading
 import time
 import angle_calibration  # Import the calibration module
-from datetime import datetime
+import re
+import atexit
+import collections
+from statistics import median
 
 # --------------------------------------------
 # Configuration Section
 # --------------------------------------------
 
-# Configure the serial port (update '/dev/cu.usbmodemXXXX' to your Arduino's port)
-SERIAL_PORT = '/dev/tty.usbmodem11101'  # Replace with your Arduino's serial port
-BAUD_RATE = 9600
+# Configure the serial ports for both Nano and Uno
+SERIAL_PORT_UNO = '/dev/cu.usbmodem11101'      # Replace with your Arduino Uno's serial port
+SERIAL_PORT_NANO = '/dev/cu.usbserial-A105A9FZ'  # Replace with your Arduino Nano's serial port
 
-# Number of servos
-NUM_SERVOS = 5
+# Function to parse ServoConfig.h and extract constants
+def parse_servo_config(config_path):
+    constants = {}
+    with open(config_path, 'r') as file:
+        for line in file:
+            # Match lines like #define CONSTANT_NAME value
+            define_match = re.match(r'#define\s+(\w+)\s+(\d+)', line)
+            if define_match:
+                key, value = define_match.groups()
+                constants[key] = int(value)
+            # Match lines like const type NAME[NUM] = {values};
+            array_match = re.match(r'const\s+(\w+)\s+(\w+)\s*\[\s*\w+\s*\]\s*=\s*\{([^}]+)\};', line)
+            if array_match:
+                type_, key, values = array_match.groups()
+                if type_.lower() == 'bool':
+                    constants[key] = [v.strip().lower() == 'true' for v in values.split(',')]
+                else:
+                    constants[key] = [int(v.strip()) for v in values.split(',')]
+    return constants
 
-# Servo Names
-SERVO_NAMES = ['base', 'shoulder', 'elbow', 'wrist', 'claw']
+# Parse ServoConfig.h
+servo_config_path = '/Users/teodorlindell/Repos/RoboticArmFreeRTOS/include/ServoConfig.h'
+config = parse_servo_config(servo_config_path)
 
-# Initialize servo angles
-servoAngles = [90, 50, 45, 90, 120]  # Initial angles for each servo
+# Extract constants
+NUM_SERVOS = config.get('NUM_SERVOS', 5)
+SERVO_NAMES = config.get('SERVO_NAMES', ['base', 'shoulder', 'elbow', 'wrist', 'claw'])
+SERVO_MIN_ANGLES = config.get('SERVO_MIN_ANGLES', [0, 45, 45, 0, 80])
+SERVO_MAX_ANGLES = config.get('SERVO_MAX_ANGLES', [180, 70, 135, 190, 150])
+SERVO_INVERT_MASK = config.get('SERVO_INVERT_MASK', [False, False, True, True, False])
+SERVO_START_ANGLES = config.get('SERVO_START_ANGLES', [90, 45, 45, 90, 90])
+SERVO_MIN_DEGREE = config.get('SERVO_MIN_DEGREE', 0)
+SERVO_MAX_DEGREE = config.get('SERVO_MAX_DEGREE', 180)
+SERVO_MIN_PULSE_WIDTH = config.get('SERVO_MIN_PULSE_WIDTH', 184)
+SERVO_MAX_PULSE_WIDTH = config.get('SERVO_MAX_PULSE_WIDTH', 430)
+I2C_ADDRESS_NANO = config.get('I2C_ADDRESS_NANO', 0x08)
+I2C_ADDRESS_PWMDRV = config.get('I2C_ADDRESS_PWMDRV', 0x40)
+
+# Initialize baud rates after removing BAUD_RATE
+BAUD_RATE_UNO = 115200
+BAUD_RATE_NANO = 57600
+
+# Remove the global servoAngles initialization
+# servoAngles = SERVO_START_ANGLES  # Initial angles for each servo
 
 # Mapping from degrees to PWM pulse
 def degrees_to_pwm(degrees):
     """
     Convert degrees to PWM pulse length based on linear mapping [0, 180] -> [184, 430].
     """
-    pwm_min = 184
-    pwm_max = 430
+    pwm_min = SERVO_MIN_PULSE_WIDTH
+    pwm_max = SERVO_MAX_PULSE_WIDTH
     degrees_min = 0
     degrees_max = 180
     pwm = int((degrees - degrees_min) * (pwm_max - pwm_min) / (degrees_max - degrees_min) + pwm_min)
     return pwm
 
 # --------------------------------------------
-# Initialize Serial Connection
+# Initialize Serial Connections
 # --------------------------------------------
 
-ser = None  # Start with no connection
-serial_lock = threading.Lock()  # To synchronize access to serial port
-connection_start_time = None  # To track when the connection was established
+ser_uno = None  # Serial connection to Arduino Uno
+ser_nano = None  # Serial connection to Arduino Nano
+serial_lock = threading.Lock()  # To synchronize access to serial ports
 
 # Initialize Calibration
 calibration = angle_calibration.AngleCalibration()
+
+# Remove the initialization of servo_data_deques
+# servo_data_deques = [collections.deque(maxlen=5) for _ in range(NUM_SERVOS)]
 
 # --------------------------------------------
 # Custom Time Axis for Displaying mm:ss
@@ -125,7 +167,7 @@ for i in range(NUM_SERVOS):
         title=f'{SERVO_NAMES[i].capitalize()} Position',
         axisItems={'bottom': TimeAxisItem(orientation='bottom')}
     )
-    plot_widget.setLabel('left', 'V')  # Changed label from 'Degrees' to 'V' for volts
+    plot_widget.setLabel('left', 'V')  # Keep label as 'V' for volts
     plot_widget.setLabel('bottom', 'Elapsed Time', units='s')
     #plot_widget.setYRange(0, 5)  # Assuming voltage ranges from 0 to 5V
     plot_widget.showGrid(x=True, y=True)  # Show grid
@@ -147,22 +189,41 @@ for i in range(NUM_SERVOS):
 
 # --------------------------------------------
 # Terminal Command Handling Widgets
-# --------------------------------------------
 
-# Output Display Area
-output_display = QtWidgets.QTextEdit()
-output_display.setReadOnly(True)
-output_display.setPlaceholderText("Terminal Output...")
-terminal_layout.addWidget(output_display)
+# Add a QTabWidget for UNO and NANO monitors
+terminal_tabs = QtWidgets.QTabWidget()
+terminal_layout.addWidget(terminal_tabs)
 
-# Command Input Field
-command_input = QtWidgets.QLineEdit()
-command_input.setPlaceholderText("Enter command here...")
-terminal_layout.addWidget(command_input)
+# Debug Toggle Button
 
-# --------------------------------------------
+debug_toggle = QtWidgets.QCheckBox("Debug Mode")
+terminal_layout.addWidget(debug_toggle)
+
+# Initialize debug mode flag
+debug_mode = False
+
+def toggle_debug_mode(state):
+    global debug_mode
+    debug_mode = bool(state)
+    if debug_mode:
+        append_output("Debug Mode Enabled.")
+    else:
+        append_output("Debug Mode Disabled.")
+
+# Connect the debug toggle button
+debug_toggle.stateChanged.connect(toggle_debug_mode)
+
+# Append Output Function
+
+def append_output(text, device='UNO'):
+    if device == 'UNO':
+        uno_output_display.append(text)
+    elif device == 'NANO':
+        nano_output_display.append(text)
+    else:
+        uno_output_display.append(text)
+
 # Calibration Controls
-# --------------------------------------------
 
 # Calibration Title Label
 calibration_label = QtWidgets.QLabel("<b>Calibration Controls</b>")
@@ -190,6 +251,34 @@ plot_calib_button = QtWidgets.QPushButton("Plot Calibration Data")
 terminal_layout.addWidget(plot_calib_button)
 
 # --------------------------------------------
+# Toggle Control Mode
+# --------------------------------------------
+
+# Add Toggle Button for Control Mode
+control_mode_layout = QtWidgets.QHBoxLayout()
+terminal_layout.addLayout(control_mode_layout)
+
+control_mode_label = QtWidgets.QLabel("Control Mode:")
+control_mode_layout.addWidget(control_mode_label)
+
+control_mode_toggle = QtWidgets.QCheckBox("Follow Potentiometers")
+control_mode_layout.addWidget(control_mode_toggle)
+
+# Initialize Control Mode Flag
+control_mode_follow = False
+
+def toggle_control_mode(state):
+    global control_mode_follow
+    control_mode_follow = state
+    if control_mode_follow:
+        append_output("Control Mode: Potentiometers (Automatic)")
+    else:
+        append_output("Control Mode: Manual Sliders")
+
+# Connect the toggle button to the function
+control_mode_toggle.stateChanged.connect(toggle_control_mode)
+
+# --------------------------------------------
 # Create Servo Control Sliders
 # --------------------------------------------
 
@@ -202,25 +291,29 @@ terminal_layout.addWidget(QtWidgets.QLabel("<b>Servo Controls</b>"))
 # Dictionary to hold sliders
 servo_sliders = {}
 
+# Import ServoConfig if necessary or define the ranges here
+# Assuming the Python interface has access to the servo angle limits
+
 def slider_changed(servo_index, value):
-    global servoAngles
+    if control_mode_follow:
+        # In Follow Mode, do not send commands from sliders
+        return
     servo_name = SERVO_NAMES[servo_index]
     degree = value
     command = f"{servo_name} {degree}"
     with serial_lock:
-        if ser and ser.is_open:
-            ser.write((command + '\n').encode('utf-8'))
-            append_output(f"> {command}")
-            # Update servoAngles if needed
-            servoAngles[servo_index] = degree
+        if ser_uno and ser_uno.is_open:
+            ser_uno.write((command + '\n').encode('utf-8'))
+            append_output(f"> {command}", 'UNO')
             # Log if calibration is active
             if calibration.logging:
                 pwm = degrees_to_pwm(degree)
                 calibration.log_input(servo_name=servo_name, input_pwm=pwm)
-                output_display.append(f"Logged input for servo '{servo_name}': {pwm} PWM, {degree} deg")
+                uno_output_display.append(f"Logged input for servo '{servo_name}': {pwm} PWM, {degree} deg")
         else:
-            append_output("Serial port is not connected. Please connect first.")
+            append_output("Serial port is not connected. Please connect first.", 'UNO')
 
+# Create Servo Control Sliders with constrained ranges
 for i in range(NUM_SERVOS):
     servo_name = SERVO_NAMES[i].capitalize()
     
@@ -231,18 +324,18 @@ for i in range(NUM_SERVOS):
     label = QtWidgets.QLabel(f"{servo_name}:")
     label.setFixedWidth(60)
     
-    # Slider setup
+    # Slider setup with constrained range
     slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
-    slider.setMinimum(0)
-    slider.setMaximum(180)
-    slider.setValue(servoAngles[i])
+    slider.setMinimum(SERVO_MIN_ANGLES[i])
+    slider.setMaximum(SERVO_MAX_ANGLES[i])
+    slider.setValue(SERVO_START_ANGLES[i])
     slider.setTickInterval(10)
     slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
     slider.setSingleStep(1)
     slider.setPageStep(10)
     
     # Current value label
-    slider_value_label = QtWidgets.QLabel(f"{servoAngles[i]}°")
+    slider_value_label = QtWidgets.QLabel(f"{SERVO_START_ANGLES[i]}°")
     slider_value_label.setFixedWidth(40)
     
     # Connect slider's valueChanged signal
@@ -263,22 +356,27 @@ for i in range(NUM_SERVOS):
 # Add "Reset Sliders" Button
 # --------------------------------------------
 
-reset_sliders_button = QtWidgets.QPushButton("Reset Sliders")
+reset_sliders_button = QtWidgets.QPushButton("Reset Positions")
 terminal_layout.addWidget(reset_sliders_button)
 
 def reset_sliders():
     for i in range(NUM_SERVOS):
-        initial_angle = servoAngles[i]
+        default_angle = SERVO_START_ANGLES[i]
         servo_sliders[i].blockSignals(True)  # Prevent triggering slider_changed
-        servo_sliders[i].setValue(initial_angle)
+        servo_sliders[i].setValue(default_angle)
         servo_sliders[i].blockSignals(False)
         # Update the corresponding label
         # Retrieve the label from the layout
         slider_layout = servo_control_layout.itemAt(i).layout()
         slider_label = slider_layout.itemAt(2).widget()
-        slider_label.setText(f"{initial_angle}°")
-        # Send the command to the servo
-        slider_changed(i, initial_angle)
+        slider_label.setText(f"{default_angle}°")
+        if not control_mode_follow:
+            # Send the command to the servo only if not in Follow Mode
+            command = f"{SERVO_NAMES[i]} {default_angle}"
+            with serial_lock:
+                if ser_uno and ser_uno.is_open:
+                    ser_uno.write((command + '\n').encode('utf-8'))
+                    append_output(f"Resetting {SERVO_NAMES[i]} to {default_angle}°")
 
 reset_sliders_button.clicked.connect(reset_sliders)
 
@@ -286,27 +384,28 @@ reset_sliders_button.clicked.connect(reset_sliders)
 terminal_layout.addWidget(servo_control_widget)
 
 # --------------------------------------------
-# Function to Toggle Serial Connection
+# Function to Toggle Serial Connections
 # --------------------------------------------
 
 def toggle_connection():
-    global ser, connection_start_time
-    if ser and ser.is_open:
-        # Disconnect
+    global ser_uno, ser_nano, connection_start_time
+    if ser_uno and ser_uno.is_open and ser_nano and ser_nano.is_open:
+        # Disconnect both
         with serial_lock:
-            ser.close()
-            ser = None
-            connection_start_time = None
+            ser_uno.close()
+            ser_nano.close()
+            ser_uno = None
+            ser_nano = None
         connect_button.setText("Connect")
-        append_output("Disconnected from serial port.")
+        append_output("Disconnected from both serial ports.")
     else:
-        # Connect
+        # Connect both
         try:
             with serial_lock:
-                ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=1)
+                ser_uno = serial.Serial(SERIAL_PORT_UNO, BAUD_RATE_UNO, timeout=1)
+                ser_nano = serial.Serial(SERIAL_PORT_NANO, BAUD_RATE_NANO, timeout=1)
             connect_button.setText("Disconnect")
-            append_output(f"Connected to {SERIAL_PORT} at {BAUD_RATE} baud.")
-            # Record the connection start time
+            append_output(f"Connected to Uno at {SERIAL_PORT_UNO} and Nano at {SERIAL_PORT_NANO}.")
             connection_start_time = time.time()
             # Clear data buffers upon connection
             for buffer in data_buffers:
@@ -315,29 +414,41 @@ def toggle_connection():
             for label in labels:
                 label.setText("N/A")
         except serial.SerialException as e:
-            append_output(f"Failed to connect to {SERIAL_PORT}: {e}")
+            append_output(f"Failed to connect: {e}")
+            ser_uno = None
+            ser_nano = None
 
 # Connect the button to the toggle function
 connect_button.clicked.connect(toggle_connection)
 
-# --------------------------------------------
-# Function to Append Text to Output Display
-# --------------------------------------------
+# Modify UNO Tab to Include Command Input Field
 
-def append_output(text):
-    if text.startswith('>'):
-        return
-    output_display.append(text)
+# Create a widget and layout for the UNO tab
+uno_tab_widget = QtWidgets.QWidget()
+uno_tab_layout = QtWidgets.QVBoxLayout()
+uno_tab_widget.setLayout(uno_tab_layout)
 
-# --------------------------------------------
-# Function to Handle Command Input
-# --------------------------------------------
+# UNO Output Display
+uno_output_display = QtWidgets.QTextEdit()
+uno_output_display.setReadOnly(True)
+uno_output_display.setPlaceholderText("UNO Monitor...")
+uno_tab_layout.addWidget(uno_output_display)
 
-def send_command():
-    user_input = command_input.text().strip()
+# UNO Command Input Field
+uno_command_input = QtWidgets.QLineEdit()
+uno_command_input.setPlaceholderText("Enter command here...")
+uno_tab_layout.addWidget(uno_command_input)
+
+# Add the UNO tab to the terminal tabs
+terminal_tabs.addTab(uno_tab_widget, "UNO Monitor")
+
+# Define the 'send_uno_command' Function
+
+def send_uno_command():
+    user_input = uno_command_input.text().strip()
     if user_input:
         with serial_lock:
-            if ser and ser.is_open:
+            if ser_uno and ser_uno.is_open:
                 try:
                     # Expected command format: "servo_name degrees", e.g., "base 90"
                     parts = user_input.split()
@@ -347,60 +458,74 @@ def send_command():
                             try:
                                 degrees = float(degrees)
                                 if not (0 <= degrees <= 180):
-                                    append_output("Degrees must be between 0 and 180.")
+                                    append_output("Degrees must be between 0 and 180.", 'UNO')
                                     return
-                                
+
                                 # Map degrees to PWM for logging
                                 pwm = degrees_to_pwm(degrees)
-                                
-                                # **Send Degrees to Arduino**
+
+                                # Send degrees to Arduino Uno
                                 command = f"{servo} {degrees}"
-                                ser.write((command + '\n').encode('utf-8'))
-                                
-                                append_output(f"> {command}")
-                                command_input.clear()
-                                
-                                # **Log PWM Value if Calibration is Active**
+                                ser_uno.write((command + '\n').encode('utf-8'))
+
+                                append_output(f"> {command}", 'UNO')
+                                uno_command_input.clear()
+
+                                # Log PWM value if calibration is active
                                 if calibration.logging:
                                     calibration.log_input(servo_name=servo, input_pwm=pwm)
-                                    output_display.append(f"Logged input for servo '{servo}': {pwm} PWM, {degrees} deg")
+                                    uno_output_display.append(
+                                        f"Logged input for servo '{servo}': {pwm} PWM, {degrees} deg"
+                                    )
                             except ValueError:
-                                append_output("Invalid degrees value. Please enter a numeric value.")
+                                append_output("Invalid degrees value. Please enter a numeric value.", 'UNO')
                         else:
-                            append_output(f"Unknown servo name: {servo}")
+                            append_output(f"Unknown servo name: {servo}", 'UNO')
                     else:
-                        append_output("Invalid command format. Use 'servo_name degrees', e.g., 'base 90'")
+                        append_output("Invalid command format. Use 'servo_name degrees', e.g., 'base 90'", 'UNO')
                 except serial.SerialException as e:
-                    append_output(f"Error sending command: {e}")
+                    append_output(f"Error sending command: {e}", 'UNO')
             else:
-                append_output("Serial port is not connected. Please connect first.")
+                append_output("Serial port is not connected. Please connect first.", 'UNO')
 
-# Connect the command_input's returnPressed signal to send_command
-command_input.returnPressed.connect(send_command)
+# Connect the UNO command input field to 'send_uno_command'
+uno_command_input.returnPressed.connect(send_uno_command)
 
-# --------------------------------------------
+# Modify NANO Tab Layout
+
+# Create a widget and layout for the NANO tab
+nano_tab_widget = QtWidgets.QWidget()
+nano_tab_layout = QtWidgets.QVBoxLayout()
+nano_tab_widget.setLayout(nano_tab_layout)
+
+# NANO Output Display
+nano_output_display = QtWidgets.QTextEdit()
+nano_output_display.setReadOnly(True)
+nano_output_display.setPlaceholderText("NANO Monitor...")
+nano_tab_layout.addWidget(nano_output_display)
+
+# Add the NANO tab to the terminal tabs
+terminal_tabs.addTab(nano_tab_widget, "NANO Monitor")
+
 # Calibration Functionality
-# --------------------------------------------
 
 def start_calibration():
     selected_servo = servo_select.currentText()
     calibration.start_logging()
-    output_display.append(f"Calibration started for servo: {selected_servo}")
+    uno_output_display.append(f"Calibration started for servo: {selected_servo}")
     start_calib_button.setEnabled(False)
     stop_calib_button.setEnabled(True)
 
 def stop_calibration():
     calibration.stop_logging()
-    output_display.append("Calibration stopped.")
+    uno_output_display.append("Calibration stopped.")
     start_calib_button.setEnabled(True)
     stop_calib_button.setEnabled(False)
 
 def plot_calibration():
     selected_servo = servo_select.currentText()
-    # Optionally, prompt user for duration or use all data
-    # For simplicity, we'll plot all logged data for the selected servo
     calibration.plot_data(selected_servo)
-    output_display.append(f"Plotted calibration data for servo: {selected_servo}")
+    uno_output_display.append(f"Plotted calibration data for servo: {selected_servo}")
 
 # Connect calibration buttons to their functions
 start_calib_button.clicked.connect(start_calibration)
@@ -411,56 +536,95 @@ plot_calib_button.clicked.connect(plot_calibration)
 # Function to Handle Incoming Serial Data
 # --------------------------------------------
 
+# Mapping from raw analog values to degrees
+def raw_to_degree(raw, servo_index):
+    """
+    Convert raw analog value to degrees based on servo-specific calibration.
+    """
+    # Define calibration parameters for each servo
+    # These should be adjusted based on actual hardware calibration
+    ANALOG_MIN = 32
+    ANALOG_MAX = 1023
+    DEGREE_MIN = SERVO_MIN_ANGLES[servo_index]
+    DEGREE_MAX = SERVO_MAX_ANGLES[servo_index]
+    
+    # Clamp the raw value to the expected range
+    raw = max(ANALOG_MIN, min(raw, ANALOG_MAX))
+    
+    # Linear mapping from raw value to degrees
+    degree = ((raw - ANALOG_MIN) / (ANALOG_MAX - ANALOG_MIN)) * (DEGREE_MAX - DEGREE_MIN) + DEGREE_MIN
+    return int(degree)
+
+# Read NANO serial
 def update():
-    if ser and ser.is_open and ser.in_waiting > 0:
+    if ser_nano and ser_nano.is_open and ser_nano.in_waiting > 0:
         try:
-            line = ser.readline().decode('utf-8').strip()
-            if line:
+            line = ser_nano.readline().decode('utf-8').strip()
+            if debug_mode:
+                append_output(line, 'NANO')
+            if line.startswith('>') or debug_mode:
                 if line.startswith('>'):
-                    # Remove the '>' prefix before splitting
                     data = line[1:]
-
-                    # Split the data by commas and convert to floats
-                    values = list(map(float, data.split(',')))
-
-                    if len(values) == NUM_SERVOS:
-                        current_time = time.time()
-                        elapsed_time = current_time - connection_start_time
-
-                        for i in range(NUM_SERVOS):
-                            servo_name = SERVO_NAMES[i]
-                            output_voltage = values[i]
-
-                            data_buffers[i].append((elapsed_time, output_voltage))
-
-                            # Update current value label
-                            labels[i].setText(f"{servo_name}: {output_voltage:.2f} V")
-
-                            # Maintain buffer size
-                            if len(data_buffers[i]) > 100:
-                                data_buffers[i].pop(0)
-
-                            # Extract x and y data for plotting
-                            x, y = zip(*data_buffers[i])
-                            curves[i].setData(x, y)
-
-                            # Adjust time range to show only the last 100 points
-                            if len(x) >= 2:
-                                plots[i].setXRange(x[0], x[-1])
-
-                            # If calibration is active, log the output_voltage
-                            if calibration.logging:
-                                calibration.log_output(servo_name=servo_name, output_voltage=output_voltage)
                 else:
-                    # Display lines that do NOT start with '>' in the terminal
-                    append_output(line)
+                    data = line
+                raw_values = list(map(float, data.split(',')))
+                if len(raw_values) == NUM_SERVOS:
+                    if control_mode_follow:
+                        # Append new raw values to the respective deques
+                        for i in range(NUM_SERVOS):
+                            raw = raw_values[i]
+                            degree = raw_to_degree(raw, i)
+                            servo_name = SERVO_NAMES[i]
+                            command = f"{servo_name} {degree}"
+                            with serial_lock:
+                                if ser_uno and ser_uno.is_open:
+                                    ser_uno.write((command + '\n').encode('utf-8'))
+                                    append_output(f"> {command}", 'UNO')
+                            servo_sliders[i].blockSignals(True)
+                            servo_sliders[i].setValue(degree)
+                            servo_sliders[i].blockSignals(False)
+                else:
+                    if debug_mode:
+                        append_output(f"Malformed data: {line}", 'NANO')
         except ValueError:
-            append_output(f"Received malformed data: {line}")
+            append_output(f"Received malformed data from Nano: {line}")
         except serial.SerialException as e:
-            append_output(f"Serial error: {e}")
-            toggle_connection()  # Attempt to disconnect on serial error
+            append_output(f"Serial error with Nano: {e}")
+            toggle_connection()
 
-# Timer to update plots
+    if ser_uno and ser_uno.is_open and ser_uno.in_waiting > 0:
+        try:
+            line = ser_uno.readline().decode('utf-8').strip()
+            if debug_mode:
+                append_output(line, 'UNO')
+            if line.startswith('>') or debug_mode:
+                if line.startswith('>'):
+                    data = line[1:]
+                else:
+                    data = line
+                values = list(map(float, data.split(',')))
+                if len(values) == NUM_SERVOS:
+                    current_time = time.time() - connection_start_time
+                    for i in range(NUM_SERVOS):
+                        voltage = values[i]
+                        data_buffers[i].append((current_time, voltage))
+                        # Update plot data
+                        times, voltages = zip(*data_buffers[i][-100:])
+                        curves[i].setData(times, voltages)
+                        # Update current value label
+                        labels[i].setText(f"{SERVO_NAMES[i]}: {voltage:.2f} V")
+                else:
+                    if debug_mode:
+                        append_output(f"Malformed data: {line}", 'UNO')
+            else:
+                append_output(line)
+        except ValueError:
+            append_output(f"Received malformed data from Uno: {line}")
+        except serial.SerialException as e:
+            append_output(f"Serial error with Uno: {e}")
+            toggle_connection()
+
+# Timer to update plots and handle serial data
 timer = QtCore.QTimer()
 timer.timeout.connect(update)
 timer.start(100)  # Update every 100 ms
@@ -469,11 +633,40 @@ timer.start(100)  # Update every 100 ms
 # Signal Handling for Graceful Exit
 # --------------------------------------------
 
+# Function to reset servos to default positions slowly
+def reset_servos():
+    with serial_lock:
+        if ser_uno and ser_uno.is_open:
+            append_output("Resetting servos to default positions...", 'UNO')
+            for i in range(NUM_SERVOS):
+                servo_name = SERVO_NAMES[i]
+                default_angle = SERVO_START_ANGLES[i]
+                command = f"{servo_name} {default_angle}"
+                try:
+                    ser_uno.write((command + '\n').encode('utf-8'))
+                    append_output(f"Resetting {servo_name} to {default_angle}°", 'UNO')
+                    # Update sliders and labels
+                    if i in servo_sliders:
+                        servo_sliders[i].blockSignals(True)
+                        servo_sliders[i].setValue(default_angle)
+                        servo_sliders[i].blockSignals(False)
+                        slider_layout = servo_control_layout.itemAt(i).layout()
+                        slider_label = slider_layout.itemAt(2).widget()
+                        slider_label.setText(f"{default_angle}°")
+                    time.sleep(0.5)  # Delay for smooth motion
+                except serial.SerialException as e:
+                    append_output(f"Failed to reset {servo_name}: {e}", 'UNO')
+
+# Register the reset_servos function to be called on exit
+atexit.register(reset_servos)
+
+# Modify the signal_handler to call reset_servos before exiting
 def signal_handler(sig, frame):
     append_output("\nKeyboardInterrupt detected. Exiting gracefully...")
-    if ser and ser.is_open:
+    reset_servos()
+    if ser_uno and ser_uno.is_open:
         with serial_lock:
-            ser.close()
+            ser_uno.close()
             append_output("Serial port closed.")
     QtWidgets.QApplication.quit()
 
