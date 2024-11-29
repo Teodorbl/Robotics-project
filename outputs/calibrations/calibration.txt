@@ -1,0 +1,29 @@
+---base---
+rotation: clockwise
+range: [0,180] deg
+middle: 90 deg
+
+---shoulder---
+rotation: clockwise
+range:
+    extended arm: [10,135] deg
+    contracted arm: [5,100] deg
+    safe: [10,45] deg
+resting: 5 deg
+neutral: 25 deg
+
+---elbow---
+rotation: counter clockwise
+safe range: [40,165] deg
+resing: 35 deg
+neutral: 45 deg
+
+---wrist---
+rotation: counter clockwise
+range: [0,180]
+middle: 90 deg
+
+---claw---
+opens: decreasing deg
+range: [0,140] = [wide open, closed]
+middle: 90 deg
