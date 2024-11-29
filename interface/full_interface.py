@@ -10,8 +10,6 @@ import time
 import angle_calibration  # Import the calibration module
 import re
 import atexit
-import collections
-from statistics import median
 
 # --------------------------------------------
 # Configuration Section
@@ -26,57 +24,72 @@ def parse_servo_config(config_path):
     constants = {}
     with open(config_path, 'r') as file:
         for line in file:
-            # Match lines like #define CONSTANT_NAME value
-            define_match = re.match(r'#define\s+(\w+)\s+(\d+)', line)
+            # Match lines like #define CONSTANT_NAME value with optional leading whitespace
+            define_match = re.match(r'\s*#define\s+(\w+)\s+(\d+)', line)
             if define_match:
                 key, value = define_match.groups()
                 constants[key] = int(value)
-            # Match lines like const type NAME[NUM] = {values};
-            array_match = re.match(r'const\s+(\w+)\s+(\w+)\s*\[\s*\w+\s*\]\s*=\s*\{([^}]+)\};', line)
+            # Match lines like const type NAME[NUM] = {values}; with optional leading whitespace and pointer types
+            array_match = re.match(r'\s*const\s+([\w\*]+)\s+(\w+)\s*\[\s*\w+\s*\]\s*=\s*\{([^}]+)\};', line)
             if array_match:
                 type_, key, values = array_match.groups()
                 if type_.lower() == 'bool':
                     constants[key] = [v.strip().lower() == 'true' for v in values.split(',')]
+                elif type_.lower() == 'char*':
+                    constants[key] = [v.strip().strip('"') for v in values.split(',')]
                 else:
                     constants[key] = [int(v.strip()) for v in values.split(',')]
+            
+            # ...existing code...
+            
+            # Add handling for scalar const declarations
+            scalar_match = re.match(r'\s*const\s+(\w+)\s+(\w+)\s*=\s*([^\s;]+)\s*;', line)
+            if scalar_match:
+                type_, key, value = scalar_match.groups()
+                if type_.lower() in ['int', 'float']:
+                    constants[key] = int(value) if type_.lower() == 'int' else float(value)
+                elif type_.lower() == 'bool':
+                    constants[key] = value.strip().lower() == 'true'
+                elif type_.lower() in ['char*', 'const char*']:
+                    constants[key] = value.strip().strip('"')
     return constants
 
 # Parse ServoConfig.h
 servo_config_path = '/Users/teodorlindell/Repos/RoboticArmFreeRTOS/include/ServoConfig.h'
-config = parse_servo_config(servo_config_path)
+try:
+    config = parse_servo_config(servo_config_path)
+except Exception as e:
+    print(f"Error parsing servo configuration: {e}")
+    sys.exit(1)
 
-# Extract constants
-NUM_SERVOS = config.get('NUM_SERVOS', 5)
-SERVO_NAMES = config.get('SERVO_NAMES', ['base', 'shoulder', 'elbow', 'wrist', 'claw'])
-SERVO_MIN_ANGLES = config.get('SERVO_MIN_ANGLES', [0, 45, 45, 0, 80])
-SERVO_MAX_ANGLES = config.get('SERVO_MAX_ANGLES', [180, 70, 135, 190, 150])
-SERVO_INVERT_MASK = config.get('SERVO_INVERT_MASK', [False, False, True, True, False])
-SERVO_START_ANGLES = config.get('SERVO_START_ANGLES', [90, 45, 45, 90, 90])
-SERVO_MIN_DEGREE = config.get('SERVO_MIN_DEGREE', 0)
-SERVO_MAX_DEGREE = config.get('SERVO_MAX_DEGREE', 180)
-SERVO_MIN_PULSE_WIDTH = config.get('SERVO_MIN_PULSE_WIDTH', 184)
-SERVO_MAX_PULSE_WIDTH = config.get('SERVO_MAX_PULSE_WIDTH', 430)
-I2C_ADDRESS_NANO = config.get('I2C_ADDRESS_NANO', 0x08)
-I2C_ADDRESS_PWMDRV = config.get('I2C_ADDRESS_PWMDRV', 0x40)
+# Extract constants and raise errors if any are missing
+required_keys = [
+    'NUM_SERVOS', 'SERVO_NAMES', 'SERVO_MIN_ANGLES', 'SERVO_MAX_ANGLES',
+    'SERVO_INVERT_MASK', 'SERVO_START_ANGLES', 'SERVO_MIN_DEGREE',
+    'SERVO_MAX_DEGREE', 'SERVO_MIN_PULSE_WIDTH', 'SERVO_MAX_PULSE_WIDTH',
+    'I2C_ADDRESS_NANO', 'I2C_ADDRESS_PWMDRV'
+]
+
+for key in required_keys:
+    if key not in config:
+        raise KeyError(f"Missing required configuration key: {key}")
+
+NUM_SERVOS = config['NUM_SERVOS']
+SERVO_NAMES = config['SERVO_NAMES']
+SERVO_MIN_ANGLES = config['SERVO_MIN_ANGLES']
+SERVO_MAX_ANGLES = config['SERVO_MAX_ANGLES']
+SERVO_INVERT_MASK = config['SERVO_INVERT_MASK']
+SERVO_START_ANGLES = config['SERVO_START_ANGLES']
+SERVO_MIN_DEGREE = config['SERVO_MIN_DEGREE']
+SERVO_MAX_DEGREE = config['SERVO_MAX_DEGREE']
+SERVO_MIN_PULSE_WIDTH = config['SERVO_MIN_PULSE_WIDTH']
+SERVO_MAX_PULSE_WIDTH = config['SERVO_MAX_PULSE_WIDTH']
+I2C_ADDRESS_NANO = config['I2C_ADDRESS_NANO']
+I2C_ADDRESS_PWMDRV = config['I2C_ADDRESS_PWMDRV']
 
 # Initialize baud rates after removing BAUD_RATE
 BAUD_RATE_UNO = 115200
 BAUD_RATE_NANO = 57600
-
-# Remove the global servoAngles initialization
-# servoAngles = SERVO_START_ANGLES  # Initial angles for each servo
-
-# Mapping from degrees to PWM pulse
-def degrees_to_pwm(degrees):
-    """
-    Convert degrees to PWM pulse length based on linear mapping [0, 180] -> [184, 430].
-    """
-    pwm_min = SERVO_MIN_PULSE_WIDTH
-    pwm_max = SERVO_MAX_PULSE_WIDTH
-    degrees_min = 0
-    degrees_max = 180
-    pwm = int((degrees - degrees_min) * (pwm_max - pwm_min) / (degrees_max - degrees_min) + pwm_min)
-    return pwm
 
 # --------------------------------------------
 # Initialize Serial Connections
@@ -294,22 +307,17 @@ servo_sliders = {}
 # Import ServoConfig if necessary or define the ranges here
 # Assuming the Python interface has access to the servo angle limits
 
-def slider_changed(servo_index, value):
+# Function to handle slider changes with inversion
+def slider_changed(servo_index, degree):
     if control_mode_follow:
         # In Follow Mode, do not send commands from sliders
         return
     servo_name = SERVO_NAMES[servo_index]
-    degree = value
     command = f"{servo_name} {degree}"
     with serial_lock:
         if ser_uno and ser_uno.is_open:
             ser_uno.write((command + '\n').encode('utf-8'))
             append_output(f"> {command}", 'UNO')
-            # Log if calibration is active
-            if calibration.logging:
-                pwm = degrees_to_pwm(degree)
-                calibration.log_input(servo_name=servo_name, input_pwm=pwm)
-                uno_output_display.append(f"Logged input for servo '{servo_name}': {pwm} PWM, {degree} deg")
         else:
             append_output("Serial port is not connected. Please connect first.", 'UNO')
 
@@ -442,8 +450,7 @@ uno_tab_layout.addWidget(uno_command_input)
 # Add the UNO tab to the terminal tabs
 terminal_tabs.addTab(uno_tab_widget, "UNO Monitor")
 
-# Define the 'send_uno_command' Function
-
+# Ensure that send_uno_command also accounts for inversion
 def send_uno_command():
     user_input = uno_command_input.text().strip()
     if user_input:
@@ -457,12 +464,10 @@ def send_uno_command():
                         if servo in SERVO_NAMES:
                             try:
                                 degrees = float(degrees)
-                                if not (0 <= degrees <= 180):
-                                    append_output("Degrees must be between 0 and 180.", 'UNO')
+                                if not (SERVO_MIN_DEGREE <= degrees <= SERVO_MAX_DEGREE):
+                                    append_output(f"Degrees must be between {SERVO_MIN_DEGREE} and {SERVO_MAX_DEGREE}.", 'UNO')
                                     return
 
-                                # Map degrees to PWM for logging
-                                pwm = degrees_to_pwm(degrees)
 
                                 # Send degrees to Arduino Uno
                                 command = f"{servo} {degrees}"
@@ -471,12 +476,6 @@ def send_uno_command():
                                 append_output(f"> {command}", 'UNO')
                                 uno_command_input.clear()
 
-                                # Log PWM value if calibration is active
-                                if calibration.logging:
-                                    calibration.log_input(servo_name=servo, input_pwm=pwm)
-                                    uno_output_display.append(
-                                        f"Logged input for servo '{servo}': {pwm} PWM, {degrees} deg"
-                                    )
                             except ValueError:
                                 append_output("Invalid degrees value. Please enter a numeric value.", 'UNO')
                         else:
@@ -537,25 +536,22 @@ plot_calib_button.clicked.connect(plot_calibration)
 # --------------------------------------------
 
 # Mapping from raw analog values to degrees
-def raw_to_degree(raw, servo_index):
+def analog_to_degree(raw, servo_index):
     """
-    Convert raw analog value to degrees based on servo-specific calibration.
+    Convert raw analog value to degrees based on a fixed mapping.
     """
-    # Define calibration parameters for each servo
-    # These should be adjusted based on actual hardware calibration
+    # Define calibration parameters (unchanged)
     ANALOG_MIN = 32
     ANALOG_MAX = 1023
-    DEGREE_MIN = SERVO_MIN_ANGLES[servo_index]
-    DEGREE_MAX = SERVO_MAX_ANGLES[servo_index]
-    
+
     # Clamp the raw value to the expected range
     raw = max(ANALOG_MIN, min(raw, ANALOG_MAX))
-    
+
     # Linear mapping from raw value to degrees
-    degree = ((raw - ANALOG_MIN) / (ANALOG_MAX - ANALOG_MIN)) * (DEGREE_MAX - DEGREE_MIN) + DEGREE_MIN
+    degree = ((ANALOG_MAX - raw) / (ANALOG_MAX - ANALOG_MIN)) * (SERVO_MAX_ANGLES[servo_index] - SERVO_MIN_ANGLES[i]) + SERVO_MIN_ANGLES[servo_index]
     return int(degree)
 
-# Read NANO serial
+# Read NANO serial, write to UNO serial
 def update():
     if ser_nano and ser_nano.is_open and ser_nano.in_waiting > 0:
         try:
@@ -573,7 +569,7 @@ def update():
                         # Append new raw values to the respective deques
                         for i in range(NUM_SERVOS):
                             raw = raw_values[i]
-                            degree = raw_to_degree(raw, i)
+                            degree = analog_to_degree(raw, i)
                             servo_name = SERVO_NAMES[i]
                             command = f"{servo_name} {degree}"
                             with serial_lock:
@@ -587,7 +583,7 @@ def update():
                     if debug_mode:
                         append_output(f"Malformed data: {line}", 'NANO')
         except ValueError:
-            append_output(f"Received malformed data from Nano: {line}")
+            append_output(f"Nano: {line}")
         except serial.SerialException as e:
             append_output(f"Serial error with Nano: {e}")
             toggle_connection()
@@ -619,7 +615,7 @@ def update():
             else:
                 append_output(line)
         except ValueError:
-            append_output(f"Received malformed data from Uno: {line}")
+            append_output(f"Uno: {line}")
         except serial.SerialException as e:
             append_output(f"Serial error with Uno: {e}")
             toggle_connection()

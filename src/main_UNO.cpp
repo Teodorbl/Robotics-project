@@ -9,13 +9,6 @@
 // Servo driver instance
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
-// Remove the hardcoded constants
-// #define NUM_SERVOS 5
-// #define SERVO_MIN_PULSE_WIDTH 184  // Corresponds to 900 µsec
-// #define SERVO_MAX_PULSE_WIDTH 430  // Corresponds to 2100 µsec
-// #define SERVO_MIN_DEGREE 0
-// #define SERVO_MAX_DEGREE 180
-
 // Update the initial servo angles using ServoConfig.h
 int servoAngles[NUM_SERVOS] = { 
     SERVO_START_ANGLES[0], 
@@ -43,14 +36,8 @@ void TaskSerialControl(void* pvParameters);
 void TaskServoFeedback(void* pvParameters);
 uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex);
 int findServoIndex(const char* name);
-// void requestPotentiometerData();  // Commented out to disable I2C control
-// uint16_t analogToDegree(uint16_t analogValue);  // Unused in current setup
 
-// Stack overflow hook
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
-    //Serial.print("Stack overflow in task: ");
-    //Serial.println(pcTaskName);
-    // Halt execution
     while (1);
 }
 
@@ -111,24 +98,6 @@ void setup() {
     } else {
         //Serial.println("TaskServoFeedback created successfully.");
     }
-
-    // // Initialize I2C as Master
-    // Wire.begin();  // Already initialized above
-
-    // // Create the I2C Communication Task
-    // xReturned = xTaskCreate(
-    //     TaskI2CCommunication,  // Task function
-    //     "I2CComm",             // Task name
-    //     128,                   // Stack size in words
-    //     NULL,                  // Task parameter
-    //     1,                     // Task priority
-    //     NULL                   // Task handle
-    // );
-
-    // if (xReturned != pdPASS) {
-    //     // Handle task creation failure
-    //     while (1);
-    // }
 
     //Serial.println("Starting scheduler...");
     vTaskStartScheduler();
@@ -191,11 +160,11 @@ void TaskSerialControl(void* pvParameters) {
                         servoAngles[servoIndex] = (uint8_t)degree;
                         uint16_t pulseWidth = degreeToPulseWidth(servoAngles[servoIndex], servoIndex);  // Pass servo index
                         pwm.setPWM(servoIndex, 0, pulseWidth);
-                        //Serial.print("Moved servo ");
-                        //Serial.print(servoName);
-                        //Serial.print(" to ");
-                        //Serial.print(degree);
-                        //Serial.println(" degrees.");
+                        // Serial.print("Moved servo ");
+                        // Serial.print(servoName);
+                        // Serial.print(" to ");
+                        // Serial.print(pulseWidth);
+                        // Serial.println(" PWM width.");
                     } else {
                         //Serial.println("Error: Invalid command format. Use '[servoName] [degrees]'.");
                     }
@@ -212,8 +181,6 @@ void TaskSerialControl(void* pvParameters) {
         }
         vTaskDelay(pdMS_TO_TICKS(10));  // Yield to other tasks
     }
-    // Servos are controlled based on commands received via serial
-    // No automatic updates unless implemented elsewhere
 }
 
 // Task to read servo feedback and send data for plotting
@@ -256,22 +223,17 @@ void TaskServoFeedback(void* pvParameters) {
     }
 }
 
-// Utility function to convert degrees to pulse width using a shared mapping and inversion mask
+// Utility function to convert degrees to pulse width using a fixed mapping
 uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex) {
+    degree = constrain(degree, SERVO_MIN_ANGLES[servoIndex], SERVO_MAX_ANGLES[servoIndex]);
+
     if (SERVO_INVERT_MASK[servoIndex]) {
         // Invert the degree mapping
-        degree = SERVO_MAX_ANGLES[servoIndex] - (degree - SERVO_MIN_ANGLES[servoIndex]);
+        degree = SERVO_MIN_ANGLES[servoIndex] + SERVO_MAX_ANGLES[servoIndex] - degree;
     }
-    degree = constrain(degree, SERVO_MIN_ANGLES[servoIndex], SERVO_MAX_ANGLES[servoIndex]);
-    return map(degree, SERVO_MIN_ANGLES[servoIndex], SERVO_MAX_ANGLES[servoIndex],
-               SERVO_MIN_PULSE_WIDTH, SERVO_MAX_PULSE_WIDTH);
+    
+    return map(degree, 0, 180, SERVO_MIN_PULSE_WIDTH, SERVO_MAX_PULSE_WIDTH);
 }
-
-// Function to convert analog value to degree
-// uint16_t analogToDegree(uint16_t analogValue) {
-//     // Assuming analogValue ranges from 0 to 1023 corresponding to 0 to 180 degrees
-//     return map(analogValue, 0, 1023, SERVO_MIN_DEGREE, SERVO_MAX_DEGREE);
-// }
 
 // Function to find servo index based on name
 int findServoIndex(const char* name) {
@@ -284,33 +246,3 @@ int findServoIndex(const char* name) {
     }
     return -1;  // Not found
 }
-
-// Function to request potentiometer data from Nano
-// void requestPotentiometerData() {
-//     Wire.beginTransmission(I2C_ADDRESS_NANO);
-//     Wire.write("POT");  // Optional: Send a command if needed
-//     Wire.endTransmission();
-
-//     Wire.requestFrom(I2C_ADDRESS_NANO, NUM_SERVOS * 2);  // Request 2 bytes per servo (uint16_t)
-
-//     uint16_t potValues[NUM_SERVOS];
-//     uint8_t i = 0;
-//     while (Wire.available() && i < NUM_SERVOS) {
-//         uint16_t highByte = Wire.read();
-//         uint16_t lowByte = Wire.read();
-//         potValues[i++] = (highByte << 8) | lowByte;
-//     }
-
-//     // Process the received potentiometer values
-//     for (uint8_t j = 0; j < i; j++) {
-//         // Example: Update servo angles based on potValues[j]
-//         servoAngles[j] = map(potValues[j], 32, 1023, SERVO_MIN_ANGLES[j], SERVO_MAX_ANGLES[j]);
-//         uint16_t pulseWidth = degreeToPulseWidth(servoAngles[j]);
-//         pwm.setPWM(j, 0, pulseWidth);
-//     }
-// }
-
-// Create a FreeRTOS task to periodically request data from Nano
-// void TaskI2CCommunication(void* pvParameters) {
-//     // Skeleton for future I2C communication tasks
-// }

@@ -9,14 +9,14 @@
 const char* SERVO_NAMES[NUM_SERVOS] = {"base", "shoulder", "elbow", "wrist", "claw"};
 
 // User-Defined Min and Max Angles for Each Servo (Degrees)
-const int SERVO_MIN_ANGLES[NUM_SERVOS] = {0, 45, 45, 0, 80};
-const int SERVO_MAX_ANGLES[NUM_SERVOS] = {180, 120, 120, 180, 180};
+const int SERVO_MIN_ANGLES[NUM_SERVOS] = {0, 35, 30, 0, 40};
+const int SERVO_MAX_ANGLES[NUM_SERVOS] = {180, 115, 165, 180, 135};
 
 // Servo Inversion Mask: true = inverted, false = normal
 const bool SERVO_INVERT_MASK[NUM_SERVOS] = {false, false, true, true, false};
 
 // User-Specified Starting Angles for Each Servo (Degrees)
-const int SERVO_START_ANGLES[NUM_SERVOS] = {90, 45, 100, 90, 150};
+const int SERVO_START_ANGLES[NUM_SERVOS] = {90, 35, 160, 90, 120};
 
 // Shared Servo Degree Limits for Mapping
 const int SERVO_MIN_DEGREE = 0;
