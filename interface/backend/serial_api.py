@@ -15,16 +15,17 @@ class SerialAPI():
         self.configs = configs
         self.gui: GUIType = None
         
-        # --------------------------------------------
         # Initialize Serial Connections
-        # --------------------------------------------
-
         self.ser_uno = None  # Serial connection to Arduino Uno
         self.ser_nano = None  # Serial connection to Arduino Nano
         self.connection_start_time = None
         
         self.serial_lock = threading.Lock()  # To synchronize access to serial ports
-    
+        
+        # Initialize servo positions
+        self.servo_pos_init = configs.SERVO_START_ANGLES
+        self.servo_positions = self.servo_pos_init.copy()
+        
     def toggle_connection(self):
         if self.ser_uno and self.ser_uno.is_open and self.ser_nano and self.ser_nano.is_open:
             self.reset_servos()
@@ -49,6 +50,7 @@ class SerialAPI():
                     self.ser_nano = serial.Serial(self.configs.SERIAL_PORT_NANO, self.configs.BAUD_RATE_NANO, timeout=1)
                 
                 self.connection_start_time = time.time()
+                self.servo_positions = self.servo_pos_init.copy()
                 
                 is_connected = True
                 error_msg = None
@@ -67,8 +69,16 @@ class SerialAPI():
         return is_connected, error_msg
         
     def servo_command(self, servo_index, degree):
-        command = f"moveServo {servo_index} {degree}"
+        if isinstance(servo_index, list):
+            for idx, deg in zip(servo_index, degree):
+                self.servo_positions[idx] = int(deg)
+        
+        else:
+            self.servo_positions[servo_index] = int(degree)
+        
+        command = f"moveServos {' '.join(map(str, self.servo_positions))}"
         print(command)
+        
         with self.serial_lock:
             try:
                 if self.ser_uno and self.ser_uno.is_open:
@@ -77,10 +87,10 @@ class SerialAPI():
                 self.gui.append_output(f"Error writing to serial port: {e}")
     
     def reset_servos(self):
-        default_degrees = self.configs.SERVO_START_ANGLES
+        default_pos = self.servo_pos_init.copy()
+        servo_indices = list(range(self.configs.NUM_SERVOS))
         
-        for servo_index, degree in enumerate(default_degrees):
-            self.servo_command(servo_index, degree)
+        self.servo_command(servo_indices, default_pos)
                 
     def read_uno(self):
         if not (self.ser_uno and self.ser_uno.is_open and self.ser_uno.in_waiting > 0):
@@ -106,10 +116,10 @@ class SerialAPI():
             if (not data_line) or debug_on:
                 # Process non-data line
                 
-                self.gui.append_output(line)
+                self.gui.append_output(line, 'UNO')
     
         except serial.SerialException as e:
-            self.gui.append_output(f"Serial error with Uno: {e}")
+            self.gui.append_output(f"Serial error with UNO: {e}")
             self.toggle_connection()
     
         except Exception as e:
@@ -130,19 +140,20 @@ class SerialAPI():
                 
                 data = line[1:]
                 values = list(map(float, data.split(',')))
+                num_values = len(values)
                 
-                if len(values) != self.configs.NUM_SERVOS:
+                if num_values != self.configs.NUM_SERVOS:
                     raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from NANO knobs, but got {len(values)}")
                 
-                for servo_index, value in enumerate(values):
-                    degree = self.knob_to_degree(value, servo_index)
-                    self.servo_command(servo_index, degree)
+                indices = list(range(num_values))
+                degrees = [self.knob_to_degree(val, idx) for val, idx in zip(values, indices)]
+                self.servo_command(indices, degrees)
                     
             
             if (not data_line) or debug_on:
                 # Process non-data line
                 
-                self.gui.append_output(line)
+                self.gui.append_output(line, 'NANO')
     
         except serial.SerialException as e:
             self.gui.append_output(f"Serial error with NANO: {e}")

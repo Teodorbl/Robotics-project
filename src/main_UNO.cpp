@@ -21,15 +21,15 @@ int servoAngles[NUM_SERVOS] = {
     SERVO_START_ANGLES[4] 
 };
 
-// Servo names stored in PROGMEM to save SRAM
-const char servoName0[] PROGMEM = "base";
-const char servoName1[] PROGMEM = "shoulder";
-const char servoName2[] PROGMEM = "elbow";
-const char servoName3[] PROGMEM = "wrist";
-const char servoName4[] PROGMEM = "claw";
-const char* const servoNames[NUM_SERVOS] PROGMEM = {
-    servoName0, servoName1, servoName2, servoName3, servoName4
-};
+// // Servo names stored in PROGMEM to save SRAM
+// const char servoName0[] PROGMEM = "base";
+// const char servoName1[] PROGMEM = "shoulder";
+// const char servoName2[] PROGMEM = "elbow";
+// const char servoName3[] PROGMEM = "wrist";
+// const char servoName4[] PROGMEM = "claw";
+// const char* const servoNames[NUM_SERVOS] PROGMEM = {
+//     servoName0, servoName1, servoName2, servoName3, servoName4
+// };
 
 // Define baud rate constant
 const uint32_t BAUD_RATE_UNO = 115200;
@@ -38,7 +38,7 @@ const uint32_t BAUD_RATE_UNO = 115200;
 void TaskSerialCommand(void* pvParameters);
 void TaskServoFeedback(void* pvParameters);
 uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex);
-int findServoIndex(const char* name);
+//int findServoIndex(const char* name);
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
     while (1);
@@ -120,72 +120,93 @@ void TaskSerialCommand(void* pvParameters) {
     char inputBuffer[BUFFER_SIZE];
     uint8_t index = 0;
     char c;
+    char latestCommand[BUFFER_SIZE] = {0};  // Buffer to store the latest complete command
 
-    Serial.println("TaskSerialControl started. Awaiting commands...");
+    //Serial.println("TaskSerialCommand started. Awaiting 'moveServos' commands...");
 
     // Define TickType_t for task timing
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xFrequency = pdMS_TO_TICKS(100); // 100 ms interval
+    const TickType_t xInterval = pdMS_TO_TICKS(100); // 100 ms interval
 
     for (;;) {
-        // Process all available serial input
+        // Read all available serial data
         while (Serial.available() > 0) {
             c = Serial.read();
 
             // Check for end of line
             if (c == '\n' || c == '\r') {
-                if (index == 0) {
-                    // Empty input; ignore
-                    continue;
-                }
-                inputBuffer[index] = '\0';  // Null-terminate the string
+                if (index > 0) {
+                    inputBuffer[index] = '\0';  // Null-terminate the string
 
-                // Parse the command
-                int servoIndex, degree;
-                // Expecting format: "moveServo [servoIndex] [degree]"
-                if (sscanf(inputBuffer, "moveServo %d %d", &servoIndex, &degree) == 2) {
-                    // Validate servoIndex
-                    if (servoIndex < 0 || servoIndex >= NUM_SERVOS) {
-                        Serial.println("Error: Invalid servo index.");
-                    }
-                    // Validate degree
-                    else if (degree < SERVO_MIN_ANGLES[servoIndex] || degree > SERVO_MAX_ANGLES[servoIndex]) {
-                        Serial.println("Error: Degree out of range.");
-                    }
-                    else {
-                        // Convert degree to pulse width
-                        uint16_t pulseWidth = degreeToPulseWidth(degree, servoIndex);
+                    // Store the latest complete command
+                    strncpy(latestCommand, inputBuffer, BUFFER_SIZE - 1);
+                    latestCommand[BUFFER_SIZE - 1] = '\0';  // Ensure null-termination
 
-                        // Update servo angle
-                        pwm.setPWM(servoIndex, 0, pulseWidth);
-                        Serial.print("Moved servo ");
-                        Serial.print(servoIndex);
-                        Serial.print(" to ");
-                        Serial.print(degree);
-                        Serial.println(" degrees.");
-                    }
+                    // Reset buffer index for next input
+                    index = 0;
                 }
-                else {
-                    Serial.println("Error: Invalid command format. Use 'moveServo [servoIndex] [degree]'.");
-                }
-
-                // Reset buffer index for next input
-                index = 0;
             }
             else {
+                // Overwrite buffer to keep only the latest data
                 if (index < (BUFFER_SIZE - 1)) {
                     inputBuffer[index++] = c;
                 }
                 else {
-                    // Buffer overflow attempt
-                    Serial.println("Error: Input buffer overflow.");
-                    index = 0;  // Reset index
+                    // Buffer full, shift left to discard oldest character
+                    memmove(inputBuffer, inputBuffer + 1, BUFFER_SIZE - 2);
+                    inputBuffer[BUFFER_SIZE - 2] = c;
+                    inputBuffer[BUFFER_SIZE - 1] = '\0';
                 }
             }
         }
 
+        // After reading all data, process only the latest complete command
+        if (strlen(latestCommand) > 0) {
+            // Check if the command starts with "moveServos"
+            if (strncmp(latestCommand, "moveServos", strlen("moveServos")) == 0) {
+                int servoValues[NUM_SERVOS];
+                // Parse the command with five degree values
+                int parsed = sscanf(latestCommand, "moveServos %d %d %d %d %d",
+                                    &servoValues[0],
+                                    &servoValues[1],
+                                    &servoValues[2],
+                                    &servoValues[3],
+                                    &servoValues[4]);
+                if (parsed == NUM_SERVOS) {
+                    bool valid = true;
+                    // Validate each servo index and degree
+                    for (int i = 0; i < NUM_SERVOS; i++) {
+                        if (servoValues[i] < SERVO_MIN_ANGLES[i] || servoValues[i] > SERVO_MAX_ANGLES[i]) {
+                            //Serial.print("Error: Degree out of range for servo ");
+                            //Serial.println(i);
+                            valid = false;
+                            break;
+                        }
+                    }
+
+                    if (valid) {
+                        // Convert degrees to pulse widths and set PWM for each servo
+                        for (int i = 0; i < NUM_SERVOS; i++) {
+                            uint16_t pulseWidth = degreeToPulseWidth(servoValues[i], i);
+                            pwm.setPWM(i, 0, pulseWidth);
+                        }
+                        //Serial.println("Moved all servos to specified degrees.");
+                    }
+                }
+                else {
+                    //Serial.println("Error: Invalid command format. Use 'moveServos [value0] [value1] [value2] [value3] [value4]'.");
+                }
+            }
+            else {
+                //Serial.println("Error: Unknown command. Use 'moveServos [value0] [value1] [value2] [value3] [value4]'.");
+            }
+
+            // Clear the latestCommand buffer after processing
+            latestCommand[0] = '\0';
+        }
+
         // Wait for the next tick to maintain consistent timing
-        vTaskDelayUntil(&xLastWakeTime, xFrequency);
+        xTaskDelayUntil(&xLastWakeTime, xInterval);
     }
 }
 
@@ -198,6 +219,9 @@ void TaskServoFeedback(void* pvParameters) {
     uint16_t analogValues[numFeedbackPins];
     uint16_t degrees[numFeedbackPins];
     uint16_t servo5Feedback = 0;  // Variable to store fifth servo feedback
+
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t xInterval = pdMS_TO_TICKS(100); // 100 ms interval
 
     for (;;) {
         // Read analog inputs for the first four servos
@@ -225,7 +249,7 @@ void TaskServoFeedback(void* pvParameters) {
         Serial.println(dataString);
 
         // Delay for 100 ms before next reading
-        vTaskDelay(pdMS_TO_TICKS(100));
+        xTaskDelayUntil(&xLastWakeTime, xInterval);
     }
 }
 
@@ -241,14 +265,14 @@ uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex) {
     return map(degree, 0, 180, SERVO_MIN_PULSE_WIDTH, SERVO_MAX_PULSE_WIDTH);
 }
 
-// Function to find servo index based on name
-int findServoIndex(const char* name) {
-    char storedName[20];
-    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-        strcpy_P(storedName, (char*)pgm_read_word(&(servoNames[i])));
-        if (strcasecmp(storedName, name) == 0) {
-            return i;
-        }
-    }
-    return -1;  // Not found
-}
+// // Function to find servo index based on name
+// int findServoIndex(const char* name) {
+//     char storedName[20];
+//     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+//         strcpy_P(storedName, (char*)pgm_read_word(&(servoNames[i])));
+//         if (strcasecmp(storedName, name) == 0) {
+//             return i;
+//         }
+//     }
+//     return -1;  // Not found
+// }
