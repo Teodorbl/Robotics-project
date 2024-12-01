@@ -225,10 +225,10 @@ class Window():
         uno_tab_widget.setLayout(uno_tab_layout)
 
         # UNO Output Display
-        uno_output_display = QtWidgets.QTextEdit()
-        uno_output_display.setReadOnly(True)
-        uno_output_display.setPlaceholderText("UNO Monitor...")
-        uno_tab_layout.addWidget(uno_output_display)
+        self.uno_output_display = QtWidgets.QTextEdit()
+        self.uno_output_display.setReadOnly(True)
+        self.uno_output_display.setPlaceholderText("UNO Monitor...")
+        uno_tab_layout.addWidget(self.uno_output_display)
 
         # UNO Command Input Field
         self.uno_command_input = QtWidgets.QLineEdit()
@@ -252,10 +252,10 @@ class Window():
         nano_tab_widget.setLayout(nano_tab_layout)
 
         # NANO Output Display
-        nano_output_display = QtWidgets.QTextEdit()
-        nano_output_display.setReadOnly(True)
-        nano_output_display.setPlaceholderText("NANO Monitor...")
-        nano_tab_layout.addWidget(nano_output_display)
+        self.nano_output_display = QtWidgets.QTextEdit()
+        self.nano_output_display.setReadOnly(True)
+        self.nano_output_display.setPlaceholderText("NANO Monitor...")
+        nano_tab_layout.addWidget(self.nano_output_display)
 
         # Add the NANO tab to the terminal tabs
         terminal_tabs.addTab(nano_tab_widget, "NANO Monitor")

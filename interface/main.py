@@ -1,7 +1,7 @@
 import atexit
 import signal
 import sys
-from pyqtgraph.Qt.QtWidgets import QApplication
+
 
 import backend.configs as configs
 from backend.serial_api import SerialAPI

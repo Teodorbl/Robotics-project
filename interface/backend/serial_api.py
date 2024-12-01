@@ -151,7 +151,7 @@ class SerialAPI():
         raw_knob = max(knob_min, min(raw_knob, knob_max))
 
         # Linear mapping from raw value to degree
-        degree = ((knob_max - raw_knob) / (knob_max - knob_min)) * (degree_max - degree_max) + degree_min
+        degree = ((knob_max - raw_knob) / (knob_max - knob_min)) * (degree_max - degree_min) + degree_min
         return int(degree)
     
     def close(self):

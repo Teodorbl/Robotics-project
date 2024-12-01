@@ -33,11 +33,9 @@ class GUI():
         self.window = Window(self, self.configs)
         
         # Init GUI event poller
-        timer = QTimer()
-        timer.timeout.connect(self.GUI_poll)
-        timer.start(polling_interval)
-        
-        
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.GUI_poll)
+        self.timer.start(polling_interval)
         
     def GUI_poll(self):
         self.serial_api.read_uno()
