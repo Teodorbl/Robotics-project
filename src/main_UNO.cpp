@@ -9,6 +9,9 @@
 // Servo driver instance
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
+#define BUFFER_SIZE 50
+#define COMMAND_PREFIX "moveServo"
+
 // Update the initial servo angles using ServoConfig.h
 int servoAngles[NUM_SERVOS] = { 
     SERVO_START_ANGLES[0], 
@@ -32,7 +35,7 @@ const char* const servoNames[NUM_SERVOS] PROGMEM = {
 const uint32_t BAUD_RATE_UNO = 115200;
 
 // Function prototypes
-void TaskSerialControl(void* pvParameters);
+void TaskSerialCommand(void* pvParameters);
 void TaskServoFeedback(void* pvParameters);
 uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex);
 int findServoIndex(const char* name);
@@ -67,8 +70,8 @@ void setup() {
     // Create the Serial Control Task
     BaseType_t xReturned;
     xReturned = xTaskCreate(
-        TaskSerialControl,   // Task function
-        "SerialCtrl",        // Task name
+        TaskSerialCommand,   // Task function
+        "SerialCommand",     // Task name
         256,                 // Stack size in words (adjusted for input buffering)
         NULL,                // Task parameter
         1,                   // Task priority
@@ -110,76 +113,79 @@ void loop() {
     // Empty. All work is done in tasks.
 }
 
-// Task to handle serial input and control servos
-void TaskSerialControl(void* pvParameters) {
+// Task for reading servo position commands
+void TaskSerialCommand(void* pvParameters) {
     (void) pvParameters;
 
-    const uint8_t bufferSize = 50;
-    char inputBuffer[bufferSize];
+    char inputBuffer[BUFFER_SIZE];
     uint8_t index = 0;
     char c;
 
-    //Serial.println("TaskSerialControl started. Awaiting commands...");
+    Serial.println("TaskSerialControl started. Awaiting commands...");
+
+    // Define TickType_t for task timing
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t xFrequency = pdMS_TO_TICKS(100); // 100 ms interval
 
     for (;;) {
-        if (Serial.available() > 0) {
-            // Read characters until end of line
-            while (Serial.available() > 0) {
-                c = Serial.read();
+        // Process all available serial input
+        while (Serial.available() > 0) {
+            c = Serial.read();
 
-                // Check for end of line
-                if (c == '\n' || c == '\r') {
-                    if (index == 0) {
-                        // Empty input
-                        continue;
+            // Check for end of line
+            if (c == '\n' || c == '\r') {
+                if (index == 0) {
+                    // Empty input; ignore
+                    continue;
+                }
+                inputBuffer[index] = '\0';  // Null-terminate the string
+
+                // Parse the command
+                int servoIndex, degree;
+                // Expecting format: "moveServo [servoIndex] [degree]"
+                if (sscanf(inputBuffer, "moveServo %d %d", &servoIndex, &degree) == 2) {
+                    // Validate servoIndex
+                    if (servoIndex < 0 || servoIndex >= NUM_SERVOS) {
+                        Serial.println("Error: Invalid servo index.");
                     }
-                    inputBuffer[index] = '\0';  // Null-terminate the string
-                    index = 0;  // Reset index for next input
-
-                    //Serial.print("Received: ");
-                    //Serial.println(inputBuffer);
-
-                    // Parse the command
-                    char servoName[20];
-                    int degree;
-                    if (sscanf(inputBuffer, "%19s %d", servoName, &degree) == 2) {
-                        // Find servo index
-                        int servoIndex = findServoIndex(servoName);
-                        if (servoIndex == -1) {
-                            //Serial.println("Error: Invalid servo name.");
-                            continue;
-                        }
-
-                        // Validate degree using ServoConfig limits
-                        if (degree < SERVO_MIN_ANGLES[servoIndex] || degree > SERVO_MAX_ANGLES[servoIndex]) {
-                            //Serial.println("Error: Degree out of range.");
-                            continue;
-                        }
+                    // Validate degree
+                    else if (degree < SERVO_MIN_ANGLES[servoIndex] || degree > SERVO_MAX_ANGLES[servoIndex]) {
+                        Serial.println("Error: Degree out of range.");
+                    }
+                    else {
+                        // Convert degree to pulse width
+                        uint16_t pulseWidth = degreeToPulseWidth(degree, servoIndex);
 
                         // Update servo angle
-                        servoAngles[servoIndex] = (uint8_t)degree;
-                        uint16_t pulseWidth = degreeToPulseWidth(servoAngles[servoIndex], servoIndex);  // Pass servo index
                         pwm.setPWM(servoIndex, 0, pulseWidth);
-                        // Serial.print("Moved servo ");
-                        // Serial.print(servoName);
-                        // Serial.print(" to ");
-                        // Serial.print(pulseWidth);
-                        // Serial.println(" PWM width.");
-                    } else {
-                        //Serial.println("Error: Invalid command format. Use '[servoName] [degrees]'.");
+                        Serial.print("Moved servo ");
+                        Serial.print(servoIndex);
+                        Serial.print(" to ");
+                        Serial.print(degree);
+                        Serial.println(" degrees.");
                     }
-                } else {
-                    if (index < (bufferSize - 1)) {
-                        inputBuffer[index++] = c;
-                    } else {
-                        // Buffer overflow attempt
-                        //Serial.println("Error: Input buffer overflow.");
-                        index = 0;  // Reset index
-                    }
+                }
+                else {
+                    Serial.println("Error: Invalid command format. Use 'moveServo [servoIndex] [degree]'.");
+                }
+
+                // Reset buffer index for next input
+                index = 0;
+            }
+            else {
+                if (index < (BUFFER_SIZE - 1)) {
+                    inputBuffer[index++] = c;
+                }
+                else {
+                    // Buffer overflow attempt
+                    Serial.println("Error: Input buffer overflow.");
+                    index = 0;  // Reset index
                 }
             }
         }
-        vTaskDelay(pdMS_TO_TICKS(10));  // Yield to other tasks
+
+        // Wait for the next tick to maintain consistent timing
+        vTaskDelayUntil(&xLastWakeTime, xFrequency);
     }
 }
 
