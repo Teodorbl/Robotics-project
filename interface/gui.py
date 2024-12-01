@@ -361,15 +361,24 @@ def setup_gui(serial_handler: SerialHandler, config: dict):
                 serial_handler.process_incoming_data(line, append_output)
             else:
                 append_output(f"Unexpected data type: {type(line)}", 'SYSTEM')
-
-    # Timer to update plots and handle serial data
-    timer = QtCore.QTimer()
-    timer.timeout.connect(update)
-    timer.start(100)  # Update every 100 ms
-
-    # --------------------------------------------
-    # Function to Handle Parsed Servo Data
-    # --------------------------------------------
+    
+    def update_plots():
+        while not serial_handler.data_queue.empty():
+            data = serial_handler.data_queue.get()
+            if isinstance(data, list) and len(data) == NUM_SERVOS:
+                current_time = time.time() - connection_start_time
+                for i in range(NUM_SERVOS):
+                    voltage = data[i]
+                    data_buffers[i].append((current_time, voltage))
+                    # Ensure there are enough data points
+                    if len(data_buffers[i]) > 100:
+                        data_buffers[i].pop(0)
+                    times, voltages = zip(*data_buffers[i])
+                    curves[i].setData(times, voltages)
+                    # Update current value label
+                    labels[i].setText(f"{SERVO_NAMES[i]}: {voltage:.2f} V")
+            else:
+                append_output(f"Received invalid data: {data}", 'GUI')
 
     def poll_parsed_data():
         while not serial_handler.parsed_data_queue.empty():
@@ -387,10 +396,29 @@ def setup_gui(serial_handler: SerialHandler, config: dict):
             except queue.Empty:
                 pass  # No more data to process
 
+    timer = QtCore.QTimer()
+    timer.timeout.connect(update)
+    timer.timeout.connect(poll_parsed_data)
+    timer.timeout.connect(update_plots)
+    timer.start(100)  # Update every 100 ms
+
+    # Remove or comment out the following redundant timer setups
+    # poll_timer = QtCore.QTimer()
+    # poll_timer.timeout.connect(poll_serial_data)
+    # poll_timer.start(100)  # Poll every 100 ms
+
+    # plot_timer = QtCore.QTimer()
+    # plot_timer.timeout.connect(update_plots)
+    # plot_timer.start(100)  # Update every 100 ms
+
+    # --------------------------------------------
+    # Function to Handle Parsed Servo Data
+    # --------------------------------------------
+
     # Set up a QTimer to poll the parsed_data_queue every 100 ms
-    poll_timer = QtCore.QTimer()
-    poll_timer.timeout.connect(poll_parsed_data)
-    poll_timer.start(100)  # Poll every 100 ms
+    # poll_timer = QtCore.QTimer()
+    # poll_timer.timeout.connect(poll_parsed_data)
+    # poll_timer.start(100)  # Poll every 100 ms
 
     # --------------------------------------------
     # Signal Handling for Graceful Exit
@@ -443,9 +471,9 @@ def setup_gui(serial_handler: SerialHandler, config: dict):
                 pass  # No more data to process
 
     # Set up a QTimer to poll the queue every 100 ms
-    poll_timer = QtCore.QTimer()
-    poll_timer.timeout.connect(poll_serial_data)
-    poll_timer.start(100)  # Poll every 100 ms
+    # poll_timer = QtCore.QTimer()
+    # poll_timer.timeout.connect(poll_serial_data)
+    # poll_timer.start(100)  # Poll every 100 ms
 
     # Close serial ports gracefully on application exit
     def close_event():
@@ -455,28 +483,12 @@ def setup_gui(serial_handler: SerialHandler, config: dict):
 
     main_window.closeEvent = lambda event: (close_event(), event.accept())
 
-    def update_plots():
-        while not serial_handler.data_queue.empty():
-            data = serial_handler.data_queue.get()
-            if isinstance(data, list) and len(data) == NUM_SERVOS:
-                current_time = time.time() - connection_start_time
-                for i in range(NUM_SERVOS):
-                    voltage = data[i]
-                    data_buffers[i].append((current_time, voltage))
-                    # Ensure there are enough data points
-                    if len(data_buffers[i]) > 100:
-                        data_buffers[i].pop(0)
-                    times, voltages = zip(*data_buffers[i])
-                    curves[i].setData(times, voltages)
-                    # Update current value label
-                    labels[i].setText(f"{SERVO_NAMES[i]}: {voltage:.2f} V")
-            else:
-                append_output(f"Received invalid data: {data}", 'GUI')
+
 
     # Timer to periodically call update_plots
-    plot_timer = QtCore.QTimer()
-    plot_timer.timeout.connect(update_plots)
-    plot_timer.start(100)  # Update every 100 ms
+    # plot_timer = QtCore.QTimer()
+    # plot_timer.timeout.connect(update_plots)
+    # plot_timer.start(100)  # Update every 100 ms
 
 # --------------------------------------------
 # Custom Time Axis for Displaying mm:ss
