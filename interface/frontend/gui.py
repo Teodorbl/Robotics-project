@@ -10,7 +10,7 @@ from frontend.window import Window
 
 class GUI():
     def __init__(self, configs, serial_api):
-        print("-- GUI init --")
+        #print("-- GUI init --")
         
         polling_interval = 100     # ms
         
@@ -40,27 +40,27 @@ class GUI():
         self.timer.timeout.connect(self.GUI_poll)
         self.timer.start(polling_interval)
         
-        print("GUI initialized.")
+        #print("GUI initialized.")
         
     def GUI_poll(self):
         # Process UNO data
         while not self.serial_api.uno_queue.empty():
-            print("Processing UNO data from queue.")
+            #print("Processing UNO data from queue.")
             values = self.serial_api.uno_queue.get()
             self.plot_servo_pos(values)
         # Process NANO data
         while not self.serial_api.nano_queue.empty():
-            print("Processing NANO data from queue.")
+            #print("Processing NANO data from queue.")
             values = self.serial_api.nano_queue.get()
             if self.knob_mode:
                 for servo_index, raw_knob_value in enumerate(values):
                     degree = self.serial_api.knob_to_degree(raw_knob_value, servo_index)
                     self.serial_api.servo_command(servo_index, degree)
         # Optionally, process any messages or errors
-        print("GUI_poll completed.")
+        #print("GUI_poll completed.")
 
     def append_output(self, text, device=None):
-        print(f"{device}: {text}")
+        #print(f"{device}: {text}")
         
         if device == 'UNO':
             self.window.uno_output_display.append(text)
@@ -197,7 +197,10 @@ class GUI():
     
     def close(self):
         # Close the main window
-        self.window.main_window.close()
+        try:
+            self.window.main_window.close()
+        except Exception as e:
+            print(f"Could not close main window. Error: {e}")
 
 
 

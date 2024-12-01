@@ -9,7 +9,7 @@ if TYPE_CHECKING:
 
 class SerialAPI():
     def __init__(self, configs):
-        print("-- SerialAPI init --")
+        #print("-- SerialAPI init --")
         self.configs = configs
         self.gui: GUIType = None
         
@@ -33,19 +33,19 @@ class SerialAPI():
         self.read_interval = 0.01
         
         
-        print("SerialAPI initialized.")
+        #print("SerialAPI initialized.")
     
     def toggle_connection(self):
-        print("Toggling connection...")
+        #print("Toggling connection...")
         if self.ser_uno and self.ser_uno.is_open and self.ser_nano and self.ser_nano.is_open:
-            print("Disconnecting serial connections...")
+            #print("Disconnecting serial connections...")
             # Disconnect both
             with self.serial_lock:
                 self.ser_uno.close()
                 self.ser_nano.close()
                 self.ser_uno = None
                 self.ser_nano = None
-            print("Serial connections disconnected.")
+            #print("Serial connections disconnected.")
             # Stop the threads
             self.uno_thread_running = False
             self.nano_thread_running = False
@@ -54,26 +54,26 @@ class SerialAPI():
             error_msg = None
 
         else:
-            print("Connecting to serial ports...")
+            #print("Connecting to serial ports...")
             # Connect both
             try:
                 with self.serial_lock:
-                    print(f"Opening UNO serial port {self.configs.SERIAL_PORT_UNO}...")
+                    #print(f"Opening UNO serial port {self.configs.SERIAL_PORT_UNO}...")
                     self.ser_uno = serial.Serial(self.configs.SERIAL_PORT_UNO, self.configs.BAUD_RATE_UNO, timeout=1)
-                    print("UNO serial port opened.")
-                    print(f"Opening NANO serial port {self.configs.SERIAL_PORT_NANO}...")
+                    #print("UNO serial port opened.")
+                    #print(f"Opening NANO serial port {self.configs.SERIAL_PORT_NANO}...")
                     self.ser_nano = serial.Serial(self.configs.SERIAL_PORT_NANO, self.configs.BAUD_RATE_NANO, timeout=1)
-                    print("NANO serial port opened.")
+                    #print("NANO serial port opened.")
 
                 # Start the threads
-                print("Starting serial read threads...")
+                #print("Starting serial read threads...")
                 self.uno_thread_running = True
                 self.nano_thread_running = True
                 self.uno_thread = threading.Thread(target=self.read_uno_thread)
                 self.nano_thread = threading.Thread(target=self.read_nano_thread)
                 self.uno_thread.start()
                 self.nano_thread.start()
-                print("Serial read threads started.")
+                #print("Serial read threads started.")
                 # Record the connection start time
                 self.connection_start_time = time.time()
                 
@@ -84,15 +84,16 @@ class SerialAPI():
                 with self.serial_lock:
                     self.ser_uno = None
                     self.ser_nano = None
-                print(f"Serial connection failed: {e}")
+                #print(f"Serial connection failed: {e}")
                 is_connected = False
                 error_msg = f"{e}"
         
-        print("toggle_connection completed.")
+        #print("toggle_connection completed.")
         return is_connected, error_msg
         
     def servo_command(self, servo_index, degree):
         command = f"moveServo {servo_index} {degree}"
+        print(f"Command: {command}")
         with self.serial_lock:
             try:
                 if self.ser_uno and self.ser_uno.is_open:
@@ -101,48 +102,48 @@ class SerialAPI():
                 self.gui.append_output(f"Error writing to serial port: {e}")
                 
     def read_uno_thread(self):
-        print("UNO thread started.")
+        #print("UNO thread started.")
         while self.uno_thread_running:
             try:
                 if self.ser_uno and self.ser_uno.is_open:
-                    print("Reading from UNO...")
+                    #print("Reading from UNO...")
                     line = self.ser_uno.readline().decode('utf-8').strip()
                     if line:
-                        print(f"UNO received: {line}")
+                        #print(f"UNO received: {line}")
                         # Parse the line here
                         self.parse_uno_line(line)
                 time.sleep(self.read_interval)  # Sleep briefly to prevent a tight loop
             except serial.SerialException as e:
-                print(f"Exception in UNO thread: {e}")
+                #print(f"Exception in UNO thread: {e}")
                 self.gui.append_output(f"Serial error with Uno: {e}")
                 self.uno_thread_running = False
                 self.toggle_connection()
             except Exception as e:
-                print(f"Exception in UNO thread: {e}")
+                #print(f"Exception in UNO thread: {e}")
                 self.gui.append_output(f"Error during read of UNO serial: {e}")
-        print("UNO thread exiting.")
+        #print("UNO thread exiting.")
 
     def read_nano_thread(self):
-        print("NANO thread started.")
+        #print("NANO thread started.")
         while self.nano_thread_running:
             try:
                 if self.ser_nano and self.ser_nano.is_open:
-                    print("Reading from NANO...")
+                    #print("Reading from NANO...")
                     line = self.ser_nano.readline().decode('utf-8').strip()
                     if line:
-                        print(f"NANO received: {line}")
+                        #print(f"NANO received: {line}")
                         # Parse the line here
                         self.parse_nano_line(line)
                 time.sleep(self.read_interval)  # Sleep briefly to prevent a tight loop
             except serial.SerialException as e:
-                print(f"Exception in NANO thread: {e}")
+                #print(f"Exception in NANO thread: {e}")
                 self.gui.append_output(f"Serial error with Nano: {e}")
                 self.nano_thread_running = False
                 self.toggle_connection()
             except Exception as e:
-                print(f"Exception in NANO thread: {e}")
+                #print(f"Exception in NANO thread: {e}")
                 self.gui.append_output(f"Error during read of NANO serial: {e}")
-        print("NANO thread exiting.")
+        #print("NANO thread exiting.")
 
     def parse_uno_line(self, line):
         data_line = line.startswith('>')
@@ -215,12 +216,18 @@ class SerialAPI():
         self.uno_thread_running = False
         self.nano_thread_running = False
         
-        if self.ser_uno and self.ser_uno.is_open:
-            with self.serial_lock:
-                self.ser_uno.close()
-                
-        if self.ser_nano and self.ser_nano.is_open:
-            with self.serial_lock:
-                self.ser_nano.close()
+        try:
+            if self.ser_uno and self.ser_uno.is_open:
+                with self.serial_lock:
+                    self.ser_uno.close()
+        except Exception as e:
+            print(f"Could not close UNO serial. Error: {e}")
+        
+        try:    
+            if self.ser_nano and self.ser_nano.is_open:
+                with self.serial_lock:
+                    self.ser_nano.close()
+        except Exception as e:
+            print(f"Could not close NANO serial. Error: {e}")
 
 
