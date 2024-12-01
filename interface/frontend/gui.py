@@ -32,18 +32,36 @@ class GUI():
         # Init window
         self.window = Window(self, self.configs)
         
+        # Associate GUI with serial_api
+        self.serial_api.gui = self
+        
         # Init GUI event poller
-        timer = QTimer()
-        timer.timeout.connect(self.GUI_poll)
-        timer.start(polling_interval)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.GUI_poll)
+        self.timer.start(polling_interval)
         
-        
+        print("GUI initialized.")
         
     def GUI_poll(self):
-        self.serial_api.read_uno()
-        self.serial_api.read_nano()
+        # Process UNO data
+        while not self.serial_api.uno_queue.empty():
+            print("Processing UNO data from queue.")
+            values = self.serial_api.uno_queue.get()
+            self.plot_servo_pos(values)
+        # Process NANO data
+        while not self.serial_api.nano_queue.empty():
+            print("Processing NANO data from queue.")
+            values = self.serial_api.nano_queue.get()
+            if self.knob_mode:
+                for servo_index, raw_knob_value in enumerate(values):
+                    degree = self.serial_api.knob_to_degree(raw_knob_value, servo_index)
+                    self.serial_api.servo_command(servo_index, degree)
+        # Optionally, process any messages or errors
+        print("GUI_poll completed.")
 
-    def append_output(self, text, device='UNO'):
+    def append_output(self, text, device=None):
+        print(f"{device}: {text}")
+        
         if device == 'UNO':
             self.window.uno_output_display.append(text)
         elif device == 'NANO':
@@ -52,15 +70,15 @@ class GUI():
             self.window.uno_output_display.append(text)
             self.window.nano_output_display.append(text)
     
-    def plot_servo_pos(self, values):   
+    def plot_servo_pos(self, values):
         current_time = time.time() - self.serial_api.connection_start_time
             
         for i in range(self.configs.NUM_SERVOS):
             voltage = values[i]
             self.servo_pos_buffers[i].append((current_time, voltage))
             
-            # Update plot data
-            times, voltages = zip(*self.gui.servo_pos_buffers[i][-100:])
+            # Corrected line: Use self.servo_pos_buffers instead of self.gui.servo_pos_buffers
+            times, voltages = zip(*self.servo_pos_buffers[i][-100:])
             self.window.curves[i].setData(times, voltages)
             
             # Update current value label
@@ -135,7 +153,7 @@ class GUI():
     
     def slider_changed(self, servo_index, degree):
         # Function to handle slider changes with inversion
-        if self.knobs:
+        if self.knob_mode:
             # In Follow Mode, do not send commands from sliders
             return
         
@@ -148,8 +166,8 @@ class GUI():
         except Exception as e:
             self.append_output(f"Error sending command to {servo_name}: {e}", 'UNO')
             
-    def reset_sliders(self, on_exit=False):
-        if self.knob_mode and (not on_exit):
+    def reset_sliders(self):
+        if self.knob_mode:
             self.append_output("Must be in slider mode to reset sliders")
             return
         
@@ -178,9 +196,8 @@ class GUI():
                 self.append_output(f"Error sending command to {servo_name}: {e}", 'UNO')
     
     def close(self):
-        # Perform necessary cleanup
-        self.serial_api.close()
-        self.window.app.quit()
+        # Close the main window
+        self.window.main_window.close()
 
 
 

@@ -8,15 +8,16 @@ from backend.serial_api import SerialAPI
 from frontend.gui import GUI
 
 def main():
+    app = QApplication(sys.argv)  # Create QApplication instance
     serial_api = SerialAPI(configs)
     gui = GUI(configs, serial_api)
     serial_api.gui = gui
     
     # On exit:
     
-    atexit.register(lambda: gui.reset_sliders(on_exit=True))
+    atexit.register(lambda: serial_api.close())
 
-    # Modify the signal_handler to call reset_servos before exiting
+    # Signal handler for graceful exit
     def signal_handler(sig, frame):
         gui.append_output("\nKeyboardInterrupt detected. Exiting gracefully...")
         gui.close()
@@ -25,7 +26,7 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     
     try:
-        sys.exit(gui.window.app.exec_())
+        sys.exit(app.exec_())  # Start event loop using app
     except SystemExit:
         pass
 
