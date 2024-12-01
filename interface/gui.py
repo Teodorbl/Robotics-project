@@ -267,15 +267,20 @@ def setup_gui(serial_handler: SerialHandler, config: dict):
     # Add Servo Control Panel to terminal layout
     terminal_layout.addWidget(servo_control_widget)
 
+    # Initialize connection_start_time
+    connection_start_time = None  # Add this line
+
     # --------------------------------------------
     # Function to Toggle Serial Connections
     # --------------------------------------------
 
     def toggle_connection():
+        nonlocal connection_start_time  # Add this line
         if serial_handler.is_connected():
             serial_handler.disconnect()
             connect_button.setText("Connect")
             append_output("Disconnected from both serial ports.")
+            connection_start_time = None  # Reset the connection start time
         else:
             try:
                 serial_handler.connect()
@@ -283,6 +288,8 @@ def setup_gui(serial_handler: SerialHandler, config: dict):
                 append_output(
                     f"Connected to Uno at {serial_handler.serial_uno.port} and Nano at {serial_handler.serial_nano.port}."
                 )
+                # Set the connection start time
+                connection_start_time = time.time()
                 # Clear data buffers upon connection
                 for buffer in data_buffers:
                     buffer.clear()
@@ -348,23 +355,42 @@ def setup_gui(serial_handler: SerialHandler, config: dict):
     # --------------------------------------------
 
     def update():
-        # Handle incoming data from serial_handler
-        serial_handler.process_incoming_data(
-            append_output=append_output,
-            update_plots=True,
-            plots=plots,
-            curves=curves,
-            labels=labels,
-            data_buffers=data_buffers,
-            debug_mode=debug_mode,
-            control_mode_follow=control_mode_follow,
-            servo_sliders=servo_sliders
-        )
+        while not serial_handler.data_queue.empty():
+            line = serial_handler.data_queue.get()
+            if isinstance(line, str):
+                serial_handler.process_incoming_data(line, append_output)
+            else:
+                append_output(f"Unexpected data type: {type(line)}", 'SYSTEM')
 
     # Timer to update plots and handle serial data
     timer = QtCore.QTimer()
     timer.timeout.connect(update)
     timer.start(100)  # Update every 100 ms
+
+    # --------------------------------------------
+    # Function to Handle Parsed Servo Data
+    # --------------------------------------------
+
+    def poll_parsed_data():
+        while not serial_handler.parsed_data_queue.empty():
+            try:
+                values = serial_handler.parsed_data_queue.get_nowait()
+                current_time = time.time()
+                for i in range(config['NUM_SERVOS']):
+                    # Append new data point
+                    data_buffers[i].append((current_time, values[i]))
+                    # Update the corresponding plot
+                    times, angles = zip(*data_buffers[i][-100:])  # Keep last 100 points
+                    curves[i].setData(times, angles)
+                    # Update the current value label
+                    labels[i].setText(f"{SERVO_NAMES[i]}: {values[i]:.2f}°")
+            except queue.Empty:
+                pass  # No more data to process
+
+    # Set up a QTimer to poll the parsed_data_queue every 100 ms
+    poll_timer = QtCore.QTimer()
+    poll_timer.timeout.connect(poll_parsed_data)
+    poll_timer.start(100)  # Poll every 100 ms
 
     # --------------------------------------------
     # Signal Handling for Graceful Exit
@@ -403,15 +429,16 @@ def setup_gui(serial_handler: SerialHandler, config: dict):
         while not serial_handler.data_queue.empty():
             try:
                 values = serial_handler.data_queue.get_nowait()
-                current_time = time.time()
-                for i in range(config['NUM_SERVOS']):
-                    # Append new data point
-                    data_buffers[i].append((current_time, values[i]))
-                    # Update the corresponding plot
-                    times, angles = zip(*data_buffers[i][-100:])  # Keep last 100 points
-                    curves[i].setData(times, angles)
-                    # Update the current value label
-                    labels[i].setText(f"{SERVO_NAMES[i]}: {values[i]:.2f}°")
+                if connection_start_time is not None:
+                    current_time = time.time() - connection_start_time  # Ensure connection_start_time is defined
+                    for i in range(config['NUM_SERVOS']):
+                        # Append new data point
+                        data_buffers[i].append((current_time, values[i]))
+                        # Update the corresponding plot
+                        times, angles = zip(*data_buffers[i][-100:])  # Keep last 100 points
+                        curves[i].setData(times, angles)
+                        # Update the current value label
+                        labels[i].setText(f"{SERVO_NAMES[i]}: {values[i]:.2f}°")
             except queue.Empty:
                 pass  # No more data to process
 
@@ -422,9 +449,34 @@ def setup_gui(serial_handler: SerialHandler, config: dict):
 
     # Close serial ports gracefully on application exit
     def close_event():
+        append_output("Closing application...")
         serial_handler.disconnect()
+        QtWidgets.QApplication.quit()
 
     main_window.closeEvent = lambda event: (close_event(), event.accept())
+
+    def update_plots():
+        while not serial_handler.data_queue.empty():
+            data = serial_handler.data_queue.get()
+            if isinstance(data, list) and len(data) == NUM_SERVOS:
+                current_time = time.time() - connection_start_time
+                for i in range(NUM_SERVOS):
+                    voltage = data[i]
+                    data_buffers[i].append((current_time, voltage))
+                    # Ensure there are enough data points
+                    if len(data_buffers[i]) > 100:
+                        data_buffers[i].pop(0)
+                    times, voltages = zip(*data_buffers[i])
+                    curves[i].setData(times, voltages)
+                    # Update current value label
+                    labels[i].setText(f"{SERVO_NAMES[i]}: {voltage:.2f} V")
+            else:
+                append_output(f"Received invalid data: {data}", 'GUI')
+
+    # Timer to periodically call update_plots
+    plot_timer = QtCore.QTimer()
+    plot_timer.timeout.connect(update_plots)
+    plot_timer.start(100)  # Update every 100 ms
 
 # --------------------------------------------
 # Custom Time Axis for Displaying mm:ss

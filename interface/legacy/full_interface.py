@@ -15,7 +15,7 @@ from pyqtgraph.Qt import QtWidgets, QtCore
 import signal
 import threading
 import time
-import angle_calibration  # Import the calibration module
+import interface.legacy.angle_calibration as angle_calibration  # Import the calibration module
 import re
 import atexit
 import random

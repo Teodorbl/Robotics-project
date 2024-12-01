@@ -8,9 +8,15 @@ def main():
     
     # Initialize serial communication
     serial_handler = SerialHandler(config)
+    serial_handler.connect()  # Start the serial reading thread
     
-    # Setup and launch GUI
-    setup_gui(serial_handler, config)
+    try:
+        # Setup and launch GUI
+        setup_gui(serial_handler, config)
+    except KeyboardInterrupt:
+        print("KeyboardInterrupt received. Exiting gracefully...")
+    finally:
+        serial_handler.disconnect()
 
 if __name__ == "__main__":
     main()

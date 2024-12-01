@@ -40,7 +40,7 @@ def load_config(config_path='/Users/teodorlindell/Repos/RoboticArmFreeRTOS/inclu
                     constants[key] = value.strip().lower() == 'true'
                 elif type_.lower() in ['char*', 'const char*']:
                     constants[key] = value.strip().strip('"')
-                    
+    
     # Interface related configs
     interface_configs = {
         'SERIAL_PORT_UNO':  '/dev/cu.usbmodem11101',

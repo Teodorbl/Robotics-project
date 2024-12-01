@@ -1,7 +1,9 @@
 import serial
 import threading
 import time
-import queue  # Added import
+import queue  # Ensure queue is imported
+
+NUM_SERVOS = 5
 
 class SerialHandler:
     """
@@ -14,7 +16,9 @@ class SerialHandler:
         self.lock = threading.Lock()
         self.running = False
         self.read_thread = None
-        self.data_queue = queue.Queue()  # Added queue for servo data
+        self.data_queue = queue.Queue()  # Original queue for raw lines
+        self.parsed_data_queue = queue.Queue()  # New queue for parsed servo data
+        self.debug_mode = False  # Initialize debug_mode
 
     def connect(self):
         """
@@ -73,27 +77,18 @@ class SerialHandler:
                 pass
 
     def read_serial(self):
-        """
-        Read incoming data from serial ports.
-        """
         while self.running:
-            with self.lock:
-                if self.serial_uno and self.serial_uno.is_open and self.serial_uno.in_waiting > 0:
-                    try:
-                        line = self.serial_uno.readline().decode('utf-8').strip()
-                        if line:
-                            self.process_incoming_data(line, self.append_output)
-                    except Exception as e:
-                        self.append_output(f"Error reading UNO: {e}", 'UNO')
-
-                if self.serial_nano and self.serial_nano.is_open and self.serial_nano.in_waiting > 0:
-                    try:
-                        line = self.serial_nano.readline().decode('utf-8').strip()
-                        if line:
-                            self.process_incoming_data(line, self.append_output)
-                    except Exception as e:
-                        self.append_output(f"Error reading Nano: {e}", 'NANO')
-            time.sleep(0.05)  # Maintain 50 ms sleep
+            try:
+                if self.serial_uno and self.serial_uno.is_open and self.serial_uno.in_waiting:
+                    line = self.serial_uno.readline().decode('utf-8').strip()
+                    # Enqueue the raw line instead of the parsed list
+                    self.data_queue.put(line)
+                # ...existing code...
+            except serial.SerialException:
+                self.data_queue.put("Serial connection lost.")
+                self.disconnect()
+            except Exception as e:
+                self.data_queue.put(f"Error: {e}")
 
     def process_incoming_data(self, line: str, append_output):
         """
@@ -113,58 +108,13 @@ class SerialHandler:
                     append_output(f"Invalid number of servo values: {line}", 'UNO')
                     return
 
-                # Put the parsed values into the queue
-                self.data_queue.put(values)
+                # Put the parsed values into the parsed_data_queue
+                self.parsed_data_queue.put(values)
             except ValueError:
                 append_output(f"Failed to parse servo values: {line}", 'UNO')
         else:
             # Line is regular terminal output
             append_output(line, 'UNO' if self.debug_mode else 'SYSTEM')
-
-    def process_incoming_data(self, append_output, update_plots, plots, curves, labels, data_buffers, debug_mode, control_mode_follow, servo_sliders):
-        """
-        Process data read from serial ports and update the GUI accordingly.
-        """
-        with self.lock:
-            # Process UNO data
-            if hasattr(self, 'latest_uno_data') and self.latest_uno_data:
-                data = self.latest_uno_data
-                append_output(f"UNO: {data}", 'UNO')
-                # Example expected format: "servo_index:angle"
-                try:
-                    parts = data.split(':')
-                    if len(parts) == 2:
-                        servo_index = int(parts[0])
-                        angle = int(parts[1])
-                        if 0 <= servo_index < len(labels):
-                            labels[servo_index].setText(f"{labels[servo_index].text().split(':')[0]}: {angle}°")
-                            if update_plots:
-                                current_time = time.time()
-                                data_buffers[servo_index].append((current_time, angle))
-                                # Update plot data
-                                times, angles = zip(*data_buffers[servo_index])
-                                curves[servo_index].setData(times, angles)
-                except ValueError:
-                    append_output(f"Invalid UNO data format: {data}", 'UNO')
-                self.latest_uno_data = None  # Reset after processing
-
-            # Process NANO data
-            if hasattr(self, 'latest_nano_data') and self.latest_nano_data:
-                data = self.latest_nano_data
-                append_output(f"NANO: {data}", 'NANO')
-                # Example expected format: "servo5_feedback:angle"
-                try:
-                    parts = data.split(':')
-                    if len(parts) == 2 and parts[0] == 'servo5_feedback':
-                        servo5_angle = int(parts[1])
-                        labels[4].setText(f"{labels[4].text().split(':')[0]}: {servo5_angle}°")
-                        if update_plots:
-                            current_time = time.time()
-                            data_buffers[4].append((current_time, servo5_angle))
-                            curves[4].setData(*zip(*data_buffers[4]))
-                except ValueError:
-                    append_output(f"Invalid NANO data format: {data}", 'NANO')
-                self.latest_nano_data = None  # Reset after processing
 
     def reset_servos(self):
         """
