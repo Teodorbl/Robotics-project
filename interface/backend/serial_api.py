@@ -135,19 +135,19 @@ class SerialAPI():
             data_line = line.startswith('>')
             debug_on = self.gui.debug_mode
             
-            if data_line and self.gui.knob_mode:
-                # Process data line
+            # if data_line and self.gui.knob_mode:
+            #     # Process data line
                 
-                data = line[1:]
-                values = list(map(float, data.split(',')))
-                num_values = len(values)
+            #     data = line[1:]
+            #     values = list(map(float, data.split(',')))
+            #     num_values = len(values)
                 
-                if num_values != self.configs.NUM_SERVOS:
-                    raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from NANO knobs, but got {len(values)}")
+            #     if num_values != self.configs.NUM_SERVOS:
+            #         raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from NANO knobs, but got {len(values)}")
                 
-                indices = list(range(num_values))
-                degrees = [self.knob_to_degree(val, idx) for val, idx in zip(values, indices)]
-                self.servo_command(indices, degrees)
+            #     indices = list(range(num_values))
+            #     degrees = [self.knob_to_degree(val, idx) for val, idx in zip(values, indices)]
+            #     self.servo_command(indices, degrees)
                     
             
             if (not data_line) or debug_on:
@@ -194,5 +194,42 @@ class SerialAPI():
         if self.ser_nano and self.ser_nano.is_open:
             with self.serial_lock:
                 self.ser_nano.close()
+
+    def set_use_knobs(self, enable: bool, retries: int = 3, timeout: float = 1.0):
+        """
+        Request the Arduino to change useKnobsEnabled state.
         
+        :param enable: True to enable, False to disable useKnobsEnabled
+        :param retries: Number of retries if ACK is not received
+        :param timeout: Time to wait for ACK in seconds
+        """
+        command = "useKnobs {}\n".format(int(enable))
+        expected_ack = f"ACK: useKnobsEnabled={'true' if enable else 'false'}"
+        
+        for attempt in range(retries):
+            with self.serial_lock:
+                try:
+                    self.ser_uno.write(command.encode('utf-8'))
+                except Exception as e:
+                    self.gui.append_output(f"Error writing to UNO serial: {e}")
+                    return False
+            
+            # Wait for ACK
+            start_time = time.time()
+            while time.time() - start_time < timeout:
+                if self.ser_uno.in_waiting > 0:
+                    try:
+                        line = self.ser_uno.readline().decode('utf-8').strip()
+                        if line == expected_ack:
+                            return True
+                    except Exception as e:
+                        self.gui.append_output(f"Error reading UNO serial: {e}")
+                        break
+                time.sleep(0.1)
+            
+            self.gui.append_output(f"ACK not received for set_use_knobs attempt {attempt + 1}")
+        
+        self.gui.append_output("Failed to receive ACK after retries.")
+        return False
+
 

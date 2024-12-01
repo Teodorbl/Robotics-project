@@ -1,6 +1,7 @@
 # Own modules
 import time
 from pyqtgraph.Qt.QtCore import QTimer
+from PyQt5 import QtCore
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -124,12 +125,18 @@ class GUI():
         else:
             self.append_output("Debug Mode Disabled.")
     
-    def toggle_control_mode(self, state):
-        self.knob_mode = state
-        if self.knob_mode:
-            self.append_output("Control Mode: Potentiometers (Automatic)")
+    def toggle_knob_mode(self, state):
+        enable = state == QtCore.Qt.Checked
+        success = self.serial_api.set_use_knobs(enable)
+        
+        if not success:
+            # Reset the QCheckBox state if the command was unsuccessful
+            self.window.knob_mode_toggle.blockSignals(True)
+            self.window.knob_mode_toggle.setChecked(not enable)
+            self.window.knob_mode_toggle.blockSignals(False)
+            self.append_output("Failed to change knob mode. Please try again.")
         else:
-            self.append_output("Control Mode: Manual Sliders")
+            self.append_output(f"Knob mode {'enabled' if enable else 'disabled'} successfully.")
     
     def slider_changed(self, servo_index, degree):
         # Function to handle slider changes with inversion

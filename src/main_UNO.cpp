@@ -11,6 +11,14 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 #define BUFFER_SIZE 50
 #define COMMAND_PREFIX "moveServo"
+#define COMMAND_PREFIX_MOVE_SERVO "moveServos"
+#define COMMAND_PREFIX_USE_KNOBS "useKnobs"
+
+bool useKnobsEnabled = false;
+
+// Variables to store data from NANO
+uint16_t knobValues[NUM_SERVOS];
+uint16_t servo5Feedback = 0;
 
 // Update the initial servo angles using ServoConfig.h
 int servoAngles[NUM_SERVOS] = { 
@@ -37,6 +45,7 @@ const uint32_t BAUD_RATE_UNO = 115200;
 // Function prototypes
 void TaskSerialCommand(void* pvParameters);
 void TaskServoFeedback(void* pvParameters);
+void TaskRequestData(void* pvParameters);
 uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex);
 //int findServoIndex(const char* name);
 
@@ -102,6 +111,16 @@ void setup() {
         //Serial.println("TaskServoFeedback created successfully.");
     }
 
+    // Create the TaskRequestData
+    xTaskCreate(
+        TaskRequestData,      // Task function
+        "RequestData",        // Task name
+        128,                  // Stack size
+        NULL,                 // Task parameter
+        1,                    // Task priority
+        NULL                  // Task handle
+    );
+
     //Serial.println("Starting scheduler...");
     vTaskStartScheduler();
 
@@ -163,7 +182,7 @@ void TaskSerialCommand(void* pvParameters) {
         // After reading all data, process only the latest complete command
         if (strlen(latestCommand) > 0) {
             // Check if the command starts with "moveServos"
-            if (strncmp(latestCommand, "moveServos", strlen("moveServos")) == 0) {
+            if (strncmp(latestCommand, COMMAND_PREFIX_MOVE_SERVO, strlen(COMMAND_PREFIX_MOVE_SERVO)) == 0) {
                 int servoValues[NUM_SERVOS];
                 // Parse the command with five degree values
                 int parsed = sscanf(latestCommand, "moveServos %d %d %d %d %d",
@@ -196,8 +215,19 @@ void TaskSerialCommand(void* pvParameters) {
                 else {
                     //Serial.println("Error: Invalid command format. Use 'moveServos [value0] [value1] [value2] [value3] [value4]'.");
                 }
-            }
-            else {
+            } else if (strncmp(latestCommand, COMMAND_PREFIX_USE_KNOBS, strlen(COMMAND_PREFIX_USE_KNOBS)) == 0) {
+                int knobValue;
+                int parsed = sscanf(latestCommand, "useKnobs %d", &knobValue);
+                if (parsed == 1) {
+                    bool newState = (knobValue != 0);
+                    if (newState != useKnobsEnabled) {
+                        useKnobsEnabled = newState;
+                        // Send detailed ACK with the new state
+                        Serial.print("ACK: useKnobsEnabled=");
+                        Serial.println(useKnobsEnabled ? "true" : "false");
+                    }
+                }
+            } else {
                 //Serial.println("Error: Unknown command. Use 'moveServos [value0] [value1] [value2] [value3] [value4]'.");
             }
 
@@ -218,7 +248,8 @@ void TaskServoFeedback(void* pvParameters) {
     const uint8_t feedbackPins[numFeedbackPins] = {A0, A1, A2, A3};
     uint16_t analogValues[numFeedbackPins];
     uint16_t degrees[numFeedbackPins];
-    uint16_t servo5Feedback = 0;  // Variable to store fifth servo feedback
+    // Remove local servo5Feedback
+    // uint16_t servo5Feedback = 0;  // Variable to store fifth servo feedback
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
     const TickType_t xInterval = pdMS_TO_TICKS(100); // 100 ms interval
@@ -230,15 +261,20 @@ void TaskServoFeedback(void* pvParameters) {
             degrees[i] = analogValues[i];  // Write as voltage
         }
 
-        // Request fifth servo feedback from Nano via I2C
-        Wire.requestFrom(I2C_ADDRESS_NANO, 2);  // Request 2 bytes for uint16_t
-        if (Wire.available() >= 2) {
-            uint8_t highByte = Wire.read();
-            uint8_t lowByte = Wire.read();
-            servo5Feedback = (highByte << 8) | lowByte;
-        } else {
-            servo5Feedback = 0;  // Default or handle error
-        }
+        // Use servo5Feedback from TaskRequestData
+        // Remove independent I2C request
+        // Wire.requestFrom(I2C_ADDRESS_NANO, 2);  // Removed
+        // if (Wire.available() >= 2) {
+        //     uint8_t highByte = Wire.read();
+        //     uint8_t lowByte = Wire.read();
+        //     servo5Feedback = (highByte << 8) | lowByte;
+        // } else {
+        //     servo5Feedback = 0;  // Default or handle error
+        // }
+
+        // Use the shared servo5Feedback variable
+        // Assuming servo5Feedback is updated by TaskRequestData
+        // No need to declare a local variable
 
         // Create a comma-separated string including the fifth servo
         char dataString[40];
@@ -249,7 +285,52 @@ void TaskServoFeedback(void* pvParameters) {
         Serial.println(dataString);
 
         // Delay for 100 ms before next reading
-        xTaskDelayUntil(&xLastWakeTime, xInterval);
+        vTaskDelayUntil(&xLastWakeTime, xInterval);
+    }
+}
+
+// Create a new task to request data from NANO
+void TaskRequestData(void* pvParameters) {
+    (void) pvParameters;
+
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    const TickType_t xInterval = pdMS_TO_TICKS(100); // 100 ms interval
+
+    for (;;) {
+        // Request data from NANO via I2C
+        Wire.requestFrom(I2C_ADDRESS_NANO, NUM_SERVOS * 2 + 2); // KnobValues + servo5Feedback
+
+        // Read knob values
+        for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+            if (Wire.available() >= 2) {
+                uint8_t highByte = Wire.read();
+                uint8_t lowByte = Wire.read();
+                knobValues[i] = (highByte << 8) | lowByte;
+            }
+        }
+
+        // Read servo5Feedback
+        if (Wire.available() >= 2) {
+            uint8_t highByte = Wire.read();
+            uint8_t lowByte = Wire.read();
+            servo5Feedback = (highByte << 8) | lowByte;
+        }
+
+        // If useKnobs is enabled, move servos based on knobValues
+        if (useKnobsEnabled) {
+            for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+                // Map knob value to servo angle
+                int degree = map(knobValues[i], 32, 1023, SERVO_MAX_ANGLES[i], SERVO_MIN_ANGLES[i]);
+                servoAngles[i] = degree;
+
+                // Move servo to the new angle
+                uint16_t pulseWidth = degreeToPulseWidth(servoAngles[i], i);
+                pwm.setPWM(i, 0, pulseWidth);
+            }
+        }
+
+        // Delay for 100 ms
+        vTaskDelayUntil(&xLastWakeTime, xInterval);
     }
 }
 

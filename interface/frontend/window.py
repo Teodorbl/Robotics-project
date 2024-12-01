@@ -140,18 +140,18 @@ class Window():
         # Toggle Control Mode
         # --------------------------------------------
 
-        # Add Toggle Button for Control Mode
-        control_mode_layout = QtWidgets.QHBoxLayout()
-        terminal_layout.addLayout(control_mode_layout)
+        # Add Toggle Button for Knob Mode
+        knob_mode_layout = QtWidgets.QHBoxLayout()
+        terminal_layout.addLayout(knob_mode_layout)
 
-        control_mode_label = QtWidgets.QLabel("Control Mode:")
-        control_mode_layout.addWidget(control_mode_label)
+        knob_mode_label = QtWidgets.QLabel("Knob Mode:")
+        knob_mode_layout.addWidget(knob_mode_label)
 
-        control_mode_toggle = QtWidgets.QCheckBox("Follow Knobs")
-        control_mode_layout.addWidget(control_mode_toggle)
+        self.knob_mode_toggle = QtWidgets.QCheckBox("Follow Knobs")
+        knob_mode_layout.addWidget(self.knob_mode_toggle)
         
         # Connect the toggle button to the function
-        control_mode_toggle.stateChanged.connect(gui.toggle_control_mode)
+        self.knob_mode_toggle.stateChanged.connect(gui.toggle_knob_mode)
         
         
         # --------------------------------------------
