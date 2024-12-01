@@ -1,5 +1,13 @@
 # angle_calibration.py
 
+
+# --------------------------------------------
+# LEGACY CODE:
+# NOT TO BE EDITED OR USED
+# --------------------------------------------
+
+
+
 import csv
 import os
 import matplotlib.pyplot as plt

@@ -1,5 +1,13 @@
 # FILE:FULL_INTERFACE.PY
 
+
+# --------------------------------------------
+# LEGACY CODE:
+# NOT TO BE EDITED OR USED
+# --------------------------------------------
+
+
+
 import sys
 import serial
 import pyqtgraph as pg
@@ -10,6 +18,7 @@ import time
 import angle_calibration  # Import the calibration module
 import re
 import atexit
+import random
 
 # --------------------------------------------
 # Configuration Section
@@ -548,7 +557,8 @@ def analog_to_degree(raw, servo_index):
     raw = max(ANALOG_MIN, min(raw, ANALOG_MAX))
 
     # Linear mapping from raw value to degrees
-    degree = ((ANALOG_MAX - raw) / (ANALOG_MAX - ANALOG_MIN)) * (SERVO_MAX_ANGLES[servo_index] - SERVO_MIN_ANGLES[i]) + SERVO_MIN_ANGLES[servo_index]
+    degree = ((ANALOG_MAX - raw) / (ANALOG_MAX - ANALOG_MIN)) * (SERVO_MAX_ANGLES[servo_index] - SERVO_MIN_ANGLES[servo_index]) + SERVO_MIN_ANGLES[servo_index]
+
     return int(degree)
 
 # Read NANO serial, write to UNO serial
