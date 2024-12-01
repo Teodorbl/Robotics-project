@@ -14,7 +14,7 @@ def main():
     
     # On exit:
     
-    atexit.register(lambda: gui.reset_sliders(on_exit=True))
+    atexit.register(lambda: serial_api.close())
 
     # Modify the signal_handler to call reset_servos before exiting
     def signal_handler(sig, frame):
@@ -25,6 +25,7 @@ def main():
     signal.signal(signal.SIGINT, signal_handler)
     
     try:
+        print("Opening app")
         sys.exit(gui.window.app.exec_())
     except SystemExit:
         pass

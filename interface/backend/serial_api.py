@@ -1,5 +1,6 @@
 import threading
 import serial
+import time
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -26,6 +27,7 @@ class SerialAPI():
     
     def toggle_connection(self):
         if self.ser_uno and self.ser_uno.is_open and self.ser_nano and self.ser_nano.is_open:
+            self.reset_servos()
             
             # Disconnect both
             with self.serial_lock:
@@ -33,6 +35,8 @@ class SerialAPI():
                 self.ser_nano.close()
                 self.ser_uno = None
                 self.ser_nano = None
+            
+            self.connection_start_time = None
             
             is_connected = False
             error_msg = None
@@ -44,26 +48,39 @@ class SerialAPI():
                     self.ser_uno = serial.Serial(self.configs.SERIAL_PORT_UNO, self.configs.BAUD_RATE_UNO, timeout=1)
                     self.ser_nano = serial.Serial(self.configs.SERIAL_PORT_NANO, self.configs.BAUD_RATE_NANO, timeout=1)
                 
+                self.connection_start_time = time.time()
+                
                 is_connected = True
                 error_msg = None
             
             except serial.SerialException as e:
+                self.reset_servos()
                 self.ser_uno = None
                 self.ser_nano = None
                 
                 is_connected = False
                 error_msg = f"{e}"
         
+        if not is_connected:
+            self.connection_start_time = None
+            
         return is_connected, error_msg
         
     def servo_command(self, servo_index, degree):
         command = f"moveServo {servo_index} {degree}"
+        print(command)
         with self.serial_lock:
             try:
                 if self.ser_uno and self.ser_uno.is_open:
                     self.ser_uno.write((command + '\n').encode('utf-8'))
             except Exception as e:
                 self.gui.append_output(f"Error writing to serial port: {e}")
+    
+    def reset_servos(self):
+        default_degrees = self.configs.SERVO_START_ANGLES
+        
+        for servo_index, degree in enumerate(default_degrees):
+            self.servo_command(servo_index, degree)
                 
     def read_uno(self):
         if not (self.ser_uno and self.ser_uno.is_open and self.ser_uno.in_waiting > 0):
@@ -118,7 +135,7 @@ class SerialAPI():
                     raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from NANO knobs, but got {len(values)}")
                 
                 for servo_index, value in enumerate(values):
-                    degree = self.knob_to_degree(value)
+                    degree = self.knob_to_degree(value, servo_index)
                     self.servo_command(servo_index, degree)
                     
             
@@ -128,11 +145,11 @@ class SerialAPI():
                 self.gui.append_output(line)
     
         except serial.SerialException as e:
-            self.gui.append_output(f"Serial error with Uno: {e}")
+            self.gui.append_output(f"Serial error with NANO: {e}")
             self.toggle_connection()
     
         except Exception as e:
-            self.gui.append_outout(f"Error during read of UNO serial: {e}")
+            self.gui.append_output(f"Error during read of NANO serial: {e}")
                 
     def knob_to_degree(self, raw_knob, servo_index):
         """
@@ -157,6 +174,7 @@ class SerialAPI():
     def close(self):
         # Disconnect both
         self.gui.append_output("Closing both serial ports")
+        self.reset_servos()
         
         if self.ser_uno and self.ser_uno.is_open:
             with self.serial_lock:

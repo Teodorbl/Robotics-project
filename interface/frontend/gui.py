@@ -41,7 +41,7 @@ class GUI():
         self.serial_api.read_uno()
         self.serial_api.read_nano()
 
-    def append_output(self, text, device='UNO'):
+    def append_output(self, text, device=None):
         if device == 'UNO':
             self.window.uno_output_display.append(text)
         elif device == 'NANO':
@@ -58,7 +58,7 @@ class GUI():
             self.servo_pos_buffers[i].append((current_time, voltage))
             
             # Update plot data
-            times, voltages = zip(*self.gui.servo_pos_buffers[i][-100:])
+            times, voltages = zip(*self.servo_pos_buffers[i][-100:])
             self.window.curves[i].setData(times, voltages)
             
             # Update current value label
@@ -133,7 +133,7 @@ class GUI():
     
     def slider_changed(self, servo_index, degree):
         # Function to handle slider changes with inversion
-        if self.knobs:
+        if self.knob_mode:
             # In Follow Mode, do not send commands from sliders
             return
         
@@ -146,10 +146,12 @@ class GUI():
         except Exception as e:
             self.append_output(f"Error sending command to {servo_name}: {e}", 'UNO')
             
-    def reset_sliders(self, on_exit=False):
-        if self.knob_mode and (not on_exit):
+    def reset_sliders(self):
+        if self.knob_mode:
             self.append_output("Must be in slider mode to reset sliders")
             return
+        
+        self.serial_api.reset_servos()
         
         for i in range(self.num_servos):
             servo_sliders = self.window.servo_sliders
@@ -165,19 +167,9 @@ class GUI():
             slider_layout = self.window.servo_control_layout.itemAt(i).layout()
             slider_label = slider_layout.itemAt(2).widget()
             slider_label.setText(f"{default_angle}°")
-            
-            try:
-                # Send command to servo through backend
-                self.serial_api.servo_command(i, default_angle)
-                servo_name = self.servo_names[i]
-                self.append_output(f"Command: {servo_name} to {default_angle}°", 'UNO')
-                
-            except Exception as e:
-                self.append_output(f"Error sending command to {servo_name}: {e}", 'UNO')
     
     def close(self):
         # Perform necessary cleanup
-        self.serial_api.close()
         self.window.app.quit()
 
 

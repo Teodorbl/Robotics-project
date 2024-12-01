@@ -41,13 +41,13 @@ class Window():
 
         self.gui = gui  # Store a reference to the GUI
         self.app = QtWidgets.QApplication([])
-        main_window = MainWindow(gui)
+        self.main_window = MainWindow(gui)
 
         # Central widget and main layout with horizontal splitter
         central_widget = QtWidgets.QWidget()
         main_layout = QtWidgets.QHBoxLayout()
         central_widget.setLayout(main_layout)
-        main_window.setCentralWidget(central_widget)
+        self.main_window.setCentralWidget(central_widget)
 
         # Splitter to divide plots and terminal interface
         splitter = QtWidgets.QSplitter(QtCore.Qt.Horizontal)
@@ -165,7 +165,7 @@ class Window():
         terminal_layout.addWidget(QtWidgets.QLabel("<b>Servo Controls</b>"))
         
         # Dictionary to hold sliders
-        servo_sliders = {}
+        self.servo_sliders = {}
 
         # Create Servo Control Sliders with constrained ranges
         for i in range(configs.NUM_SERVOS):
@@ -201,10 +201,10 @@ class Window():
             self.servo_control_layout.addLayout(slider_layout)
             
             # Store slider in dictionary
-            servo_sliders[i] = slider
+            self.servo_sliders[i] = slider
             
             # Connect slider's valueChanged signal
-            servo_sliders[i].valueChanged.connect(
+            self.servo_sliders[i].valueChanged.connect(
                 lambda value, idx=i, lbl=slider_value_label: (lbl.setText(f"{value}°"), gui.slider_changed(idx, value))
             )
 
@@ -261,7 +261,7 @@ class Window():
         terminal_tabs.addTab(nano_tab_widget, "NANO Monitor")
         
         # Finish construction
-        main_window.show()
+        self.main_window.show()
 
 
 
