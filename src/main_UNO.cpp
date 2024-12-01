@@ -29,16 +29,6 @@ int servoAngles[NUM_SERVOS] = {
     SERVO_START_ANGLES[4] 
 };
 
-// // Servo names stored in PROGMEM to save SRAM
-// const char servoName0[] PROGMEM = "base";
-// const char servoName1[] PROGMEM = "shoulder";
-// const char servoName2[] PROGMEM = "elbow";
-// const char servoName3[] PROGMEM = "wrist";
-// const char servoName4[] PROGMEM = "claw";
-// const char* const servoNames[NUM_SERVOS] PROGMEM = {
-//     servoName0, servoName1, servoName2, servoName3, servoName4
-// };
-
 // Define baud rate constant
 const uint32_t BAUD_RATE_UNO = 115200;
 
@@ -47,7 +37,6 @@ void TaskSerialCommand(void* pvParameters);
 void TaskServoFeedback(void* pvParameters);
 void TaskRequestData(void* pvParameters);
 uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex);
-//int findServoIndex(const char* name);
 
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
     while (1);
@@ -261,21 +250,6 @@ void TaskServoFeedback(void* pvParameters) {
             degrees[i] = analogValues[i];  // Write as voltage
         }
 
-        // Use servo5Feedback from TaskRequestData
-        // Remove independent I2C request
-        // Wire.requestFrom(I2C_ADDRESS_NANO, 2);  // Removed
-        // if (Wire.available() >= 2) {
-        //     uint8_t highByte = Wire.read();
-        //     uint8_t lowByte = Wire.read();
-        //     servo5Feedback = (highByte << 8) | lowByte;
-        // } else {
-        //     servo5Feedback = 0;  // Default or handle error
-        // }
-
-        // Use the shared servo5Feedback variable
-        // Assuming servo5Feedback is updated by TaskRequestData
-        // No need to declare a local variable
-
         // Create a comma-separated string including the fifth servo
         char dataString[40];
         snprintf(dataString, sizeof(dataString), ">%d,%d,%d,%d,%d",
@@ -345,15 +319,3 @@ uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex) {
     
     return map(degree, 0, 180, SERVO_MIN_PULSE_WIDTH, SERVO_MAX_PULSE_WIDTH);
 }
-
-// // Function to find servo index based on name
-// int findServoIndex(const char* name) {
-//     char storedName[20];
-//     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-//         strcpy_P(storedName, (char*)pgm_read_word(&(servoNames[i])));
-//         if (strcasecmp(storedName, name) == 0) {
-//             return i;
-//         }
-//     }
-//     return -1;  // Not found
-// }
