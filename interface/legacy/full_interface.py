@@ -65,7 +65,7 @@ except Exception as e:
 # Extract constants and raise errors if any are missing
 required_keys = [
     'NUM_SERVOS', 'SERVO_NAMES', 'SERVO_MIN_ANGLES', 'SERVO_MAX_ANGLES',
-    'SERVO_INVERT_MASK', 'SERVO_START_ANGLES', 'SERVO_MIN_DEGREE',
+    'SERVO_INVERT_MASK', 'SERVO_DEFAULT_ANGLES', 'SERVO_MIN_DEGREE',
     'SERVO_MAX_DEGREE', 'SERVO_MIN_PULSE_WIDTH', 'SERVO_MAX_PULSE_WIDTH',
     'I2C_ADDRESS_NANO', 'I2C_ADDRESS_PWMDRV'
 ]
@@ -79,7 +79,7 @@ SERVO_NAMES = config['SERVO_NAMES']
 SERVO_MIN_ANGLES = config['SERVO_MIN_ANGLES']
 SERVO_MAX_ANGLES = config['SERVO_MAX_ANGLES']
 SERVO_INVERT_MASK = config['SERVO_INVERT_MASK']
-SERVO_START_ANGLES = config['SERVO_START_ANGLES']
+SERVO_DEFAULT_ANGLES = config['SERVO_DEFAULT_ANGLES']
 SERVO_MIN_DEGREE = config['SERVO_MIN_DEGREE']
 SERVO_MAX_DEGREE = config['SERVO_MAX_DEGREE']
 SERVO_MIN_PULSE_WIDTH = config['SERVO_MIN_PULSE_WIDTH']
@@ -336,14 +336,14 @@ for i in range(NUM_SERVOS):
     slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
     slider.setMinimum(SERVO_MIN_ANGLES[i])
     slider.setMaximum(SERVO_MAX_ANGLES[i])
-    slider.setValue(SERVO_START_ANGLES[i])
+    slider.setValue(SERVO_DEFAULT_ANGLES[i])
     slider.setTickInterval(10)
     slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
     slider.setSingleStep(1)
     slider.setPageStep(10)
     
     # Current value label
-    slider_value_label = QtWidgets.QLabel(f"{SERVO_START_ANGLES[i]}°")
+    slider_value_label = QtWidgets.QLabel(f"{SERVO_DEFAULT_ANGLES[i]}°")
     slider_value_label.setFixedWidth(40)
     
     # Connect slider's valueChanged signal
@@ -369,7 +369,7 @@ terminal_layout.addWidget(reset_sliders_button)
 
 def reset_sliders():
     for i in range(NUM_SERVOS):
-        default_angle = SERVO_START_ANGLES[i]
+        default_angle = SERVO_DEFAULT_ANGLES[i]
         servo_sliders[i].blockSignals(True)  # Prevent triggering slider_changed
         servo_sliders[i].setValue(default_angle)
         servo_sliders[i].blockSignals(False)
@@ -636,7 +636,7 @@ def reset_servos():
             append_output("Resetting servos to default positions...", 'UNO')
             for i in range(NUM_SERVOS):
                 servo_name = SERVO_NAMES[i]
-                default_angle = SERVO_START_ANGLES[i]
+                default_angle = SERVO_DEFAULT_ANGLES[i]
                 command = f"{servo_name} {default_angle}"
                 try:
                     ser_uno.write((command + '\n').encode('utf-8'))

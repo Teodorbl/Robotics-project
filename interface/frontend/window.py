@@ -182,14 +182,14 @@ class Window():
             slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
             slider.setMinimum(configs.SERVO_MIN_ANGLES[i])
             slider.setMaximum(configs.SERVO_MAX_ANGLES[i])
-            slider.setValue(configs.SERVO_START_ANGLES[i])
+            slider.setValue(configs.SERVO_DEFAULT_ANGLES[i])
             slider.setTickInterval(10)
             slider.setTickPosition(QtWidgets.QSlider.TicksBelow)
             slider.setSingleStep(1)
             slider.setPageStep(10)
             
             # Current value label
-            slider_value_label = QtWidgets.QLabel(f"{configs.SERVO_START_ANGLES[i]}°")
+            slider_value_label = QtWidgets.QLabel(f"{configs.SERVO_DEFAULT_ANGLES[i]}°")
             slider_value_label.setFixedWidth(40)
             
             # Add widgets to slider layout

@@ -5,25 +5,13 @@
 #include <Arduino_FreeRTOS.h>
 #include "ServoConfig.h"  // Include the ServoConfig header
 
-// Update analog pins for potentiometers to include A6 for the fifth knob
+// Update analog pins for potentiometers to include A7 for the fifth servo
 const uint8_t KNOB_PINS[5] = {A0, A1, A2, A3, A6};
 
 const uint8_t SERVO5_PIN = A7;
 
 // Stack overflow hook
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
-    // Blink an LED to indicate stack overflow
-    pinMode(LED_BUILTIN, OUTPUT);
-    while (1) {
-        digitalWrite(LED_BUILTIN, HIGH);
-        delay(500);
-        digitalWrite(LED_BUILTIN, LOW);
-        delay(500);
-    }
-
-    // Send a message over the serial port
-    Serial.print("! Stack overflow in task: ");
-    Serial.println(pcTaskName);
     while (1);
 }
 

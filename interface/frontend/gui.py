@@ -163,7 +163,7 @@ class GUI():
         for i in range(self.num_servos):
             servo_sliders = self.window.servo_sliders
             
-            default_angle = self.configs.SERVO_START_ANGLES[i]
+            default_angle = self.configs.SERVO_DEFAULT_ANGLES[i]
             
             servo_sliders[i].blockSignals(True)  # Prevent triggering slider_changed
             servo_sliders[i].setValue(default_angle)

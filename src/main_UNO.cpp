@@ -4,43 +4,56 @@
 #include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <Arduino_FreeRTOS.h>
+#include <semphr.h>
 #include "ServoConfig.h"  // Include the ServoConfig header
+#include <string.h>  // For memcpy and string operations
+
+// Servo feedback pins
+const uint8_t FEEDBACK_PINS[4] = {A0, A1, A2, A3};
+
+// Global variable to store analog feedback values
+uint16_t feedbackValues[NUM_SERVOS] = {0};
+
+// Array for commanded servo angles
+uint8_t servoCommandAngles[NUM_SERVOS];
 
 // Servo driver instance
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
-#define BUFFER_SIZE 50
-#define COMMAND_PREFIX "moveServo"
-#define COMMAND_PREFIX_MOVE_SERVO "moveServos"
-#define COMMAND_PREFIX_USE_KNOBS "useKnobs"
+// Task priority levels
+#define PRIORITY_CONTROL_TASK 3
+#define PRIORITY_SERIAL_TASK 2
+#define PRIORITY_I2C_TASK 1
 
-bool useKnobsEnabled = false;
+// Task interval and delays
+#define CONTROL_LOOP_INTERVAL_MS 1000
+#define SERIAL_DELAY_MS 1000
+#define I2C_DELAY_MS 1000
 
-// Variables to store data from NANO
-uint16_t knobValues[NUM_SERVOS];
-uint16_t servo5Feedback = 0;
-
-// Update the initial servo angles using ServoConfig.h
-int servoAngles[NUM_SERVOS] = { 
-    SERVO_START_ANGLES[0], 
-    SERVO_START_ANGLES[1], 
-    SERVO_START_ANGLES[2], 
-    SERVO_START_ANGLES[3], 
-    SERVO_START_ANGLES[4] 
-};
-
-// Define baud rate constant
-const uint32_t BAUD_RATE_UNO = 115200;
+// Define stack sizes for each task
+#define CONTROL_LOOP_STACK_SIZE 256
+#define SERIAL_TASK_STACK_SIZE 256
+#define I2C_TASK_STACK_SIZE 128
 
 // Function prototypes
-void TaskSerialCommand(void* pvParameters);
-void TaskServoFeedback(void* pvParameters);
-void TaskRequestData(void* pvParameters);
-uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex);
+void vControlLoopTask(void *pvParameters);
+void vSerialTask(void *pvParameters);
+void vI2CTask(void *pvParameters);
 
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
-    while (1);
-}
+uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex);
+void ReadAnalogInputs();
+void ComputeControl();
+void UpdateServos();
+void ProcessSerialCommands();
+void SendDataToComputer();
+void RequestI2CData();
+void ProcessI2CData();
+
+// Declare a mutex for protecting servoCommandAngles
+SemaphoreHandle_t xServoCommandMutex;
+
+// Declare a mutex for protecting feedbackValues
+SemaphoreHandle_t xFeedbackMutex;
 
 void setup() {
     Serial.begin(BAUD_RATE_UNO);
@@ -50,261 +63,116 @@ void setup() {
 
     Wire.begin();
 
-    //Serial.println("Initializing PWM driver...");
     pwm.begin();
-    pwm.setPWMFreq(50);  // Set to 50 Hz
+    pwm.setPWMFreq(PWM_FREQ);
 
     // Initialize servos to desired positions using ServoConfig.h
     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-        uint16_t pulseWidth = degreeToPulseWidth(servoAngles[i], i);  // Pass servo index
+        servoCommandAngles[i] = SERVO_DEFAULT_ANGLES[i];
+        uint16_t pulseWidth = degreeToPulseWidth(servoCommandAngles[i], i);  // Pass servo index
         pwm.setPWM(i, 0, pulseWidth);
-        //Serial.print("Servo ");
-        //Serial.print(i);
-        //Serial.print(" initialized to ");
-        //Serial.print(servoAngles[i]);
-        //Serial.println(" degrees.");
     }
 
-    // Create the Serial Control Task
-    BaseType_t xReturned;
-    xReturned = xTaskCreate(
-        TaskSerialCommand,   // Task function
-        "SerialCommand",     // Task name
-        256,                 // Stack size in words (adjusted for input buffering)
-        NULL,                // Task parameter
-        1,                   // Task priority
-        NULL                 // Task handle
-    );
-
-    if (xReturned != pdPASS) {
-        //Serial.println("TaskSerialControl creation failed.");
-        while (1);
-    } else {
-        //Serial.println("TaskSerialControl created successfully.");
+    xServoCommandMutex = xSemaphoreCreateMutex();
+    if (xServoCommandMutex == NULL) {
+        Serial.println("Failed to create servo command mutex");
+        while (1); // Halt if mutex creation fails
     }
 
-    // Create the Servo Feedback Task
-    xReturned = xTaskCreate(
-        TaskServoFeedback,   // Task function
-        "ServoFB",           // Task name
-        128,                 // Stack size in words (adjust as needed)
-        NULL,                // Task parameter
-        1,                   // Task priority
-        NULL                 // Task handle
-    );
-
-    if (xReturned != pdPASS) {
-        //Serial.println("TaskServoFeedback creation failed.");
-        while (1);
-    } else {
-        //Serial.println("TaskServoFeedback created successfully.");
+    xFeedbackMutex = xSemaphoreCreateMutex();
+    if (xFeedbackMutex == NULL) {
+        Serial.println("Failed to create feedback mutex");
+        while (1); // Halt if mutex creation fails
     }
 
-    // Create the TaskRequestData
     xTaskCreate(
-        TaskRequestData,      // Task function
-        "RequestData",        // Task name
-        128,                  // Stack size
-        NULL,                 // Task parameter
-        1,                    // Task priority
-        NULL                  // Task handle
+        vControlLoopTask,                // Task function
+        "ControlLoop",                   // Task name
+        CONTROL_LOOP_STACK_SIZE,         // Stack size
+        NULL,                            // Task parameters
+        PRIORITY_CONTROL_TASK,           // Priority
+        NULL                             // Task handle
     );
 
-    //Serial.println("Starting scheduler...");
+    xTaskCreate(
+        vSerialTask,
+        "SerialTask",
+        SERIAL_TASK_STACK_SIZE,
+        NULL,
+        PRIORITY_SERIAL_TASK,
+        NULL
+    );
+
+    xTaskCreate(
+        vI2CTask,
+        "I2CTask",
+        I2C_TASK_STACK_SIZE,
+        NULL,
+        PRIORITY_I2C_TASK,
+        NULL
+    );
+
     vTaskStartScheduler();
 
     //Serial.println("Scheduler failed to start.");
     while (1);
 }
 
-void loop() {
-    // Empty. All work is done in tasks.
-}
-
-// Task for reading servo position commands
-void TaskSerialCommand(void* pvParameters) {
-    (void) pvParameters;
-
-    char inputBuffer[BUFFER_SIZE];
-    uint8_t index = 0;
-    char c;
-    char latestCommand[BUFFER_SIZE] = {0};  // Buffer to store the latest complete command
-
-    //Serial.println("TaskSerialCommand started. Awaiting 'moveServos' commands...");
-
-    // Define TickType_t for task timing
+void vControlLoopTask(void *pvParameters) {
+    const TickType_t xTimeIncrementControl = pdMS_TO_TICKS(CONTROL_LOOP_INTERVAL_MS);
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xInterval = pdMS_TO_TICKS(100); // 100 ms interval
 
     for (;;) {
-        // Read all available serial data
-        while (Serial.available() > 0) {
-            c = Serial.read();
+        // Wait for the next cycle
+        BaseType_t xWasDelayed = xTaskDelayUntil(&xLastWakeTime, xTimeIncrementControl);
 
-            // Check for end of line
-            if (c == '\n' || c == '\r') {
-                if (index > 0) {
-                    inputBuffer[index] = '\0';  // Null-terminate the string
+        // Read analog inputs (feedback)
+        ReadAnalogInputs();
 
-                    // Store the latest complete command
-                    strncpy(latestCommand, inputBuffer, BUFFER_SIZE - 1);
-                    latestCommand[BUFFER_SIZE - 1] = '\0';  // Ensure null-termination
+        // Perform computations (e.g., Kalman filter)
+        ComputeControl();
 
-                    // Reset buffer index for next input
-                    index = 0;
-                }
-            }
-            else {
-                // Overwrite buffer to keep only the latest data
-                if (index < (BUFFER_SIZE - 1)) {
-                    inputBuffer[index++] = c;
-                }
-                else {
-                    // Buffer full, shift left to discard oldest character
-                    memmove(inputBuffer, inputBuffer + 1, BUFFER_SIZE - 2);
-                    inputBuffer[BUFFER_SIZE - 2] = c;
-                    inputBuffer[BUFFER_SIZE - 1] = '\0';
-                }
-            }
+        // Send commands to servos
+        UpdateServos(); // Removed argument
+
+        // Check if the task was delayed
+        if (xWasDelayed == pdFALSE) {
+            // Handle the case where the task missed its deadline
+            Serial.println("! ERROR: vControlLoopTask was delayed");
         }
-
-        // After reading all data, process only the latest complete command
-        if (strlen(latestCommand) > 0) {
-            // Check if the command starts with "moveServos"
-            if (strncmp(latestCommand, COMMAND_PREFIX_MOVE_SERVO, strlen(COMMAND_PREFIX_MOVE_SERVO)) == 0) {
-                int servoValues[NUM_SERVOS];
-                // Parse the command with five degree values
-                int parsed = sscanf(latestCommand, "moveServos %d %d %d %d %d",
-                                    &servoValues[0],
-                                    &servoValues[1],
-                                    &servoValues[2],
-                                    &servoValues[3],
-                                    &servoValues[4]);
-                if (parsed == NUM_SERVOS) {
-                    bool valid = true;
-                    // Validate each servo index and degree
-                    for (int i = 0; i < NUM_SERVOS; i++) {
-                        if (servoValues[i] < SERVO_MIN_ANGLES[i] || servoValues[i] > SERVO_MAX_ANGLES[i]) {
-                            //Serial.print("Error: Degree out of range for servo ");
-                            //Serial.println(i);
-                            valid = false;
-                            break;
-                        }
-                    }
-
-                    if (valid) {
-                        // Convert degrees to pulse widths and set PWM for each servo
-                        for (int i = 0; i < NUM_SERVOS; i++) {
-                            uint16_t pulseWidth = degreeToPulseWidth(servoValues[i], i);
-                            pwm.setPWM(i, 0, pulseWidth);
-                        }
-                        //Serial.println("Moved all servos to specified degrees.");
-                    }
-                }
-                else {
-                    //Serial.println("Error: Invalid command format. Use 'moveServos [value0] [value1] [value2] [value3] [value4]'.");
-                }
-            } else if (strncmp(latestCommand, COMMAND_PREFIX_USE_KNOBS, strlen(COMMAND_PREFIX_USE_KNOBS)) == 0) {
-                int knobValue;
-                int parsed = sscanf(latestCommand, "useKnobs %d", &knobValue);
-                if (parsed == 1) {
-                    bool newState = (knobValue != 0);
-                    if (newState != useKnobsEnabled) {
-                        useKnobsEnabled = newState;
-                        // Send detailed ACK with the new state
-                        Serial.print("ACK: useKnobsEnabled=");
-                        Serial.println(useKnobsEnabled ? "true" : "false");
-                    }
-                }
-            } else {
-                //Serial.println("Error: Unknown command. Use 'moveServos [value0] [value1] [value2] [value3] [value4]'.");
-            }
-
-            // Clear the latestCommand buffer after processing
-            latestCommand[0] = '\0';
-        }
-
-        // Wait for the next tick to maintain consistent timing
-        xTaskDelayUntil(&xLastWakeTime, xInterval);
     }
 }
 
-// Task to read servo feedback and send data for plotting
-void TaskServoFeedback(void* pvParameters) {
-    (void) pvParameters;
-
-    const uint8_t numFeedbackPins = 4;
-    const uint8_t feedbackPins[numFeedbackPins] = {A0, A1, A2, A3};
-    uint16_t analogValues[numFeedbackPins];
-    uint16_t degrees[numFeedbackPins];
-    // Remove local servo5Feedback
-    // uint16_t servo5Feedback = 0;  // Variable to store fifth servo feedback
-
-    TickType_t xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xInterval = pdMS_TO_TICKS(100); // 100 ms interval
+void vSerialTask(void *pvParameters) {
+    const TickType_t xTimeIncrementSerial = pdMS_TO_TICKS(SERIAL_DELAY_MS);
 
     for (;;) {
-        // Read analog inputs for the first four servos
-        for (uint8_t i = 0; i < numFeedbackPins; i++) {
-            analogValues[i] = analogRead(feedbackPins[i]);
-            degrees[i] = analogValues[i];  // Write as voltage
+        // Check for serial data
+        if (Serial.available() > 0) {
+            // Read and process serial commands
+            ProcessSerialCommands();
         }
 
-        // Create a comma-separated string including the fifth servo
-        char dataString[40];
-        snprintf(dataString, sizeof(dataString), ">%d,%d,%d,%d,%d",
-                 degrees[0], degrees[1], degrees[2], degrees[3], servo5Feedback);
+        // Send data back to the computer
+        SendDataToComputer();
 
-        // Send the data string over Serial
-        Serial.println(dataString);
-
-        // Delay for 100 ms before next reading
-        vTaskDelayUntil(&xLastWakeTime, xInterval);
+        // Delay before the next read
+        vTaskDelay(xTimeIncrementSerial);
     }
 }
 
-// Create a new task to request data from NANO
-void TaskRequestData(void* pvParameters) {
-    (void) pvParameters;
-
-    TickType_t xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xInterval = pdMS_TO_TICKS(100); // 100 ms interval
+void vI2CTask(void *pvParameters) {
+    const TickType_t xTimeIncrementI2C = pdMS_TO_TICKS(I2C_DELAY_MS);
 
     for (;;) {
-        // Request data from NANO via I2C
-        Wire.requestFrom(I2C_ADDRESS_NANO, NUM_SERVOS * 2 + 2); // KnobValues + servo5Feedback
+        // Request data from peripheral sensors
+        RequestI2CData();
 
-        // Read knob values
-        for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-            if (Wire.available() >= 2) {
-                uint8_t highByte = Wire.read();
-                uint8_t lowByte = Wire.read();
-                knobValues[i] = (highByte << 8) | lowByte;
-            }
-        }
+        // Process received data
+        ProcessI2CData();
 
-        // Read servo5Feedback
-        if (Wire.available() >= 2) {
-            uint8_t highByte = Wire.read();
-            uint8_t lowByte = Wire.read();
-            servo5Feedback = (highByte << 8) | lowByte;
-        }
-
-        // If useKnobs is enabled, move servos based on knobValues
-        if (useKnobsEnabled) {
-            for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-                // Map knob value to servo angle
-                int degree = map(knobValues[i], 32, 1023, SERVO_MAX_ANGLES[i], SERVO_MIN_ANGLES[i]);
-                servoAngles[i] = degree;
-
-                // Move servo to the new angle
-                uint16_t pulseWidth = degreeToPulseWidth(servoAngles[i], i);
-                pwm.setPWM(i, 0, pulseWidth);
-            }
-        }
-
-        // Delay for 100 ms
-        vTaskDelayUntil(&xLastWakeTime, xInterval);
+        // Delay before the next request
+        vTaskDelay(xTimeIncrementI2C);
     }
 }
 
@@ -318,4 +186,105 @@ uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex) {
     }
     
     return map(degree, 0, 180, SERVO_MIN_PULSE_WIDTH, SERVO_MAX_PULSE_WIDTH);
+}
+
+void ReadAnalogInputs() {
+    for (uint8_t i = 0; i < 4; i++) {
+        feedbackValues[i] = analogRead(FEEDBACK_PINS[i]);
+    }
+}
+
+void ComputeControl() {
+    // TODO: Implement control algorithms (e.g., Kalman filter)
+}
+
+void UpdateServos() {
+    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+        pwm.setPWM(i, 0, degreeToPulseWidth(servoCommandAngles[i], i));
+    }
+}
+
+// Define a designated start character for command lines
+#define COMMAND_START_CHAR '>'
+#define COMMAND_END_CHAR '\n'
+
+void ProcessSerialCommands() {
+    static char inputBuffer[100];
+    static uint8_t bufferIndex = 0;
+    bool newLineReceived = false;
+
+    // Discard any characters until the start character is found
+    while (Serial.available()) {
+        char inChar = Serial.read();
+        if (inChar == COMMAND_START_CHAR) {
+            bufferIndex = 0; // Reset buffer index for a new command
+            inputBuffer[bufferIndex++] = inChar;
+        } else if (bufferIndex > 0) {
+            if (inChar == COMMAND_END_CHAR) {
+                inputBuffer[bufferIndex] = '\0';
+                newLineReceived = true;
+                break;
+            } else if (bufferIndex < sizeof(inputBuffer) - 1) {
+                inputBuffer[bufferIndex++] = inChar;
+            }
+        }
+    }
+
+    if (newLineReceived) {
+        // Parse the input line for five integers after the start character
+        uint8_t tempAngles[NUM_SERVOS];
+        int parsed = sscanf(inputBuffer, "%*c %hhu %hhu %hhu %hhu %hhu",
+                            &tempAngles[0], &tempAngles[1],
+                            &tempAngles[2], &tempAngles[3],
+                            &tempAngles[4]);
+        if (parsed == NUM_SERVOS) {
+            // Acquire mutex before updating servoCommandAngles
+            if (xSemaphoreTake(xServoCommandMutex, portMAX_DELAY)) {
+                memcpy(servoCommandAngles, tempAngles, sizeof(tempAngles));
+                xSemaphoreGive(xServoCommandMutex);
+            }
+        } else {
+            // Handle malformed input
+            Serial.print("! ERROR: Malformed input buffer: ");Serial.println(inputBuffer);
+        }
+
+        // Clear the buffer after processing
+        bufferIndex = 0;
+    }
+
+    // Discard any remaining characters in the buffer to keep only the latest line
+    while (Serial.available()) {
+        char inChar = Serial.read();
+        if (inChar == COMMAND_START_CHAR) {
+            bufferIndex = 0;
+            inputBuffer[bufferIndex++] = inChar;
+        }
+    }
+}
+
+void SendDataToComputer() {
+    if (xSemaphoreTake(xFeedbackMutex, portMAX_DELAY)) {
+        // Send feedback values as a space-separated string
+        Serial.print("Feedback: ");
+        for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+            Serial.print(feedbackValues[i]);
+            if (i < NUM_SERVOS - 1) {
+                Serial.print(" ");
+            }
+        }
+        Serial.println();
+        xSemaphoreGive(xFeedbackMutex);
+    }
+}
+
+void RequestI2CData() {
+    // TODO: Implement requesting data from I2C peripherals
+}
+
+void ProcessI2CData() {
+    // TODO: Implement processing received I2C data
+}
+
+void loop() {
+    // Empty. All work is done in tasks.
 }

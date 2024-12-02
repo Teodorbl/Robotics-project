@@ -23,7 +23,7 @@ class SerialAPI():
         self.serial_lock = threading.Lock()  # To synchronize access to serial ports
         
         # Initialize servo positions
-        self.servo_pos_init = configs.SERVO_START_ANGLES
+        self.servo_pos_init = configs.SERVO_DEFAULT_ANGLES
         self.servo_positions = self.servo_pos_init.copy()
         
     def toggle_connection(self):
