@@ -76,7 +76,9 @@ class SerialAPI():
         else:
             self.servo_positions[servo_index] = int(degree)
         
-        command = f"moveServos {' '.join(map(str, self.servo_positions))}"
+        prefix = '>'
+        postfix = '\n'
+        command = f"{prefix}{' '.join(map(str, self.servo_positions))}{postfix}"
         print(command)
         
         with self.serial_lock:

@@ -1,0 +1,126 @@
+{
+    "errors": {
+        "1001": {
+            "message": "Stack overflow in task",
+            "data": "TaskName"
+        },
+        "1002": {
+            "message": "Failed to create servo command mutex",
+            "data": null
+        },
+        "1003": {
+            "message": "Failed to create feedback mutex",
+            "data": null
+        },
+        "1004": {
+            "message": "Scheduler failed to start.",
+            "data": null
+        },
+        "1005": {
+            "message": "vControlLoopTask was delayed",
+            "data": null
+        },
+        "1006": {
+            "message": "Failed to take xFeedbackMutex in SendDataToComputer.",
+            "data": null
+        },
+        "1007": {
+            "message": "Failed to take xFeedbackMutex in ProcessI2CData.",
+            "data": null
+        },
+        "1008": {
+            "message": "Malformed input buffer",
+            "data": "InputBuffer"
+        }
+    },
+    "debugs": {
+        "2001": {
+            "message": "Serial initialized.",
+            "data": null
+        },
+        "2002": {
+            "message": "SoftwareWire initialized.",
+            "data": null
+        },
+        "2003": {
+            "message": "PWM initialized with frequency",
+            "data": "PWM_FREQ"
+        },
+        "2004": {
+            "message": "Servo initialized",
+            "data": "ServoIndex, Angle, PulseWidth"
+        },
+        "2005": {
+            "message": "Control Loop Task started.",
+            "data": null
+        },
+        "2006": {
+            "message": "Serial Task started.",
+            "data": null
+        },
+        "2007": {
+            "message": "I2C Task started.",
+            "data": null
+        },
+        "2008": {
+            "message": "Control Loop Task cycle started.",
+            "data": null
+        },
+        "2009": {
+            "message": "Control Loop Task cycle completed.",
+            "data": null
+        },
+        "2010": {
+            "message": "Serial data available.",
+            "data": null
+        },
+        "2011": {
+            "message": "Serial Task cycle completed.",
+            "data": null
+        },
+        "2012": {
+            "message": "I2C data request sent.",
+            "data": null
+        },
+        "2013": {
+            "message": "I2C Task cycle completed.",
+            "data": null
+        },
+        "2014": {
+            "message": "Reading analog inputs.",
+            "data": null
+        },
+        "2015": {
+            "message": "Computing control algorithms.",
+            "data": null
+        },
+        "2016": {
+            "message": "Updating servos.",
+            "data": null
+        },
+        "2017": {
+            "message": "Command start character received.",
+            "data": null
+        },
+        "2018": {
+            "message": "Command end character received. Processing command",
+            "data": "InputBuffer"
+        },
+        "2019": {
+            "message": "Feedback data sent to computer.",
+            "data": null
+        },
+        "2020": {
+            "message": "I2C data received",
+            "data": "ReceivedValue"
+        },
+        "2021": {
+            "message": "Feedback value updated for servo",
+            "data": "ServoIndex, ReceivedValue"
+        },
+        "2022": {
+            "message": "No I2C data available to process.",
+            "data": null
+        }
+    }
+}

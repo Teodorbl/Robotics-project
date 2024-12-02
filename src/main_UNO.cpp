@@ -7,6 +7,7 @@
 #include <string.h>
 #include <SoftwareWire.h>
 #include "ServoConfig.h"
+#include "ErrorCodes.h"
 
 // Define new digital pins for I2C
 #define SDA_PIN 2
@@ -45,6 +46,42 @@ SemaphoreHandle_t xServoCommandMutex;
 #define SERIAL_TASK_STACK_SIZE 256
 #define I2C_TASK_STACK_SIZE 128
 
+#define ENABLE_ERROR 1  // Enables error prints
+#define ENABLE_DEBUG 1  // Enables debug prints
+
+// Modified logging macros to accept optional data arguments
+#if ENABLE_ERROR
+    #define LOG_ERROR(code, ...) \
+        do { \
+            Serial.print(F("E:")); \
+            Serial.print(static_cast<uint8_t>(code)); \
+            Serial.print(F(":")); \
+            if (sizeof(#__VA_ARGS__) > 1) { \
+                Serial.println(__VA_ARGS__); \
+            } else { \
+                Serial.println(); \
+            } \
+        } while(0)
+#else
+    #define LOG_ERROR(code, ...)
+#endif
+
+#if ENABLE_DEBUG
+    #define LOG_DEBUG(code, ...) \
+        do { \
+            Serial.print(F("D:")); \
+            Serial.print(static_cast<uint8_t>(code)); \
+            Serial.print(F(":")); \
+            if (sizeof(#__VA_ARGS__) > 1) { \
+                Serial.println(__VA_ARGS__); \
+            } else { \
+                Serial.println(); \
+            } \
+        } while(0)
+#else
+    #define LOG_DEBUG(code, ...)
+#endif
+
 // Function prototypes
 void vControlLoopTask(void *pvParameters);
 void vSerialTask(void *pvParameters);
@@ -60,6 +97,14 @@ void ProcessI2CData();
 
 // Stack overflow hook
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
+    #ifdef LOG_ERROR
+    LOG_ERROR(ERROR_STACK_OVERFLOW, pcTaskName);
+    #endif
+
+    #ifdef LOG_DEBUG
+    // LOG_DEBUG(DEBUG_CONTROL_LOOP_START);
+    #endif
+
     // Blink an LED to indicate stack overflow
     pinMode(LED_BUILTIN, OUTPUT);
     while (1) {
@@ -68,9 +113,6 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
         digitalWrite(LED_BUILTIN, LOW);
         delay(500);
     }
-
-    // Send a message over the serial port
-    Serial.print("! ERROR: Stack overflow in task: ");Serial.println(pcTaskName);
     while (1);
 }
 
@@ -80,7 +122,6 @@ void setup() {
         ;  // Wait for serial port to connect (needed for native USB)
     }
 
-    // Wire.begin();  // Remove hardware I2C initialization
     softWire.begin();  // Initialize SoftwareWire
 
     pwm.begin();
@@ -95,13 +136,17 @@ void setup() {
 
     xServoCommandMutex = xSemaphoreCreateMutex();
     if (xServoCommandMutex == NULL) {
-        Serial.println("Failed to create servo command mutex");
+        #ifdef LOG_ERROR
+        LOG_ERROR(ERROR_MUTEX_CREATION_FAIL_SERVO);
+        #endif
         while (1); // Halt if mutex creation fails
     }
 
     xFeedbackMutex = xSemaphoreCreateMutex();
     if (xFeedbackMutex == NULL) {
-        Serial.println("Failed to create feedback mutex");
+        #ifdef LOG_ERROR
+        LOG_ERROR(ERROR_MUTEX_CREATION_FAIL_FEEDBACK);
+        #endif
         while (1); // Halt if mutex creation fails
     }
 
@@ -134,13 +179,20 @@ void setup() {
 
     vTaskStartScheduler();
 
-    //Serial.println("Scheduler failed to start.");
+    #ifdef LOG_ERROR
+    LOG_ERROR(ERROR_SCHEDULER_START_FAIL);
+    #endif
+    
     while (1);
 }
 
 void vControlLoopTask(void *pvParameters) {
     const TickType_t xTimeIncrementControl = pdMS_TO_TICKS(CONTROL_LOOP_INTERVAL_MS);
     TickType_t xLastWakeTime = xTaskGetTickCount();
+
+    #ifdef LOG_DEBUG
+    LOG_DEBUG(DEBUG_CONTROL_LOOP_START);
+    #endif
 
     for (;;) {
         // Wait for the next cycle
@@ -155,10 +207,15 @@ void vControlLoopTask(void *pvParameters) {
         // Send commands to servos
         UpdateServos();
 
+        #ifdef LOG_DEBUG
+        LOG_DEBUG(DEBUG_CONTROL_LOOP_COMPLETE);
+        #endif
+
         // Check if the task was delayed
         if (xWasDelayed == pdFALSE) {
-            // Handle the case where the task missed its deadline
-            Serial.println("! ERROR: vControlLoopTask was delayed");
+            #ifdef LOG_ERROR
+            LOG_ERROR(ERROR_DELAYED_CONTROL_LOOP);
+            #endif
         }
     }
 }
@@ -166,15 +223,28 @@ void vControlLoopTask(void *pvParameters) {
 void vSerialTask(void *pvParameters) {
     const TickType_t xTimeIncrementSerial = pdMS_TO_TICKS(SERIAL_DELAY_MS);
 
+    #ifdef LOG_DEBUG
+    LOG_DEBUG(DEBUG_TASK_START_SERIAL);
+    #endif
+
     for (;;) {
         // Check for serial data
         if (Serial.available() > 0) {
+
+            #ifdef LOG_DEBUG
+            LOG_DEBUG(DEBUG_SERIAL_DATA_AVAILABLE);
+            #endif
+
             // Read and process serial commands
             ProcessSerialCommands();
         }
 
         // Send data back to the computer
         SendDataToComputer();
+
+        #ifdef LOG_DEBUG
+        LOG_DEBUG(DEBUG_SERIAL_CYCLE_COMPLETE);
+        #endif
 
         // Delay before the next read
         vTaskDelay(xTimeIncrementSerial);
@@ -184,12 +254,19 @@ void vSerialTask(void *pvParameters) {
 void vI2CTask(void *pvParameters) {
     const TickType_t xTimeIncrementI2C = pdMS_TO_TICKS(I2C_DELAY_MS);
 
+    #ifdef LOG_DEBUG
+    LOG_DEBUG(DEBUG_TASK_START_I2C);
+    #endif
+
     for (;;) {
         // Request data from peripheral sensors
         RequestI2CData();
 
         // Process received data
-        ProcessI2CData();
+
+        #ifdef LOG_DEBUG
+        LOG_DEBUG(DEBUG_I2C_CYCLE_COMPLETE);
+        #endif
 
         // Delay before the next request
         vTaskDelay(xTimeIncrementI2C);
@@ -209,19 +286,62 @@ uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex) {
 }
 
 void ReadAnalogInputs() {
+    #ifdef LOG_DEBUG
+    LOG_DEBUG(DEBUG_READING_ANALOG);
+    #endif
     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
         feedbackValues[i] = analogRead(FEEDBACK_PINS[i]);
+
+        #ifdef LOG_DEBUG
+        // Replace String concatenation with separate Serial.print calls
+        Serial.print(F("D:"));
+        Serial.print(DEBUG_READING_ANALOG);
+        Serial.print(F(":"));
+        Serial.print(i);
+        Serial.print(F(": "));
+        Serial.println(feedbackValues[i]);
+        #endif
     }
 }
 
 void ComputeControl() {
+    #ifdef LOG_DEBUG
+    LOG_DEBUG(DEBUG_COMPUTING_CONTROL);
+    #endif
     // TODO: Implement control algorithms (e.g., Kalman filter)
+
+    // Example error condition after implementing control algorithms
+    // if (controlAlgorithmFailed) {
+    //     #ifdef LOG_ERROR
+    //     LOG_ERROR(F("Control algorithm failed."));
+    //     #endif
+    // }
 }
 
 void UpdateServos() {
+    #ifdef LOG_DEBUG
+    LOG_DEBUG(DEBUG_UPDATING_SERVOS);
+    #endif
     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
         uint16_t pulseWidth = degreeToPulseWidth(servoCommandAngles[i], i);
         pwm.setPWM(i, 0, pulseWidth);
+
+        #ifdef LOG_DEBUG
+        // Replace String concatenation with separate Serial.print calls
+        Serial.print(F("D:"));
+        Serial.print(DEBUG_UPDATING_SERVOS);
+        Serial.print(F(":"));
+        Serial.print(i);
+        Serial.print(F(" updated to pulse width "));
+        Serial.println(pulseWidth);
+        #endif
+
+        // Example error condition after setting PWM
+        // if (pwmUpdateFailed) {
+        //     #ifdef LOG_ERROR
+        //     LOG_ERROR(F("Failed to update servo "), String(i));
+        //     #endif
+        // }
     }
 }
 
@@ -240,10 +360,18 @@ void ProcessSerialCommands() {
         if (inChar == COMMAND_START_CHAR) {
             bufferIndex = 0; // Reset buffer index for a new command
             inputBuffer[bufferIndex++] = inChar;
+
+            #ifdef LOG_DEBUG
+            LOG_DEBUG(DEBUG_COMMAND_START);
+            #endif
         } else if (bufferIndex > 0) {
             if (inChar == COMMAND_END_CHAR) {
                 inputBuffer[bufferIndex] = '\0';
                 newLineReceived = true;
+
+                #ifdef LOG_DEBUG
+                LOG_DEBUG(DEBUG_COMMAND_END);
+                #endif
                 break;
             } else if (bufferIndex < sizeof(inputBuffer) - 1) {
                 inputBuffer[bufferIndex++] = inChar;
@@ -259,14 +387,18 @@ void ProcessSerialCommands() {
                             &tempAngles[2], &tempAngles[3],
                             &tempAngles[4]);
         if (parsed == NUM_SERVOS) {
+            #ifdef LOG_DEBUG
+            LOG_DEBUG(DEBUG_COMMAND_END);
+            #endif
             // Acquire mutex before updating servoCommandAngles
             if (xSemaphoreTake(xServoCommandMutex, portMAX_DELAY)) {
                 memcpy(servoCommandAngles, tempAngles, sizeof(tempAngles));
                 xSemaphoreGive(xServoCommandMutex);
             }
         } else {
-            // Handle malformed input
-            Serial.print("! ERROR: Malformed input buffer: ");Serial.println(inputBuffer);
+            #ifdef LOG_ERROR
+            LOG_ERROR(ERROR_MALFORMED_INPUT_BUFFER, inputBuffer);
+            #endif
         }
 
         // Clear the buffer after processing
@@ -279,14 +411,22 @@ void ProcessSerialCommands() {
         if (inChar == COMMAND_START_CHAR) {
             bufferIndex = 0;
             inputBuffer[bufferIndex++] = inChar;
+
+            #ifdef LOG_DEBUG
+            LOG_DEBUG(DEBUG_COMMAND_START);
+            #endif
         }
     }
 }
 
 void SendDataToComputer() {
     if (xSemaphoreTake(xFeedbackMutex, portMAX_DELAY)) {
-        // Send feedback values as a space-separated string
-        Serial.print("Feedback: ");
+
+        Serial.print(F("D:"));
+        Serial.print(DEBUG_FEEDBACK_SENT);
+        Serial.print(F(":"));
+
+        // Send feedback values as a space-separated string with code
         for (uint8_t i = 0; i < NUM_SERVOS; i++) {
             Serial.print(feedbackValues[i]);
             if (i < NUM_SERVOS - 1) {
@@ -294,25 +434,63 @@ void SendDataToComputer() {
             }
         }
         Serial.println();
+
+        #ifdef LOG_DEBUG
+        LOG_DEBUG(DEBUG_FEEDBACK_SENT);
+        #endif
+
         xSemaphoreGive(xFeedbackMutex);
+    } else {
+        #ifdef LOG_ERROR
+        LOG_ERROR(ERROR_TAKE_FEEDBACK_MUTEX_SENDDATA);
+        #endif
     }
 }
 
 void RequestI2CData() {
-    // Wire.requestFrom(I2C_ADDRESS_NANO, (uint8_t)2);  // Remove hardware I2C request
     softWire.requestFrom(I2C_ADDRESS_NANO, (uint8_t)2);  // Use SoftwareWire request
+
+    #ifdef LOG_DEBUG
+    LOG_DEBUG(DEBUG_I2C_REQUEST);
+    #endif
 }
 
 void ProcessI2CData() {
-    // if (Wire.available() >= 2) {  // Remove hardware I2C available check
-    if (softWire.available() >= 2) {  // Use SoftwareWire available check
-        // uint16_t receivedValue = Wire.read() | (Wire.read() << 8);  // Remove hardware I2C read
-        uint16_t receivedValue = softWire.read() | (softWire.read() << 8);  // Use SoftwareWire read
+    if (softWire.available() >= 2) {
+        uint16_t receivedValue = softWire.read() | (softWire.read() << 8);
+
+        #ifdef LOG_DEBUG
+        Serial.print(F("D:"));
+        Serial.print(DEBUG_I2C_DATA_RECEIVED);
+        Serial.print(F(":"));
+        Serial.println(receivedValue);
+        #endif
+
         if (xSemaphoreTake(xFeedbackMutex, portMAX_DELAY)) {
             feedbackValues[4] = receivedValue; // Store in the fifth servo's feedback
+
+            #ifdef LOG_DEBUG
+            Serial.print(F("D:"));
+            Serial.print(DEBUG_FEEDBACK_UPDATED);
+            Serial.print(F(":4,"));
+            Serial.println(receivedValue);
+            #endif
+
             xSemaphoreGive(xFeedbackMutex);
+        } else {
+            #ifdef LOG_ERROR
+            LOG_ERROR(ERROR_TAKE_FEEDBACK_MUTEX_PROCESSI2C);
+            #endif
         }
     }
+    #ifdef LOG_DEBUG
+    else {
+        Serial.print(F("D:"));
+        Serial.print(DEBUG_I2C_NO_DATA);
+        Serial.print(F(":"));
+        Serial.println("");
+    }
+    #endif
 }
 
 void loop() {
