@@ -20,6 +20,10 @@ uint8_t servoCommandAngles[NUM_SERVOS];
 // Servo driver instance
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
+// Declare a mutex for protecting servoCommandAngles and feedbackValues
+SemaphoreHandle_t xFeedbackMutex;
+SemaphoreHandle_t xServoCommandMutex;
+
 // Task priority levels
 #define PRIORITY_CONTROL_TASK 3
 #define PRIORITY_SERIAL_TASK 2
@@ -39,7 +43,6 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 void vControlLoopTask(void *pvParameters);
 void vSerialTask(void *pvParameters);
 void vI2CTask(void *pvParameters);
-
 uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex);
 void ReadAnalogInputs();
 void ComputeControl();
@@ -49,11 +52,21 @@ void SendDataToComputer();
 void RequestI2CData();
 void ProcessI2CData();
 
-// Declare a mutex for protecting servoCommandAngles
-SemaphoreHandle_t xServoCommandMutex;
+// Stack overflow hook
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
+    // Blink an LED to indicate stack overflow
+    pinMode(LED_BUILTIN, OUTPUT);
+    while (1) {
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(500);
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(500);
+    }
 
-// Declare a mutex for protecting feedbackValues
-SemaphoreHandle_t xFeedbackMutex;
+    // Send a message over the serial port
+    Serial.print("! ERROR: Stack overflow in task: ");Serial.println(pcTaskName);
+    while (1);
+}
 
 void setup() {
     Serial.begin(BAUD_RATE_UNO);
@@ -278,11 +291,17 @@ void SendDataToComputer() {
 }
 
 void RequestI2CData() {
-    // TODO: Implement requesting data from I2C peripherals
+    Wire.requestFrom(I2C_ADDRESS_NANO, (uint8_t)2); // Request 2 bytes for uint16_t
 }
 
 void ProcessI2CData() {
-    // TODO: Implement processing received I2C data
+    if (Wire.available() >= 2) {
+        uint16_t receivedValue = Wire.read() | (Wire.read() << 8);
+        if (xSemaphoreTake(xFeedbackMutex, portMAX_DELAY)) {
+            feedbackValues[4] = receivedValue; // Store in the fifth servo's feedback
+            xSemaphoreGive(xFeedbackMutex);
+        }
+    }
 }
 
 void loop() {

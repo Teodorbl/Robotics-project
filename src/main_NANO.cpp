@@ -7,25 +7,7 @@
 
 // Update analog pins for potentiometers to include A6 for the fifth knob
 const uint8_t KNOB_PINS[5] = {A0, A1, A2, A3, A6};
-
 const uint8_t SERVO5_PIN = A7;
-
-// Stack overflow hook
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
-    // Blink an LED to indicate stack overflow
-    pinMode(LED_BUILTIN, OUTPUT);
-    while (1) {
-        digitalWrite(LED_BUILTIN, HIGH);
-        delay(500);
-        digitalWrite(LED_BUILTIN, LOW);
-        delay(500);
-    }
-
-    // Send a message over the serial port
-    Serial.print("! Stack overflow in task: ");
-    Serial.println(pcTaskName);
-    while (1);
-}
 
 volatile bool dataRequested = false;
 
@@ -47,16 +29,26 @@ void receiveEvent(int howMany) {
 
 // Handler for sending data to Master upon request
 void requestEvent() {
-    // Send knob values
-    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-        uint16_t value = knobValues[i];
-        Wire.write((value >> 8) & 0xFF); // High byte
-        Wire.write(value & 0xFF);        // Low byte
+    // Send only servo5Feedback
+    uint16_t value = servo5Feedback;
+    Wire.write((value >> 8) & 0xFF); // High byte
+    Wire.write(value & 0xFF);        // Low byte
+}
+
+// Stack overflow hook
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
+    // Blink an LED to indicate stack overflow
+    pinMode(LED_BUILTIN, OUTPUT);
+    while (1) {
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(500);
+        digitalWrite(LED_BUILTIN, LOW);
+        delay(500);
     }
 
-    // Send servo5Feedback
-    Wire.write((servo5Feedback >> 8) & 0xFF); // High byte
-    Wire.write(servo5Feedback & 0xFF);        // Low byte
+    // Send a message over the serial port
+    Serial.print("! ERROR: Stack overflow in task: ");Serial.println(pcTaskName);
+    while (1);
 }
 
 void setup() {
@@ -70,20 +62,14 @@ void setup() {
     Wire.onRequest(requestEvent);
 
     // Create the Read Potentiometers Task
-    BaseType_t xReturned;
-    xReturned = xTaskCreate(
-        TaskReadKnobs,    // Task function
+    xTaskCreate(
+        TaskReadKnobs,             // Task function
         "ReadKnobs",               // Task name
         128,                       // Stack size in words
         NULL,                      // Task parameter
         1,                         // Task priority
         NULL                       // Task handle
     );
-
-    if (xReturned != pdPASS) {
-        // Handle task creation failure
-        while (1);
-    }
 
     // Start the scheduler
     vTaskStartScheduler();
