@@ -22,4 +22,6 @@
 // Include assert functionality
 #define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
 
+#define configCHECK_FOR_STACK_OVERFLOW          2
+
 #endif /* FREERTOS_CONFIG_H */

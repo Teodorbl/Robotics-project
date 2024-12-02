@@ -95,7 +95,7 @@
             "data": null
         },
         "2016": {
-            "message": "Updating servos.",
+            "message": "Updating servos to PWM width:",
             "data": null
         },
         "2017": {
