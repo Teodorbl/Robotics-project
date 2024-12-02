@@ -1,15 +1,21 @@
 // src/main_UNO.cpp
 
 #include <Arduino.h>
-#include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <Arduino_FreeRTOS.h>
 #include <semphr.h>
-#include "ServoConfig.h"  // Include the ServoConfig header
-#include <string.h>  // For memcpy and string operations
+#include <string.h>
+#include <SoftwareWire.h>
+#include "ServoConfig.h"
+
+// Define new digital pins for I2C
+#define SDA_PIN 2
+#define SCL_PIN 3
+
+SoftwareWire softWire(SDA_PIN, SCL_PIN);  // Create SoftwareWire instance
 
 // Servo feedback pins
-const uint8_t FEEDBACK_PINS[4] = {A0, A1, A2, A3};
+const uint8_t FEEDBACK_PINS[NUM_SERVOS] = {A0, A1, A2, A3, A4};
 
 // Global variable to store analog feedback values
 uint16_t feedbackValues[NUM_SERVOS] = {0};
@@ -74,7 +80,8 @@ void setup() {
         ;  // Wait for serial port to connect (needed for native USB)
     }
 
-    Wire.begin();
+    // Wire.begin();  // Remove hardware I2C initialization
+    softWire.begin();  // Initialize SoftwareWire
 
     pwm.begin();
     pwm.setPWMFreq(PWM_FREQ);
@@ -82,7 +89,7 @@ void setup() {
     // Initialize servos to desired positions using ServoConfig.h
     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
         servoCommandAngles[i] = SERVO_DEFAULT_ANGLES[i];
-        uint16_t pulseWidth = degreeToPulseWidth(servoCommandAngles[i], i);  // Pass servo index
+        uint16_t pulseWidth = degreeToPulseWidth(servoCommandAngles[i], i);
         pwm.setPWM(i, 0, pulseWidth);
     }
 
@@ -146,7 +153,7 @@ void vControlLoopTask(void *pvParameters) {
         ComputeControl();
 
         // Send commands to servos
-        UpdateServos(); // Removed argument
+        UpdateServos();
 
         // Check if the task was delayed
         if (xWasDelayed == pdFALSE) {
@@ -202,7 +209,7 @@ uint16_t degreeToPulseWidth(uint8_t degree, uint8_t servoIndex) {
 }
 
 void ReadAnalogInputs() {
-    for (uint8_t i = 0; i < 4; i++) {
+    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
         feedbackValues[i] = analogRead(FEEDBACK_PINS[i]);
     }
 }
@@ -213,7 +220,8 @@ void ComputeControl() {
 
 void UpdateServos() {
     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-        pwm.setPWM(i, 0, degreeToPulseWidth(servoCommandAngles[i], i));
+        uint16_t pulseWidth = degreeToPulseWidth(servoCommandAngles[i], i);
+        pwm.setPWM(i, 0, pulseWidth);
     }
 }
 
@@ -291,12 +299,15 @@ void SendDataToComputer() {
 }
 
 void RequestI2CData() {
-    Wire.requestFrom(I2C_ADDRESS_NANO, (uint8_t)2); // Request 2 bytes for uint16_t
+    // Wire.requestFrom(I2C_ADDRESS_NANO, (uint8_t)2);  // Remove hardware I2C request
+    softWire.requestFrom(I2C_ADDRESS_NANO, (uint8_t)2);  // Use SoftwareWire request
 }
 
 void ProcessI2CData() {
-    if (Wire.available() >= 2) {
-        uint16_t receivedValue = Wire.read() | (Wire.read() << 8);
+    // if (Wire.available() >= 2) {  // Remove hardware I2C available check
+    if (softWire.available() >= 2) {  // Use SoftwareWire available check
+        // uint16_t receivedValue = Wire.read() | (Wire.read() << 8);  // Remove hardware I2C read
+        uint16_t receivedValue = softWire.read() | (softWire.read() << 8);  // Use SoftwareWire read
         if (xSemaphoreTake(xFeedbackMutex, portMAX_DELAY)) {
             feedbackValues[4] = receivedValue; // Store in the fifth servo's feedback
             xSemaphoreGive(xFeedbackMutex);

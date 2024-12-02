@@ -5,34 +5,23 @@
 #include <Arduino_FreeRTOS.h>
 #include "ServoConfig.h"  // Include the ServoConfig header
 
-// Update analog pins for potentiometers to include A6 for the fifth knob
+// Analog pins for potentiometer knobs
 const uint8_t KNOB_PINS[5] = {A0, A1, A2, A3, A6};
-const uint8_t SERVO5_PIN = A7;
 
-volatile bool dataRequested = false;
-
-// Buffer to hold knob values and servo5Feedback
+// Buffer to hold knob values
 uint16_t knobValues[NUM_SERVOS];
-uint16_t servo5Feedback = 0;
 
 // Function prototypes
 void TaskReadKnobs(void* pvParameters);
 
-// Handler for receiving data from Master (if needed)
-void receiveEvent(int howMany) {
-    // Optional: Handle incoming data if the Master sends commands
-    while (Wire.available()) {
-        Wire.read();  // Read and discard the incoming byte
-        // Process command if necessary
-    }
-}
-
 // Handler for sending data to Master upon request
 void requestEvent() {
-    // Send only servo5Feedback
-    uint16_t value = servo5Feedback;
-    Wire.write((value >> 8) & 0xFF); // High byte
-    Wire.write(value & 0xFF);        // Low byte
+    // Create a comma-separated string of all five user input potentiometers
+    char dataString[40];
+    snprintf(dataString, sizeof(dataString), "knobs: %d,%d,%d,%d,%d",
+             knobValues[0], knobValues[1], knobValues[2], knobValues[3], knobValues[4]);
+
+    Wire.write(dataString);  // Send data to Master
 }
 
 // Stack overflow hook
@@ -57,8 +46,7 @@ void setup() {
         ;  // Wait for serial port to connect (needed for native USB)
     }
 
-    Wire.begin(I2C_ADDRESS_NANO);
-    Wire.onReceive(receiveEvent);
+    Wire.begin(I2C_ADDRESS_NANO);  // Initialize hardware I2C in Slave mode
     Wire.onRequest(requestEvent);
 
     // Create the Read Potentiometers Task
@@ -81,7 +69,6 @@ void loop() {
     // Empty. All work is done in tasks.
 }
 
-
 void TaskReadKnobs(void* pvParameters) {
     (void) pvParameters;
 
@@ -90,7 +77,7 @@ void TaskReadKnobs(void* pvParameters) {
 
     for (;;) {
         // Read user input knobs
-        for (uint8_t i = 0; i < 5; i++) {
+        for (uint8_t i = 0; i < NUM_SERVOS; i++) {
             uint16_t rawValue = analogRead(KNOB_PINS[i]);
             if (rawValue < 32) {
                 rawValue = 32;
@@ -98,18 +85,17 @@ void TaskReadKnobs(void* pvParameters) {
             knobValues[i] = rawValue;  // Store user input potentiometer values
         }
 
-        // Read fifth servo feedback from A7
-        servo5Feedback = analogRead(A7);
-
-        // Create a comma-separated string of all five user input potentiometers
-        char dataString[40];
-        snprintf(dataString, sizeof(dataString), ">%d,%d,%d,%d,%d",
-                 knobValues[0], knobValues[1], knobValues[2], knobValues[3], knobValues[4]);
-
         // Send the user input potentiometers data string over Serial
+        char dataString[40];
+        snprintf(dataString, sizeof(dataString), "knobs: %d,%d,%d,%d,%d",
+                 knobValues[0], knobValues[1], knobValues[2], knobValues[3], knobValues[4]);
         Serial.println(dataString);
 
         // Delay for consistent intervals (e.g., 100 ms)
         xTaskDelayUntil(&xLastWakeTime, xInterval);
     }
+}
+
+void RequestI2CData() {
+    // softWire.requestFrom(...);  // Use SoftwareWire request if needed
 }
