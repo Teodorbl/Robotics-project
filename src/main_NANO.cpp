@@ -18,7 +18,7 @@ void TaskReadKnobs(void* pvParameters);
 void requestEvent() {
     // Create a comma-separated string of all five user input potentiometers
     char dataString[40];
-    snprintf(dataString, sizeof(dataString), "knobs: %d,%d,%d,%d,%d",
+    snprintf(dataString, sizeof(dataString), "KNOBS:%d,%d,%d,%d,%d",
              knobValues[0], knobValues[1], knobValues[2], knobValues[3], knobValues[4]);
 
     Wire.write(dataString);  // Send data to Master
@@ -87,7 +87,7 @@ void TaskReadKnobs(void* pvParameters) {
 
         // Send the user input potentiometers data string over Serial
         char dataString[40];
-        snprintf(dataString, sizeof(dataString), "knobs: %d,%d,%d,%d,%d",
+        snprintf(dataString, sizeof(dataString), "KNOBS:%d,%d,%d,%d,%d",
                  knobValues[0], knobValues[1], knobValues[2], knobValues[3], knobValues[4]);
         Serial.println(dataString);
 

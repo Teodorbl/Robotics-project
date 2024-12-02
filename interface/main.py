@@ -16,7 +16,7 @@ def main():
     
     atexit.register(lambda: serial_api.close())
 
-    # Modify the signal_handler to call reset_servos before exiting
+    # Modify the signal_handler to call reset_servos before exiting    ls /dev/cu.*
     def signal_handler(sig, frame):
         gui.append_output("\nKeyboardInterrupt detected. Exiting gracefully...")
         gui.close()

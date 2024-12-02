@@ -43,11 +43,11 @@ SemaphoreHandle_t xServoCommandMutex;
 
 // Define stack sizes for each task
 #define CONTROL_LOOP_STACK_SIZE 256
-#define SERIAL_TASK_STACK_SIZE 256
+#define SERIAL_TASK_STACK_SIZE 128
 #define I2C_TASK_STACK_SIZE 128
 
 #define ENABLE_ERROR 1  // Enables error prints
-#define ENABLE_DEBUG 1  // Enables debug prints
+#define ENABLE_DEBUG 0  // Enables debug prints
 
 // Modified logging macros to accept optional data arguments
 #if ENABLE_ERROR
@@ -121,11 +121,17 @@ void setup() {
     while (!Serial) {
         ;  // Wait for serial port to connect (needed for native USB)
     }
+    Serial.println("UNO serial started");
 
     softWire.begin();  // Initialize SoftwareWire
-
+    Serial.println("softWire started");
+    // Wire.begin();     // Initialize hardware I2C - Removed
+    
     pwm.begin();
+    Serial.println("PWM began");
     pwm.setPWMFreq(PWM_FREQ);
+    Serial.println("PWM set freq");
+
 
     // Initialize servos to desired positions using ServoConfig.h
     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
@@ -133,6 +139,7 @@ void setup() {
         uint16_t pulseWidth = degreeToPulseWidth(servoCommandAngles[i], i);
         pwm.setPWM(i, 0, pulseWidth);
     }
+    Serial.println("Servos init");
 
     xServoCommandMutex = xSemaphoreCreateMutex();
     if (xServoCommandMutex == NULL) {
@@ -141,6 +148,7 @@ void setup() {
         #endif
         while (1); // Halt if mutex creation fails
     }
+    Serial.println("Command Mutex created");
 
     xFeedbackMutex = xSemaphoreCreateMutex();
     if (xFeedbackMutex == NULL) {
@@ -149,6 +157,7 @@ void setup() {
         #endif
         while (1); // Halt if mutex creation fails
     }
+    Serial.println("Feedback Mutex created");
 
     xTaskCreate(
         vControlLoopTask,                // Task function
@@ -158,6 +167,8 @@ void setup() {
         PRIORITY_CONTROL_TASK,           // Priority
         NULL                             // Task handle
     );
+    
+    Serial.println("Control task created");
 
     xTaskCreate(
         vSerialTask,
@@ -168,6 +179,8 @@ void setup() {
         NULL
     );
 
+    Serial.println("Serial task created");
+
     xTaskCreate(
         vI2CTask,
         "I2CTask",
@@ -176,6 +189,8 @@ void setup() {
         PRIORITY_I2C_TASK,
         NULL
     );
+
+    Serial.println("Setup ended");
 
     vTaskStartScheduler();
 
@@ -422,16 +437,13 @@ void ProcessSerialCommands() {
 void SendDataToComputer() {
     if (xSemaphoreTake(xFeedbackMutex, portMAX_DELAY)) {
 
-        Serial.print(F("D:"));
-        Serial.print(DEBUG_FEEDBACK_SENT);
-        Serial.print(F(":"));
-
-        // Send feedback values as a space-separated string with code
+        // Send feedback values as a comma-separated string with code
+        Serial.print(F("FEEDBACK:"));
         for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-            Serial.print(feedbackValues[i]);
-            if (i < NUM_SERVOS - 1) {
-                Serial.print(" ");
+            if (i != 0) {
+                Serial.print(",");
             }
+            Serial.print(feedbackValues[i]);
         }
         Serial.println();
 

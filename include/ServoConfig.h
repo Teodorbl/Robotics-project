@@ -28,7 +28,8 @@ const uint8_t I2C_ADDRESS_PWMDRV = 0x40;   // I2C address for PWM Servo Driver (
 const uint8_t I2C_ADDRESS_NANO = 0x08;     // I2C address for Arduino Nano
 
 // Define baud rate constants
-const uint32_t BAUD_RATE_UNO = 115200;
+//const uint32_t BAUD_RATE_UNO = 115200;
+const uint32_t BAUD_RATE_UNO = 57600;
 const uint32_t BAUD_RATE_NANO = 57600;
 
 const uint8_t PWM_FREQ = 50;

@@ -1,6 +1,8 @@
 import threading
 import serial
 import time
+import os
+import json
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -10,7 +12,7 @@ if TYPE_CHECKING:
 
 class SerialAPI():
     def __init__(self, configs):
-        print("-- Serial init --")
+        print("-- Serial init start --")
         
         self.configs = configs
         self.gui: GUIType = None
@@ -25,6 +27,21 @@ class SerialAPI():
         # Initialize servo positions
         self.servo_pos_init = configs.SERVO_DEFAULT_ANGLES
         self.servo_positions = self.servo_pos_init.copy()
+        
+        # Init error and debug parsing
+        self.json_filepath = configs.JSON_FILEPATH
+        self.errors = {}
+        self.debugs = {}
+
+        if not os.path.exists(self.json_filepath):
+            raise FileNotFoundError(f"JSON file not found at: {self.json_filepath}")
+
+        with open(self.json_filepath, 'r') as file:
+            data = json.load(file)
+            self.errors = {int(k): v for k, v in data.get("errors", {}).items()}
+            self.debugs = {int(k): v for k, v in data.get("debugs", {}).items()}
+        
+        print("-- Serial init end --")
         
     def toggle_connection(self):
         if self.ser_uno and self.ser_uno.is_open and self.ser_nano and self.ser_nano.is_open:
@@ -93,6 +110,24 @@ class SerialAPI():
         servo_indices = list(range(self.configs.NUM_SERVOS))
         
         self.servo_command(servo_indices, default_pos)
+
+    def get_error_message(self, code):
+        error = self.errors.get(code)
+        if error:
+            message = error["message"]
+            data = error["data"]
+            return f"Error {code}: {message}" + (f" | Data: {data}" if data else "")
+        else:
+            raise ValueError(f"Unknown Error Code: {code}")
+
+    def get_debug_message(self, code):
+        debug = self.debugs.get(code)
+        if debug:
+            message = debug["message"]
+            data = debug["data"]
+            return f"Debug {code}: {message}" + (f" | Data: {data}" if data else "")
+        else:
+            raise ValueError(f"Unknown Debug Code: {code}")
                 
     def read_uno(self):
         if not (self.ser_uno and self.ser_uno.is_open and self.ser_uno.in_waiting > 0):
@@ -101,13 +136,34 @@ class SerialAPI():
         try:
             line = self.ser_uno.readline().decode('utf-8').strip()
             
-            data_line = line.startswith('>')
+            # Check for error line
+            if line.startswith("E:"):
+                parts = line.strip().split(":", 2)
+                code = int(parts[1])
+                data = parts[2] if len(parts) > 2 else None
+                message = self.get_error_message(code)
+                output = message + (f" | Data: {data}" if data else "")
+                print(output)
+                if self.gui.debug_mode: self.gui.append_output(output)
+            
+            # Check for debug line
+            elif line.startswith("D:"):
+                parts = line.strip().split(":", 2)
+                code = int(parts[1])
+                data = parts[2] if len(parts) > 2 else None
+                message = self.get_debug_message(code)
+                output = message + (f" | Data: {data}" if data else "")
+                print(output)
+                if self.gui.debug_mode: self.gui.append_output(output)
+        
+            # Check for data line
+            feedback_data_line = line.startswith('FEEDBACK,')
             debug_on = self.gui.debug_mode
             
-            if data_line:
+            if feedback_data_line:
                 # Process data line
                 
-                data = line[1:]
+                data = line[9:]
                 values = list(map(float, data.split(',')))
                 
                 if len(values) != self.configs.NUM_SERVOS:
@@ -115,7 +171,7 @@ class SerialAPI():
                 
                 self.gui.plot_servo_pos(values)
             
-            if (not data_line) or debug_on:
+            if (not feedback_data_line) or debug_on:
                 # Process non-data line
                 
                 self.gui.append_output(line, 'UNO')
@@ -233,5 +289,6 @@ class SerialAPI():
         
         self.gui.append_output("Failed to receive ACK after retries.")
         return False
+
 
 

@@ -44,10 +44,9 @@ config = parse_servo_config(servo_config_path)
 required_keys = [
     'NUM_SERVOS', 'SERVO_NAMES', 'SERVO_MIN_ANGLES', 'SERVO_MAX_ANGLES',
     'SERVO_INVERT_MASK', 'SERVO_DEFAULT_ANGLES', 'SERVO_MIN_DEGREE',
-    'SERVO_MAX_DEGREE', 'SERVO_MIN_PULSE_WIDTH', 'SERVO_MAX_PULSE_WIDTH'
+    'SERVO_MAX_DEGREE', 'SERVO_MIN_PULSE_WIDTH', 'SERVO_MAX_PULSE_WIDTH',
+    'BAUD_RATE_UNO', 'BAUD_RATE_NANO'
 ]
-
-#print(config)
 
 for key in required_keys:
     if key not in config:
@@ -63,12 +62,14 @@ SERVO_MIN_DEGREE = config['SERVO_MIN_DEGREE']
 SERVO_MAX_DEGREE = config['SERVO_MAX_DEGREE']
 SERVO_MIN_PULSE_WIDTH = config['SERVO_MIN_PULSE_WIDTH']
 SERVO_MAX_PULSE_WIDTH = config['SERVO_MAX_PULSE_WIDTH']
+BAUD_RATE_UNO = config['BAUD_RATE_UNO']
+BAUD_RATE_NANO = config['BAUD_RATE_NANO']
 
+JSON_FILEPATH = 'interface/backend/error_codes.json'
 
 # Configure the serial ports for both Nano and Uno
 SERIAL_PORT_UNO = '/dev/cu.usbmodem11101'
 SERIAL_PORT_NANO = '/dev/cu.usbserial-A105A9FZ'
 
-# Initialize baud rates after removing BAUD_RATE
-BAUD_RATE_UNO = 115200
-BAUD_RATE_NANO = 57600
+if __name__ == '__main__':
+    print(config)
