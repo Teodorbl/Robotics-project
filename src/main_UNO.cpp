@@ -7,7 +7,7 @@
 #include <semphr.h>
 #include <avr/pgmspace.h>
 #include <Wire.h>
-//#include <SoftwareWire.h>
+
 
 #define I2C_ADDRESS_PWMDRV 0x40
 #define I2C_ADDRESS_NANO 0x08     // I2C address for Arduino Nano
@@ -46,14 +46,8 @@ const TickType_t xTimeIncrementControl = pdMS_TO_TICKS(CONTROL_INTERVAL_MS);
 const TickType_t xTimeIncrementComs PROGMEM = pdMS_TO_TICKS(COMS_DELAY_MS);
 
 //PUT IN PROGMEM?
-const char* controlTaskName = "a";
-const char* comsTaskName = "b";
-
-// #define SDA_PIN 2
-// #define SCL_PIN 3
-
-//SoftwareWire softWire(SDA_PIN, SCL_PIN);  // Create SoftwareWire instance
-#define softWire Wire
+const char* controlTaskName = "ctrl";
+const char* comsTaskName = "coms";
 
 // Global variable to store analog feedback values
 uint16_t feedbackValues[NUM_SERVOS] = {0};
@@ -109,17 +103,9 @@ void setup() {
     while (!Serial) {
         ;  // Wait for serial port to connect (needed for native USB)
     }
-    // softWire.begin();  // Initialize SoftwareWire
-    // Serial.println("softWire started");
-    // // Wire.begin();     // Initialize hardware I2C - Removed
-    
-    // pwm.begin();
-    // Serial.println("PWM began");
-    // pwm.setPWMFreq(PWM_FREQ);
-
-    // Serial.println("PWM set freq");
 
     Wire.begin();
+
     pwm.begin();
     pwm.setPWMFreq(PWM_FREQ);
 
@@ -337,8 +323,8 @@ void RequestI2CData() {
 }
 
 void ProcessI2CData() {
-    if (softWire.available() >= 2) {
-        uint16_t receivedValue = softWire.read() | (softWire.read() << 8);
+    if (Wire.available() >= 2) {
+        uint16_t receivedValue = Wire.read() | (Wire.read() << 8);
         Serial.println(receivedValue);
 
         if (xSemaphoreTake(xGlobalMutex, portMAX_DELAY)) {

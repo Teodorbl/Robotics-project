@@ -157,7 +157,7 @@ class SerialAPI():
                 if self.gui.debug_mode: self.gui.append_output(output)
         
             # Check for data line
-            feedback_data_line = line.startswith('FEEDBACK,')
+            feedback_data_line = line.startswith('FEEDBACK:')
             debug_on = self.gui.debug_mode
             
             if feedback_data_line:
