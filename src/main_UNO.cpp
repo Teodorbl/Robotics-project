@@ -6,6 +6,7 @@
 #include <Arduino_FreeRTOS.h>
 #include <semphr.h>
 #include <Wire.h>
+#include <SPI.h>  // Add SPI library
 
 
 
@@ -84,6 +85,7 @@ void ProcessSerialCommands();
 void SendDataToComputer();
 void RequestI2CData();
 void ProcessI2CData();
+void SendSPIData(uint8_t *data, size_t length);
 
 #ifdef DEBUG_PRINTS
 void PrintStackUsage(const char* taskName, TaskHandle_t xHandle);
@@ -125,6 +127,9 @@ void setup() {
 
     pwm.begin();
     pwm.setPWMFreq(PWM_FREQ);
+
+    SPI.begin();  // Initialize SPI as Master
+    SPI.setClockDivider(SPI_CLOCK_DIV16); // Set SPI clock speed as needed
 
     // Initialize servos to desired positions using ServoConfig.h
     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
@@ -216,9 +221,10 @@ void vComsTask(void *pvParameters) {
             DEBUG_PRINTLN(F("Coms task: Overtime"));
         }
 
-        // Request and store data over I2C
-        RequestI2CData();
-        ProcessI2CData();
+        // Replace I2C communication with SPI
+        uint8_t spiData[13];
+        // Populate spiData with necessary information
+        SendSPIData(spiData, 13);
 
         // Send data back to the computer over serial
         SendDataToComputer();
@@ -379,6 +385,12 @@ void ProcessI2CData() {
         } else {
             DEBUG_PRINTLN(F("Failed to acquire feedback values mutex"));
         }
+    }
+}
+
+void SendSPIData(uint8_t *data, size_t length) {
+    for (size_t i = 0; i < length; i++) {
+        SPI.transfer(data[i]);
     }
 }
 

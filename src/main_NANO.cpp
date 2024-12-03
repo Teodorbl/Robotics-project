@@ -3,7 +3,7 @@
 #include <Arduino.h>
 #include <Arduino_FreeRTOS.h>
 #include <Wire.h>
-
+#include <SPI.h>  // Add SPI library
 
 // #define DEBUG_PRINTS
 
@@ -38,6 +38,10 @@ const uint8_t FIFTH_FEEDBACK_PIN = A7;
 volatile uint16_t fifthFeedbackValue = 0;
 volatile uint16_t currentLevels[NUM_SERVOS] = {0};
 volatile bool stopFlag = false;          // Signal to stop because of overcurrent
+
+volatile bool spiDataReady = false;
+volatile uint8_t receivedData[13];
+volatile uint8_t dataIndex = 0;
 
 const char* mainTaskName = "main";
 const TickType_t xTimeIncrementMain = pdMS_TO_TICKS(MAIN_INTERVAL_MS);
@@ -83,8 +87,10 @@ void setup() {
         ;  // Wait for serial port to connect (needed for native USB)
     }
 
-    Wire.begin(I2C_ADDRESS_NANO);  // Initialize hardware I2C in Slave mode
-    Wire.onRequest(RequestEvent);
+    pinMode(MISO, OUTPUT); // Set MISO as output
+    SPCR |= _BV(SPE); // Enable SPI as Slave
+
+    SPI.attachInterrupt(); // Enable SPI interrupt
 
     // Create the Main Task
     xTaskCreate(
@@ -102,6 +108,14 @@ void setup() {
     vTaskStartScheduler();
 
     while (1);
+}
+
+ISR(SPI_STC_vect) {
+    receivedData[dataIndex++] = SPDR;
+    if (dataIndex >= 13) {
+        spiDataReady = true;
+        dataIndex = 0;
+    }
 }
 
 void vMainTask(void* pvParameters) {
@@ -125,6 +139,12 @@ void vMainTask(void* pvParameters) {
         // Perform computations (e.g., Kalman filter)
         DEBUG_PRINTLN(F("Main task: Checking current"));
         CheckOvercurrent();
+
+        if (spiDataReady) {
+            // Process received SPI data
+            spiDataReady = false;
+            // ...handle receivedData...
+        }
 
         // Monitor stack usage periodically
         #ifdef DEBUG_PRINTS
