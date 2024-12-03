@@ -142,8 +142,15 @@ void ReadAnalogInputs() {
         currentLevels[i] = analogRead(CURRENT_SENSOR_PINS[i]);
     }
 
-    Serial.print("Current 5: ");
-    Serial.println(currentLevels[4]);
+    // Send to serial output
+    Serial.print("A:");
+    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+        if (i != 0) {
+            Serial.print(",");
+        }
+        Serial.print(currentLevels[i]);
+    }
+    Serial.println();
 }
 
 void CheckOvercurrent() {

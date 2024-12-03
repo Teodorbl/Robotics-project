@@ -103,7 +103,7 @@ class SerialAPI():
                 if self.ser_uno and self.ser_uno.is_open:
                     self.ser_uno.write((command + '\n').encode('utf-8'))
             except Exception as e:
-                self.gui.append_output(f"Error writing to serial port: {e}")
+                self.gui.append_output(f"Error writing to serial port: {e}", 'serial_api')
     
     def reset_servos(self):
         default_pos = self.servo_pos_init.copy()
@@ -136,25 +136,25 @@ class SerialAPI():
         try:
             line = self.ser_uno.readline().decode('utf-8').strip()
             
-            # Check for error line
-            if line.startswith("E:"):
-                parts = line.strip().split(":", 2)
-                code = int(parts[1])
-                data = parts[2] if len(parts) > 2 else None
-                message = self.get_error_message(code)
-                output = message + (f" | Data: {data}" if data else "")
-                print(output)
-                if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
+            # # Check for error line
+            # if line.startswith("E:"):
+            #     parts = line.strip().split(":", 2)
+            #     code = int(parts[1])
+            #     data = parts[2] if len(parts) > 2 else None
+            #     message = self.get_error_message(code)
+            #     output = message + (f" | Data: {data}" if data else "")
+            #     print(output)
+            #     if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
             
-            # Check for debug line
-            elif line.startswith("D:"):
-                parts = line.strip().split(":", 2)
-                code = int(parts[1])
-                data = parts[2] if len(parts) > 2 else None
-                message = self.get_debug_message(code)
-                output = message + (f" | Data: {data}" if data else "")
-                print(output)
-                if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
+            # # Check for debug line
+            # elif line.startswith("D:"):
+            #     parts = line.strip().split(":", 2)
+            #     code = int(parts[1])
+            #     data = parts[2] if len(parts) > 2 else None
+            #     message = self.get_debug_message(code)
+            #     output = message + (f" | Data: {data}" if data else "")
+            #     print(output)
+            #     if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
         
             # Check for data line
             feedback_data_line = line.startswith('FB:')
@@ -181,7 +181,9 @@ class SerialAPI():
             self.toggle_connection()
     
         except Exception as e:
-            self.gui.append_output(f"Error during read of UNO serial: {e}")
+            self.gui.append_output("Error during read of UNO serial", 'serial_api')
+            self.gui.append_output(f"Line: {line}", 'serial_api')
+            self.gui.append_output(f"Error: {e}", 'serial_api')
 
     def read_nano(self):
         if not (self.ser_nano and self.ser_nano.is_open and self.ser_nano.in_waiting > 0):
@@ -190,8 +192,19 @@ class SerialAPI():
         try:
             line = self.ser_nano.readline().decode('utf-8').strip()
             
-            data_line = line.startswith('>')
+            data_line = line.startswith('A:')       # Current readings
             debug_on = self.gui.debug_mode
+            
+            if data_line:
+                data = line[2:]
+                values = list(map(float, data.split(',')))
+                num_values = len(values)
+                
+                if num_values != self.configs.NUM_SERVOS:
+                    raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from NANO current sensors, but got {len(values)}")
+                
+                self.gui.plot_servo_currents(values)
+                
             
             # if data_line and self.gui.knob_mode:
             #     # Process data line
@@ -206,7 +219,7 @@ class SerialAPI():
             #     indices = list(range(num_values))
             #     degrees = [self.knob_to_degree(val, idx) for val, idx in zip(values, indices)]
             #     self.servo_command(indices, degrees)
-                    
+            
             
             if (not data_line) or debug_on:
                 # Process non-data line
@@ -214,11 +227,13 @@ class SerialAPI():
                 self.gui.append_output(line, 'NANO')
     
         except serial.SerialException as e:
-            self.gui.append_output(f"Serial error NANO: {e}")
+            self.gui.append_output(f"Serial error NANO: {e}", 'serial_api')
             self.toggle_connection()
     
-        except Exception as e:
-            self.gui.append_output(f"Error during read of NANO serial: {e}")
+        # except Exception as e:
+        #     self.gui.append_output("Error during read of NANO serial", 'serial_api')
+        #     self.gui.append_output(f"Line: {line}", 'serial_api')
+        #     self.gui.append_output(f"Error: {e}", 'serial_api')
                 
     def knob_to_degree(self, raw_knob, servo_index):
         """
@@ -256,7 +271,7 @@ class SerialAPI():
                 try:
                     self.ser_uno.write(command.encode('utf-8'))
                 except Exception as e:
-                    self.gui.append_output(f"Error writing to UNO serial: {e}")
+                    self.gui.append_output(f"Error writing to UNO serial: {e}", 'serial_api')
                     return False
             
             # Wait for ACK
@@ -268,18 +283,18 @@ class SerialAPI():
                         if line == expected_ack:
                             return True
                     except Exception as e:
-                        self.gui.append_output(f"Error reading UNO serial: {e}")
+                        self.gui.append_output(f"Error reading UNO serial: {e}", 'serial_api')
                         break
                 time.sleep(0.1)
             
-            self.gui.append_output(f"ACK not received for set_use_knobs attempt {attempt + 1}")
+            self.gui.append_output(f"ACK not received for set_use_knobs attempt {attempt + 1}", 'serial_api')
         
-        self.gui.append_output("Failed to receive ACK after retries.")
+        self.gui.append_output("Failed to receive ACK after retries.", 'serial_api')
         return False
 
     def close(self):
         # Disconnect both
-        self.gui.append_output("Closing both serial ports")
+        self.gui.append_output("Closing both serial ports", 'serial_api')
         self.reset_servos()
         
         if self.ser_uno and self.ser_uno.is_open:

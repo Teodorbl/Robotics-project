@@ -23,6 +23,7 @@ class GUI():
         
         # Initialize buffer for each servo
         self.servo_pos_buffers = [[] for _ in range(configs.NUM_SERVOS)]
+        self.servo_current_buffers = [[] for _ in range(configs.NUM_SERVOS)]
         
         # Initialize debug mode flag
         self.debug_mode = False
@@ -66,16 +67,32 @@ class GUI():
         current_time = time.time() - self.serial_api.connection_start_time
             
         for i in range(self.configs.NUM_SERVOS):
-            voltage = values[i]
-            self.servo_pos_buffers[i].append((current_time, voltage))
+            analog_read = values[i]
+            self.servo_pos_buffers[i].append((current_time, analog_read))
             
             # Update plot data
-            times, voltages = zip(*self.servo_pos_buffers[i][-100:])
-            self.window.curves[i].setData(times, voltages)
+            times, analog_reads = zip(*self.servo_pos_buffers[i][-100:])
+            self.window.pos_curves[i].setData(times, analog_reads)
             
             # Update current value label
             servo_name = self.servo_names[i]
-            self.window.labels[i].setText(f"{servo_name}: {voltage:.2f} Value")
+            self.window.pos_labels[i].setText(f"{servo_name}: {analog_read:.2f}")
+    
+    def plot_servo_currents(self, values):
+        current_time = time.time() - self.serial_api.connection_start_time
+            
+        for i in range(self.configs.NUM_SERVOS):
+            analog_read = values[i]
+            self.servo_current_buffers[i].append((current_time, analog_read))
+            
+            # Update plot data
+            times, analog_reads = zip(*self.servo_current_buffers[i][-100:])
+            self.window.current_curves[i].setData(times, analog_reads)
+            
+            # Update current value label
+            servo_name = self.servo_names[i]
+            self.window.current_labels[i].setText(f"{servo_name}: {analog_read:.2f}")
+        
     
     def uno_text_command(self):
         
@@ -118,7 +135,7 @@ class GUI():
                 buffer.clear()
             
             # Reset all current value labels
-            for label in self.window.labels:
+            for label in self.window.pos_labels + self.window.current_labels:
                 label.setText("N/A")
             
         else:
@@ -189,7 +206,11 @@ class GUI():
     
     def close(self):
         # Perform necessary cleanup
-        self.window.app.quit()
+        try:
+            self.window.app.quit()
+        
+        except Exception as e:
+            pass
 
 
 

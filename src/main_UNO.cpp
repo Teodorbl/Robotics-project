@@ -37,7 +37,7 @@
 
 // Task interval and delays
 #define CONTROL_INTERVAL_MS 100
-#define COMS_DELAY_MS 10000
+#define COMS_DELAY_MS 100
 
 const uint8_t NUM_SERVOS = 5;
 

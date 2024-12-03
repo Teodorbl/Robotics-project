@@ -82,39 +82,63 @@ class Window():
         # --------------------------------------------
         # Create PyQtGraph plots and labels
         # --------------------------------------------
-
-        plots = []
-        self.curves = []
-        self.labels = []
-        pen_colors = ['r', 'g', 'b', 'c', 'm']  # Different colors for each servo
+        
+        self.pos_curves = []
+        self.pos_labels = []
+        self.current_curves = []
+        self.current_labels = []
+        pen_colors = ['r', 'g', 'orange', 'c', 'm']
 
         for i in range(configs.NUM_SERVOS):
             # Horizontal layout for plot and label
             servo_layout = QtWidgets.QHBoxLayout()
             
-            # Plot Widget with custom TimeAxisItem
-            plot_widget = pg.PlotWidget(
+            # Plot Widget with custom TimeAxisItem for Voltage
+            pos_plot_widget = pg.PlotWidget(
                 title=f'{configs.SERVO_NAMES[i].capitalize()} Position',
                 axisItems={'bottom': TimeAxisItem(orientation='bottom')}
             )
             
-            plot_widget.setLabel('left', 'V')  # Keep label as 'V' for volts
-            plot_widget.setLabel('bottom', 'Elapsed Time', units='s')
+            pos_plot_widget.setLabel('left', 'Value')
+            pos_plot_widget.setLabel('bottom', 'Elapsed Time', units='s')
             
-            #plot_widget.setYRange(0, 5)  # Assuming voltage ranges from 0 to 5V
-            
-            plot_widget.showGrid(x=True, y=True)  # Show grid
-            curve = plot_widget.plot(pen=pen_colors[i], name=f'{configs.SERVO_NAMES[i].capitalize()}')
-            plots.append(plot_widget)
-            self.curves.append(curve)
+            pos_plot_widget.showGrid(x=True, y=True)  # Show grid
+            pos_curve = pos_plot_widget.plot(pen=pen_colors[i], name=f'{configs.SERVO_NAMES[i].capitalize()} Angle')
+            self.pos_curves.append(pos_curve)
             
             # Current Value Label
-            current_value_label = QtWidgets.QLabel(f"{configs.SERVO_NAMES[i]}: N/A")
-            current_value_label.setFixedWidth(100)
-            self.labels.append(current_value_label)
+            pos_value_label = QtWidgets.QLabel(f"{configs.SERVO_NAMES[i]}: N/A")
+            pos_value_label.setFixedWidth(100)
+            self.pos_labels.append(pos_value_label)
             
             # Add plot and label to servo layout
-            servo_layout.addWidget(plot_widget)
+            servo_layout.addWidget(pos_plot_widget)
+            servo_layout.addWidget(pos_value_label)
+            
+            # --------------------------------------------
+            # Create PyQtGraph plots and labels for Current
+            # --------------------------------------------
+            
+            # Plot Widget for Current
+            current_plot_widget = pg.PlotWidget(
+                title=f'{configs.SERVO_NAMES[i].capitalize()} Current',
+                axisItems={'bottom': TimeAxisItem(orientation='bottom')}
+            )
+            
+            current_plot_widget.setLabel('left', 'Value')
+            current_plot_widget.setLabel('bottom', 'Elapsed Time', units='s')
+            
+            current_plot_widget.showGrid(x=True, y=True)  # Show grid
+            current_curve = current_plot_widget.plot(pen=pen_colors[i], name=f'{configs.SERVO_NAMES[i].capitalize()} Current')
+            self.current_curves.append(current_curve)
+            
+            # Electrical Current Value Label
+            current_value_label = QtWidgets.QLabel(f"{configs.SERVO_NAMES[i]}: N/A")
+            current_value_label.setFixedWidth(100)
+            self.current_labels.append(current_value_label)
+            
+            # Add current plot and label to servo layout
+            servo_layout.addWidget(current_plot_widget)
             servo_layout.addWidget(current_value_label)
             
             # Add servo layout to plots layout
