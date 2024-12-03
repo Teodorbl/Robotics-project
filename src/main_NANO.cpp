@@ -4,6 +4,17 @@
 #include <Arduino_FreeRTOS.h>
 #include <Wire.h>
 
+
+// #define DEBUG_PRINTS
+
+#ifdef DEBUG_PRINTS
+#define DEBUG_PRINT(x)    Serial.print(x)
+#define DEBUG_PRINTLN(x)  Serial.println(x)
+#else
+#define DEBUG_PRINT(x)
+#define DEBUG_PRINTLN(x)
+#endif
+
 #define NUM_SERVOS 5
 
 // I2C address for the Nano
@@ -40,13 +51,19 @@ void ReadAnalogInputs();
 void CheckOvercurrent();
 void RequestEvent();
 
+#ifdef DEBUG_PRINTS
+void PrintStackUsage(const char* taskName, TaskHandle_t xHandle);
+#endif
+
 // Function to print stack high water mark
+#ifdef DEBUG_PRINTS
 void PrintStackUsage(const char* taskName, TaskHandle_t xHandle) {
     UBaseType_t uxHighWaterMark = uxTaskGetStackHighWaterMark(xHandle);
-    Serial.print(taskName);  // taskName is a pointer to a string in Flash memory
-    Serial.print(F(" Stack High Water Mark: "));  // Use F() macro to store string in Flash memory
-    Serial.println(uxHighWaterMark);
+    DEBUG_PRINT(taskName);  // taskName is a pointer to a string in Flash memory
+    DEBUG_PRINT(F(" Stack High Water Mark: "));  // Use F() macro to store string in Flash memory
+    DEBUG_PRINTLN(uxHighWaterMark);
 }
+#endif
 
 // Stack overflow hook
 void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
@@ -79,7 +96,7 @@ void setup() {
         &xMainTaskHandle            // Task handle
     );
 
-    Serial.println(F("Setup completed"));
+    DEBUG_PRINTLN(F("Setup completed"));
 
     // Start the scheduler
     vTaskStartScheduler();
@@ -88,29 +105,31 @@ void setup() {
 }
 
 void vMainTask(void* pvParameters) {
-    Serial.println(F("Main task: Init"));
+    DEBUG_PRINTLN(F("Main task: Init"));
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
     for (;;) {
         // Wait for the next cycle
-        Serial.println(F("Main task: Waiting for cycle"));
+        DEBUG_PRINTLN(F("Main task: Waiting for cycle"));
         BaseType_t xWasDelayed = xTaskDelayUntil(&xLastWakeTime, xTimeIncrementMain);
 
         // Check if the task was delayed
-        if (xWasDelayed == pdTRUE) {
-            Serial.println(F("Main task: Delayed"));
+        if (xWasDelayed == pdFALSE) {
+            DEBUG_PRINTLN(F("Main task: Overtime"));
         }
 
         // Read analog inputs (feedback)
-        Serial.println(F("Main task: Reading analog"));
+        DEBUG_PRINTLN(F("Main task: Reading analog"));
         ReadAnalogInputs();
 
         // Perform computations (e.g., Kalman filter)
-        Serial.println(F("Main task: Checking current"));
+        DEBUG_PRINTLN(F("Main task: Checking current"));
         CheckOvercurrent();
 
         // Monitor stack usage periodically
+        #ifdef DEBUG_PRINTS
         PrintStackUsage(mainTaskName, xMainTaskHandle);
+        #endif
     }
 }
 

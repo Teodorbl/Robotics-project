@@ -8,7 +8,7 @@
 #include <Wire.h>
 
 
-// Define DEBUG_PRINTS to enable debug output
+
 // #define DEBUG_PRINTS
 
 #ifdef DEBUG_PRINTS
@@ -37,7 +37,7 @@
 
 // Task interval and delays
 #define CONTROL_INTERVAL_MS 100
-#define COMS_DELAY_MS 100
+#define COMS_DELAY_MS 10000
 
 const uint8_t NUM_SERVOS = 5;
 
@@ -70,8 +70,7 @@ uint8_t servoCommandAngles[NUM_SERVOS];
 // Servo driver instance
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(I2C_ADDRESS_PWMDRV);
 
-// Define separate mutexes for servoCommandAngles and feedbackValues
-SemaphoreHandle_t xServoAnglesMutex;
+// Define separate mutexes for feedbackValues
 SemaphoreHandle_t xFeedbackValuesMutex;
 
 // Function prototypes
@@ -135,11 +134,6 @@ void setup() {
     }
 
     // Create separate mutexes
-    xServoAnglesMutex = xSemaphoreCreateMutex();
-    if (xServoAnglesMutex == NULL) {
-        while (1); // Halt if mutex creation fails
-    }
-
     xFeedbackValuesMutex = xSemaphoreCreateMutex();
     if (xFeedbackValuesMutex == NULL) {
         while (1); // Halt if mutex creation fails
@@ -172,7 +166,7 @@ void setup() {
 }
 
 void vControlTask(void *pvParameters) {
-    DEBUG_PRINTLN(F("Control task init"));
+    DEBUG_PRINTLN(F("Control task: Init"));
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
     for (;;) {
@@ -180,10 +174,8 @@ void vControlTask(void *pvParameters) {
         BaseType_t xWasDelayed = xTaskDelayUntil(&xLastWakeTime, xTimeIncrementControl);
 
         // Check if the task was delayed
-        if (xWasDelayed == pdTRUE) {
-            #ifdef DEBUG_PRINTS
-                DEBUG_PRINTLN(F("Control task delayed"));
-            #endif
+        if (xWasDelayed == pdFALSE) {
+            DEBUG_PRINTLN(F("Control task: Overtime"));
         }
 
         // Check for serial data
@@ -208,8 +200,11 @@ void vControlTask(void *pvParameters) {
     }
 }
 
+
+
+
 void vComsTask(void *pvParameters) {
-    DEBUG_PRINTLN(F("Coms task init"));
+    DEBUG_PRINTLN(F("Coms task: Init"));
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
     for (;;) {
@@ -217,10 +212,8 @@ void vComsTask(void *pvParameters) {
         BaseType_t xWasDelayed = xTaskDelayUntil(&xLastWakeTime, xTimeIncrementComs);
 
         // Check if the task was delayed
-        if (xWasDelayed == pdTRUE) {
-            #ifdef DEBUG_PRINTS
-                DEBUG_PRINTLN(F("Coms task delayed"));
-            #endif
+        if (xWasDelayed == pdFALSE) {
+            DEBUG_PRINTLN(F("Coms task: Overtime"));
         }
 
         // Request and store data over I2C
@@ -260,7 +253,6 @@ void ReadAnalogInputs() {
         xSemaphoreGive(xFeedbackValuesMutex);
     } else {
         DEBUG_PRINTLN(F("Failed to acquire feedback values mutex"));
-        Serial.println(F("Failed to acquire feedback values mutex"));
     }
 }
 
@@ -276,15 +268,10 @@ void ComputeControl() {
 }
 
 void UpdateServos() {
-    // Acquire servo angles mutex with timeout
-    if (xSemaphoreTake(xServoAnglesMutex, pdMS_TO_TICKS(100))) {
-        for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-            uint16_t pulseWidth = DegreeToPulseWidth(servoCommandAngles[i], i);
-            pwm.setPWM(i, 0, pulseWidth);
-        }
-        xSemaphoreGive(xServoAnglesMutex);
-    } else {
-        DEBUG_PRINTLN(F("Failed to acquire servo angles mutex"));
+    // Directly update servos
+    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+        uint16_t pulseWidth = DegreeToPulseWidth(servoCommandAngles[i], i);
+        pwm.setPWM(i, 0, pulseWidth);
     }
 }
 
@@ -318,20 +305,10 @@ void ProcessSerialCommands() {
 
     if (newLineReceived) {
         // Parse the input line for five integers after the start character
-        uint8_t tempAngles[NUM_SERVOS];
-        int parsed = sscanf(inputBuffer, "%*c %hhu %hhu %hhu %hhu %hhu",
-                            &tempAngles[0], &tempAngles[1],
-                            &tempAngles[2], &tempAngles[3],
-                            &tempAngles[4]);
-        if (parsed == NUM_SERVOS) {
-            // Acquire servo angles mutex with timeout
-            if (xSemaphoreTake(xServoAnglesMutex, pdMS_TO_TICKS(100))) {
-                memcpy(servoCommandAngles, tempAngles, sizeof(tempAngles));
-                xSemaphoreGive(xServoAnglesMutex);
-            } else {
-                DEBUG_PRINTLN(F("Failed to acquire servo angles mutex"));
-            }
-        }
+        sscanf(inputBuffer, "%*c %hhu %hhu %hhu %hhu %hhu",
+                &servoCommandAngles[0], &servoCommandAngles[1],
+                &servoCommandAngles[2], &servoCommandAngles[3],
+                &servoCommandAngles[4]);
 
         // Clear the buffer after processing
         bufferIndex = 0;
