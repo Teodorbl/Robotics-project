@@ -144,7 +144,7 @@ class SerialAPI():
                 message = self.get_error_message(code)
                 output = message + (f" | Data: {data}" if data else "")
                 print(output)
-                if self.gui.debug_mode: self.gui.append_output(output)
+                if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
             
             # Check for debug line
             elif line.startswith("D:"):
@@ -154,16 +154,16 @@ class SerialAPI():
                 message = self.get_debug_message(code)
                 output = message + (f" | Data: {data}" if data else "")
                 print(output)
-                if self.gui.debug_mode: self.gui.append_output(output)
+                if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
         
             # Check for data line
-            feedback_data_line = line.startswith('FEEDBACK:')
+            feedback_data_line = line.startswith('FB:')
             debug_on = self.gui.debug_mode
             
             if feedback_data_line:
                 # Process data line
                 
-                data = line[9:]
+                data = line[3:]
                 values = list(map(float, data.split(',')))
                 
                 if len(values) != self.configs.NUM_SERVOS:
@@ -181,7 +181,7 @@ class SerialAPI():
             self.toggle_connection()
     
         except Exception as e:
-            self.gui.append_outout(f"Error during read of UNO serial: {e}")
+            self.gui.append_output(f"Error during read of UNO serial: {e}")
 
     def read_nano(self):
         if not (self.ser_nano and self.ser_nano.is_open and self.ser_nano.in_waiting > 0):
@@ -214,7 +214,7 @@ class SerialAPI():
                 self.gui.append_output(line, 'NANO')
     
         except serial.SerialException as e:
-            self.gui.append_output(f"Serial error with NANO: {e}")
+            self.gui.append_output(f"Serial error NANO: {e}")
             self.toggle_connection()
     
         except Exception as e:
@@ -239,19 +239,6 @@ class SerialAPI():
         # Linear mapping from raw value to degree
         degree = ((knob_max - raw_knob) / (knob_max - knob_min)) * (degree_max - degree_min) + degree_min
         return int(degree)
-    
-    def close(self):
-        # Disconnect both
-        self.gui.append_output("Closing both serial ports")
-        self.reset_servos()
-        
-        if self.ser_uno and self.ser_uno.is_open:
-            with self.serial_lock:
-                self.ser_uno.close()
-                
-        if self.ser_nano and self.ser_nano.is_open:
-            with self.serial_lock:
-                self.ser_nano.close()
 
     def set_use_knobs(self, enable: bool, retries: int = 3, timeout: float = 1.0):
         """
@@ -290,5 +277,21 @@ class SerialAPI():
         self.gui.append_output("Failed to receive ACK after retries.")
         return False
 
-
-
+    def close(self):
+        # Disconnect both
+        self.gui.append_output("Closing both serial ports")
+        self.reset_servos()
+        
+        if self.ser_uno and self.ser_uno.is_open:
+            try:
+                with self.serial_lock:
+                    self.ser_uno.close()
+            except Exception as e:
+                print("Could not close UNO serial. Error: {e}")
+                
+        if self.ser_nano and self.ser_nano.is_open:
+            try:
+                with self.serial_lock:
+                    self.ser_nano.close()
+            except Exception as e:
+                print("Could not close NANO serial. Error: {e}")

@@ -1,27 +1,51 @@
 // src/main_NANO.cpp
 
 #include <Arduino.h>
-#include <Wire.h>
 #include <Arduino_FreeRTOS.h>
-#include "ServoConfig.h"  // Include the ServoConfig header
+#include <Wire.h>
 
-// Analog pins for potentiometer knobs
-const uint8_t KNOB_PINS[5] = {A0, A1, A2, A3, A6};
+#define NUM_SERVOS 5
 
-// Buffer to hold knob values
-uint16_t knobValues[NUM_SERVOS];
+// I2C address for the Nano
+#define I2C_ADDRESS_NANO 0x08
+#define BAUD_RATE_NANO 57600
+
+// Task priority levels
+#define PRIORITY_MAIN_TASK 1
+
+// Define stack sizes for each task
+#define MAIN_STACK_SIZE 258
+
+// Task interval and delays
+#define MAIN_INTERVAL_MS 100
+
+// Analog pins for current readings
+const uint8_t CURRENT_SENSOR_PINS[5] = {A0, A1, A2, A3, A6};
+const uint8_t FIFTH_FEEDBACK_PIN = A7;
+
+// Shared variables to be sent to master
+volatile uint16_t fifthFeedbackValue = 0;
+volatile uint16_t currentLevels[NUM_SERVOS] = {0};
+volatile bool stopFlag = false;          // Signal to stop because of overcurrent
+
+const char* mainTaskName = "main";
+const TickType_t xTimeIncrementMain = pdMS_TO_TICKS(MAIN_INTERVAL_MS);
+
+// Modify task creation to store task handles
+TaskHandle_t xMainTaskHandle = NULL;
 
 // Function prototypes
-void TaskReadKnobs(void* pvParameters);
+void vMainTask(void* pvParameters);
+void ReadAnalogInputs();
+void CheckOvercurrent();
+void RequestEvent();
 
-// Handler for sending data to Master upon request
-void requestEvent() {
-    // Create a comma-separated string of all five user input potentiometers
-    char dataString[40];
-    snprintf(dataString, sizeof(dataString), "KNOBS:%d,%d,%d,%d,%d",
-             knobValues[0], knobValues[1], knobValues[2], knobValues[3], knobValues[4]);
-
-    Wire.write(dataString);  // Send data to Master
+// Function to print stack high water mark
+void PrintStackUsage(const char* taskName, TaskHandle_t xHandle) {
+    UBaseType_t uxHighWaterMark = uxTaskGetStackHighWaterMark(xHandle);
+    Serial.print(taskName);  // taskName is a pointer to a string in Flash memory
+    Serial.print(F(" Stack High Water Mark: "));  // Use F() macro to store string in Flash memory
+    Serial.println(uxHighWaterMark);
 }
 
 // Stack overflow hook
@@ -34,10 +58,6 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, char* pcTaskName) {
         digitalWrite(LED_BUILTIN, LOW);
         delay(500);
     }
-
-    // Send a message over the serial port
-    Serial.print("! ERROR: Stack overflow in task: ");Serial.println(pcTaskName);
-    while (1);
 }
 
 void setup() {
@@ -47,17 +67,19 @@ void setup() {
     }
 
     Wire.begin(I2C_ADDRESS_NANO);  // Initialize hardware I2C in Slave mode
-    Wire.onRequest(requestEvent);
+    Wire.onRequest(RequestEvent);
 
-    // Create the Read Potentiometers Task
+    // Create the Main Task
     xTaskCreate(
-        TaskReadKnobs,             // Task function
-        "ReadKnobs",               // Task name
-        128,                       // Stack size in words
-        NULL,                      // Task parameter
-        1,                         // Task priority
-        NULL                       // Task handle
+        vMainTask,                  // Task function
+        mainTaskName,               // Task name
+        MAIN_STACK_SIZE,            // Stack size in words
+        NULL,                       // Task parameter
+        PRIORITY_MAIN_TASK,         // Task priority
+        &xMainTaskHandle            // Task handle
     );
+
+    Serial.println(F("Setup completed"));
 
     // Start the scheduler
     vTaskStartScheduler();
@@ -65,37 +87,76 @@ void setup() {
     while (1);
 }
 
+void vMainTask(void* pvParameters) {
+    Serial.println(F("Main task: Init"));
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+
+    for (;;) {
+        // Wait for the next cycle
+        Serial.println(F("Main task: Waiting for cycle"));
+        BaseType_t xWasDelayed = xTaskDelayUntil(&xLastWakeTime, xTimeIncrementMain);
+
+        // Check if the task was delayed
+        if (xWasDelayed == pdTRUE) {
+            Serial.println(F("Main task: Delayed"));
+        }
+
+        // Read analog inputs (feedback)
+        Serial.println(F("Main task: Reading analog"));
+        ReadAnalogInputs();
+
+        // Perform computations (e.g., Kalman filter)
+        Serial.println(F("Main task: Checking current"));
+        CheckOvercurrent();
+
+        // Monitor stack usage periodically
+        PrintStackUsage(mainTaskName, xMainTaskHandle);
+    }
+}
+
+void ReadAnalogInputs() {
+    // Read feedback of fifth servo
+    fifthFeedbackValue = analogRead(FIFTH_FEEDBACK_PIN);
+
+    // Read current level of all servos
+    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+        currentLevels[i] = analogRead(CURRENT_SENSOR_PINS[i]);
+    }
+
+    Serial.print("Current 5: ");
+    Serial.println(currentLevels[4]);
+}
+
+void CheckOvercurrent() {
+    // TODO: Implement overcurrent detection logic
+    // Example:
+    // for(uint8_t i = 0; i < NUM_SERVOS; i++) {
+    //     if(currentLevels[i] > OVERCURRENT_THRESHOLD) {
+    //         stopFlag = true;
+    //     }
+    // }
+}
+
+void RequestEvent() {
+    // Ensure data consistency if needed
+    bool localStopFlag = stopFlag;
+    uint16_t localFifthFeedback = fifthFeedbackValue;
+    uint16_t localCurrentLevels[NUM_SERVOS];
+    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+        localCurrentLevels[i] = currentLevels[i];
+    }
+
+    // Send data
+    Wire.write((uint8_t)(localStopFlag ? 1 : 0));
+    Wire.write(lowByte(localFifthFeedback));
+    Wire.write(highByte(localFifthFeedback));
+    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+        Wire.write(lowByte(localCurrentLevels[i]));
+        Wire.write(highByte(localCurrentLevels[i]));
+    }
+}
+
 void loop() {
     // Empty. All work is done in tasks.
 }
 
-void TaskReadKnobs(void* pvParameters) {
-    (void) pvParameters;
-
-    TickType_t xLastWakeTime = xTaskGetTickCount();
-    const TickType_t xInterval = pdMS_TO_TICKS(100); // 100 ms interval
-
-    for (;;) {
-        // Read user input knobs
-        for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-            uint16_t rawValue = analogRead(KNOB_PINS[i]);
-            if (rawValue < 32) {
-                rawValue = 32;
-            }
-            knobValues[i] = rawValue;  // Store user input potentiometer values
-        }
-
-        // Send the user input potentiometers data string over Serial
-        char dataString[40];
-        snprintf(dataString, sizeof(dataString), "KNOBS:%d,%d,%d,%d,%d",
-                 knobValues[0], knobValues[1], knobValues[2], knobValues[3], knobValues[4]);
-        Serial.println(dataString);
-
-        // Delay for consistent intervals (e.g., 100 ms)
-        xTaskDelayUntil(&xLastWakeTime, xInterval);
-    }
-}
-
-void RequestI2CData() {
-    // softWire.requestFrom(...);  // Use SoftwareWire request if needed
-}

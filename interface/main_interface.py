@@ -7,9 +7,13 @@ import backend.configs as configs
 from backend.serial_api import SerialAPI
 from frontend.gui import GUI
 
+
+DEBUG_MODE = True
+AUTO_CONNECT = True
+
 def main():
     serial_api = SerialAPI(configs)
-    gui = GUI(configs, serial_api)
+    gui = GUI(configs, serial_api, DEBUG_MODE, AUTO_CONNECT)
     serial_api.gui = gui
     
     # On exit:

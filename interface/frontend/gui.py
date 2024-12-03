@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 from frontend.window import Window
 
 class GUI():
-    def __init__(self, configs, serial_api):
+    def __init__(self, configs, serial_api, DEBUG_MODE=False, AUTO_CONNECT=False):
         print("-- GUI init --")
         
         polling_interval = 100     # ms
@@ -38,18 +38,29 @@ class GUI():
         self.timer.timeout.connect(self.GUI_poll)
         self.timer.start(polling_interval)
         
+        if DEBUG_MODE:
+            self.toggle_debug_mode(DEBUG_MODE)
+            
+        if AUTO_CONNECT:
+            self.toggle_connection()
+        
     def GUI_poll(self):
         self.serial_api.read_uno()
         self.serial_api.read_nano()
 
-    def append_output(self, text, device=None):
-        if device == 'UNO':
+    def append_output(self, text, who=None):
+        if who == 'UNO':
             self.window.uno_output_display.append(text)
-        elif device == 'NANO':
+        elif who == 'NANO':
             self.window.nano_output_display.append(text)
         else:
             self.window.uno_output_display.append(text)
             self.window.nano_output_display.append(text)
+        
+        if who is not None:
+            text = f"{who}: {text}"
+        
+        print(text)
     
     def plot_servo_pos(self, values):   
         current_time = time.time() - self.serial_api.connection_start_time
@@ -64,13 +75,42 @@ class GUI():
             
             # Update current value label
             servo_name = self.servo_names[i]
-            self.window.labels[i].setText(f"{servo_name}: {voltage:.2f} V")
+            self.window.labels[i].setText(f"{servo_name}: {voltage:.2f} Value")
+    
+    def uno_text_command(self):
+        
+        # Extract text input
+        user_input = self.window.uno_command_input.text().strip()
+        if not user_input:
+            return
+
+        # Should be "[servoName OR servo_index] [degree]"
+        parts = user_input.split()
+        if len(parts) != 2:
+            self.append_output('Should be "[servoName OR servo_index] [degree]"', 'gui')
+            return
+        
+        servo, degree = parts
+        
+        if not type(degree) is int:
+            self.append_output("Degree must be integer", 'gui')
+            return
+        
+        if (not servo in self.servo_names) and (not servo in range(self.num_servos)):
+            self.append_output("Servo doesn't exist", 'gui')
+            return
+        
+        # Get index from name
+        if type(servo) is str:
+            servo = self.servo_indices[servo]
+
+        self.serial_api.servo_command(servo, degree)
     
     def toggle_connection(self):
         is_connected, error_msg = self.serial_api.toggle_connection()
         
         if is_connected:
-            self.append_output(f"Connected to Uno at {self.configs.SERIAL_PORT_UNO} and Nano at {self.configs.SERIAL_PORT_NANO}.")
+            self.append_output(f"Connected to Uno at {self.configs.SERIAL_PORT_UNO} and Nano at {self.configs.SERIAL_PORT_NANO}.", 'gui')
             self.window.connect_button.setText("Disconnect")
             
             # Clear data buffers upon connection
@@ -83,47 +123,19 @@ class GUI():
             
         else:
             if error_msg is not None:
-                self.append_output(f"Failed to connect: {error_msg}")
+                self.append_output(f"Failed to connect: {error_msg}", 'gui')
             else:
-                self.append_output("Disconnected from serial monitors")
+                self.append_output("Disconnected from serial monitors", 'gui')
             
             self.window.connect_button.setText("Connect")
-    
-    def uno_text_command(self):
-        
-        # Extract text input
-        user_input = self.window.uno_command_input.text().strip()
-        if not user_input:
-            return
-
-        # Should be "[servoName OR servo_index] [degree]"
-        parts = user_input.split()
-        if len(parts) != 2:
-            self.append_output('Should be "[servoName OR servo_index] [degree]"')
-            return
-        
-        servo, degree = parts
-        
-        if not type(degree) is int:
-            self.append_output("Degree must be integer")
-            return
-        
-        if (not servo in self.servo_names) and (not servo in range(self.num_servos)):
-            self.append_output("Servo doesn't exist")
-            return
-        
-        # Get index from name
-        if type(servo) is str:
-            servo = self.servo_indices[servo]
-
-        self.serial_api.servo_command(servo, degree)
 
     def toggle_debug_mode(self, state: bool):
         self.debug_mode = state
+        self.window.debug_toggle.setChecked(state)
         if self.debug_mode:
-            self.append_output("Debug Mode Enabled.")
+            self.append_output("Debug Mode Enabled.", 'gui')
         else:
-            self.append_output("Debug Mode Disabled.")
+            self.append_output("Debug Mode Disabled.", 'gui')
     
     def toggle_knob_mode(self, state):
         enable = state == QtCore.Qt.Checked
@@ -134,9 +146,9 @@ class GUI():
             self.window.knob_mode_toggle.blockSignals(True)
             self.window.knob_mode_toggle.setChecked(not enable)
             self.window.knob_mode_toggle.blockSignals(False)
-            self.append_output("Failed to change knob mode. Please try again.")
+            self.append_output("Failed to change knob mode. Please try again.", 'gui')
         else:
-            self.append_output(f"Knob mode {'enabled' if enable else 'disabled'} successfully.")
+            self.append_output(f"Knob mode {'enabled' if enable else 'disabled'} successfully.", 'gui')
     
     def slider_changed(self, servo_index, degree):
         # Function to handle slider changes with inversion
@@ -148,14 +160,14 @@ class GUI():
             # Send command to servo through backend
             self.serial_api.servo_command(servo_index, degree)
             servo_name = self.servo_names[servo_index]
-            self.append_output(f"Command: {servo_name} to {degree}°", 'UNO')
+            self.append_output(f"Command: {servo_name} to {degree}°", 'gui')
             
         except Exception as e:
-            self.append_output(f"Error sending command to {servo_name}: {e}", 'UNO')
+            self.append_output(f"Error sending command to {servo_name}: {e}", 'gui')
             
     def reset_sliders(self):
         if self.knob_mode:
-            self.append_output("Must be in slider mode to reset sliders")
+            self.append_output("Must be in slider mode to reset sliders", 'gui')
             return
         
         self.serial_api.reset_servos()

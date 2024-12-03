@@ -129,11 +129,11 @@ class Window():
         terminal_layout.addWidget(terminal_tabs)
 
         # Debug Toggle Button
-        debug_toggle = QtWidgets.QCheckBox("Debug Mode")
-        terminal_layout.addWidget(debug_toggle)
+        self.debug_toggle = QtWidgets.QCheckBox("Debug Mode")
+        terminal_layout.addWidget(self.debug_toggle)
         
         # Connect the debug toggle button
-        debug_toggle.stateChanged.connect(gui.toggle_debug_mode)
+        self.debug_toggle.stateChanged.connect(gui.toggle_debug_mode)
         
         
         # --------------------------------------------
