@@ -6,7 +6,7 @@
 #include <semphr.h>
 #include <SPI.h>
 
-// #define DEBUG_PRINTS
+#define DEBUG_PRINTS
 #ifdef DEBUG_PRINTS
 #define DEBUG_PRINT(x)    Serial.print(x)
 #define DEBUG_PRINTLN(x)  Serial.println(x)
@@ -56,9 +56,10 @@ const char* comsTaskName = "coms";
 // Global variable to store analog feedback values
 uint16_t feedbackValues[NUM_SERVOS] = {0};
 uint16_t currentLevels[NUM_SERVOS] = {0};
+bool stopFlag = false;          // Signal to stop because of overcurrent
 
-// Signal to stop because of overcurrent
-bool stopFlag = false;
+// Whenever serial parsing goes wrong
+bool invalidCommand = false;
 
 // Array for commanded servo angles from computer
 uint8_t servoCommandAngles[NUM_SERVOS];
@@ -196,7 +197,9 @@ void vControlTask(void *pvParameters) {
         ComputeControl();
 
         // Send commands to servos
-        UpdateServos();
+        if (!invalidCommand) {
+            UpdateServos();
+        }
 
         // Monitor stack usage periodically
         #ifdef DEBUG_PRINTS
@@ -283,11 +286,11 @@ void UpdateServos() {
 }
 
 // Define a designated start character for command lines
-#define COMMAND_START_CHAR '>'
-#define COMMAND_END_CHAR '\n'
+#define COMMAND_START_CHAR '<'
+#define COMMAND_END_CHAR '>'
 
 void ProcessSerialCommands() {
-    static char inputBuffer[61];
+    static char inputBuffer[41];
     static uint8_t bufferIndex = 0;
     bool newLineReceived = false;
 
@@ -312,10 +315,30 @@ void ProcessSerialCommands() {
 
     if (newLineReceived) {
         // Parse the input line for five integers after the start character
-        sscanf(inputBuffer, "%*c %hhu %hhu %hhu %hhu %hhu",
-                &servoCommandAngles[0], &servoCommandAngles[1],
-                &servoCommandAngles[2], &servoCommandAngles[3],
-                &servoCommandAngles[4]);
+        int parsed = sscanf(inputBuffer, "<%3hhu,%3hhu,%3hhu,%3hhu,%3hhu>",
+            &servoCommandAngles[0], &servoCommandAngles[1],
+            &servoCommandAngles[2], &servoCommandAngles[3],
+            &servoCommandAngles[4]);
+        
+        if (parsed == 5) {
+            invalidCommand = false;
+        } else {
+            // Handle error accordingly
+            invalidCommand = true;
+            DEBUG_PRINTLN(F("ERROR: Invalid command format:"));
+        }
+
+        // TEST
+        // Write the parsed values to the serial port
+        Serial.print(F("Co:"));
+        for (int i = 0; i < 5; i++) {
+            if (i != 0) {
+                Serial.print(F(","));
+            }
+            Serial.print(servoCommandAngles[i]);
+        }
+        Serial.println();
+        // ENDTEST
 
         // Clear the buffer after processing
         bufferIndex = 0;

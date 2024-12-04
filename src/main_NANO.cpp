@@ -33,6 +33,8 @@
 const uint8_t CURRENT_SENSOR_PINS[5] = {A0, A1, A2, A3, A4};
 const uint8_t FIFTH_FEEDBACK_PIN = A7;
 
+#define SS_PIN 10
+
 // Max apms allowed
 #define MAX_AMPS 2
 
@@ -93,6 +95,7 @@ void setup() {
         ;  // Wait for serial port to connect (needed for native USB)
     }
 
+    pinMode(SS_PIN, INPUT_PULLUP);
     pinMode(MISO, OUTPUT); // Set MISO as output
     SPCR |= _BV(SPE); // Enable SPI as Slave
     SPI.attachInterrupt(); // Enable SPI interrupt
@@ -116,10 +119,18 @@ void setup() {
 }
 
 ISR(SPI_STC_vect) {
+    // Debug: SPI interrupt triggered
+    //Serial.println(F("SPI Interrupt Triggered"));
+
     // Load the next byte to send into SPDR
     SPDR = txBuffer[txIndex++];
+    //Serial.print(F("Sending byte: "));
+    //Serial.println(txBuffer[txIndex - 1], HEX);
+
+    // Reset txIndex if end of buffer is reached
     if (txIndex >= sizeof(txBuffer)) {
         txIndex = 0;
+        //Serial.println(F("txIndex reset to 0"));
     }
 }
 

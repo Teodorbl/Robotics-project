@@ -93,10 +93,12 @@ class SerialAPI():
         else:
             self.servo_positions[servo_index] = int(degree)
         
-        prefix = '>'
-        postfix = '\n'
-        command = f"{prefix}{' '.join(map(str, self.servo_positions))}{postfix}"
-        print(command)
+        
+        pos = self.servo_positions
+        
+        command = f"<{pos[0]:03d},{pos[1]:03d},{pos[2]:03d},{pos[3]:03d},{pos[4]:03d}>"
+        
+        self.gui.append_output(f"Sending command: {command}", 'serial_api')
         
         with self.serial_lock:
             try:
