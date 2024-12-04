@@ -13,8 +13,6 @@ class GUI():
     def __init__(self, configs, serial_api, DEBUG_MODE=False, AUTO_CONNECT=False):
         print("-- GUI init --")
         
-        polling_interval = 50     # ms
-        
         self.configs = configs
         self.num_servos = self.configs.NUM_SERVOS
         self.servo_names = self.configs.SERVO_NAMES
@@ -35,10 +33,19 @@ class GUI():
         # Init window
         self.window = Window(self, self.configs)
         
+        # For plotting with correct time
+        self.servo_pos_iteration = 0
+        self.servo5_pos_iteration = 0
+        self.servo_current_iteration = 0
+        
+        self.uno_interval = 40      # ms
+        self.nano_interval = 40      # ms
+        
         # Init GUI event poller
+        self.polling_interval = 50     # ms
         self.timer = QTimer()
         self.timer.timeout.connect(self.GUI_poll)
-        self.timer.start(polling_interval)
+        self.timer.start(self.polling_interval)
         
         if DEBUG_MODE:
             self.toggle_debug_mode(DEBUG_MODE)
@@ -64,8 +71,9 @@ class GUI():
         
         print(text)
     
-    def plot_servo_pos(self, values):   
-        current_time = time.time() - self.serial_api.connection_start_time
+    def plot_servo_pos(self, values):
+        current_time = self.servo_pos_iteration * (self.nano_interval / 1000.0)  # Convert ms to seconds
+        self.servo_pos_iteration += 1
             
         for i in range(self.configs.NUM_SERVOS -1):
             analog_read = values[i]
@@ -80,7 +88,8 @@ class GUI():
             self.window.pos_labels[i].setText(f"{servo_name}: {analog_read:.2f}")
     
     def plot_servo5_pos(self, value):   
-        current_time = time.time() - self.serial_api.connection_start_time
+        current_time = self.servo5_pos_iteration * (self.nano_interval / 1000.0)  # Convert ms to seconds
+        self.servo5_pos_iteration += 1
             
         i = 4
         self.servo_pos_buffers[i].append((current_time, value))
@@ -94,7 +103,8 @@ class GUI():
         self.window.pos_labels[i].setText(f"{servo_name}: {value:.2f}")
     
     def plot_servo_currents(self, values):
-        current_time = time.time() - self.serial_api.connection_start_time
+        current_time = self.servo_current_iteration * (self.nano_interval / 1000.0)  # Convert ms to seconds
+        self.servo_current_iteration += 1
             
         for i in range(self.configs.NUM_SERVOS):
             analog_read = values[i]
@@ -110,7 +120,7 @@ class GUI():
             # Update current value label
             servo_name = self.servo_names[i]
             self.window.current_labels[i].setText(f"{servo_name}: {amps:.2f} A")
-    
+                
     def uno_text_command(self):
         
         # Extract text input

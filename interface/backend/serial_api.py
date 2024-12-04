@@ -136,47 +136,48 @@ class SerialAPI():
             return
         
         try:
-            line = self.ser_uno.readline().decode('utf-8').strip()
-            
-            # # Check for error line
-            # if line.startswith("E:"):
-            #     parts = line.strip().split(":", 2)
-            #     code = int(parts[1])
-            #     data = parts[2] if len(parts) > 2 else None
-            #     message = self.get_error_message(code)
-            #     output = message + (f" | Data: {data}" if data else "")
-            #     print(output)
-            #     if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
-            
-            # # Check for debug line
-            # elif line.startswith("D:"):
-            #     parts = line.strip().split(":", 2)
-            #     code = int(parts[1])
-            #     data = parts[2] if len(parts) > 2 else None
-            #     message = self.get_debug_message(code)
-            #     output = message + (f" | Data: {data}" if data else "")
-            #     print(output)
-            #     if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
-        
-            # Check for data line
-            feedback_data_line = line.startswith('FB:')
-            debug_on = self.gui.debug_mode
-            
-            if feedback_data_line:
-                # Process data line
+            while self.ser_uno.in_waiting > 0:
+                line = self.ser_uno.readline().decode('utf-8').strip()
                 
-                data = line[3:]
-                values = list(map(float, data.split(',')))
+                # # Check for error line
+                # if line.startswith("E:"):
+                #     parts = line.strip().split(":", 2)
+                #     code = int(parts[1])
+                #     data = parts[2] if len(parts) > 2 else None
+                #     message = self.get_error_message(code)
+                #     output = message + (f" | Data: {data}" if data else "")
+                #     print(output)
+                #     if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
                 
-                if len(values) != self.configs.NUM_SERVOS:
-                    raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from UNO serial line, but got {len(values)}")
-                
-                self.gui.plot_servo_pos(values)
+                # # Check for debug line
+                # elif line.startswith("D:"):
+                #     parts = line.strip().split(":", 2)
+                #     code = int(parts[1])
+                #     data = parts[2] if len(parts) > 2 else None
+                #     message = self.get_debug_message(code)
+                #     output = message + (f" | Data: {data}" if data else "")
+                #     print(output)
+                #     if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
             
-            if (not feedback_data_line) or debug_on:
-                # Process non-data line
+                # Check for data line
+                feedback_data_line = line.startswith('FB:')
+                debug_on = self.gui.debug_mode
                 
-                self.gui.append_output(line, 'UNO')
+                if feedback_data_line:
+                    # Process data line
+                    
+                    data = line[3:]
+                    values = list(map(float, data.split(',')))
+                    
+                    if len(values) != self.configs.NUM_SERVOS-1:
+                        raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from UNO serial line, but got {len(values)}")
+                    
+                    self.gui.plot_servo_pos(values)
+                
+                if (not feedback_data_line) or debug_on:
+                    # Process non-data line
+                    
+                    self.gui.append_output(line, 'UNO')
     
         except serial.SerialException as e:
             self.gui.append_output(f"Serial error with UNO: {e}")

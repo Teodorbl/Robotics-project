@@ -1,3 +1,5 @@
+# FILE:WINDOW.PY
+
 from pyqtgraph.Qt import QtWidgets, QtCore
 import pyqtgraph as pg
 import time
@@ -12,7 +14,7 @@ if TYPE_CHECKING:
 
 class TimeAxisItem(pg.AxisItem):
     """
-    Custom AxisItem to display time in MM:SS format since connection started.
+    Custom AxisItem to display time in MM:SS format based on seconds.
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -231,7 +233,7 @@ class Window():
             self.servo_sliders[i].valueChanged.connect(
                 lambda value, idx=i, lbl=slider_value_label: (lbl.setText(f"{value}°"), gui.slider_changed(idx, value))
             )
-
+        
         # Reset all servos button
         reset_sliders_button = QtWidgets.QPushButton("Reset Positions")
         terminal_layout.addWidget(reset_sliders_button)
@@ -265,7 +267,7 @@ class Window():
         # Add the UNO tab to the terminal tabs
         terminal_tabs.addTab(uno_tab_widget, "UNO Monitor")
                 
-                
+        
         # --------------------------------------------
         # NANO tab
         # --------------------------------------------
@@ -286,8 +288,3 @@ class Window():
         
         # Finish construction
         self.main_window.show()
-
-
-
-
-

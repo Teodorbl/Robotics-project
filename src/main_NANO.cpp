@@ -25,7 +25,7 @@
 #define MAIN_STACK_SIZE 258
 
 // Task interval and delays
-#define MAIN_INTERVAL_MS 50
+#define MAIN_INTERVAL_MS 40
 
 // Analog pins for current readings
 const uint8_t CURRENT_SENSOR_PINS[5] = {A0, A1, A2, A3, A4};
