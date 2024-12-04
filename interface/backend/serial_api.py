@@ -28,19 +28,6 @@ class SerialAPI():
         self.servo_pos_init = configs.SERVO_DEFAULT_ANGLES
         self.servo_positions = self.servo_pos_init.copy()
         
-        # Init error and debug parsing
-        self.json_filepath = configs.JSON_FILEPATH
-        self.errors = {}
-        self.debugs = {}
-
-        if not os.path.exists(self.json_filepath):
-            raise FileNotFoundError(f"JSON file not found at: {self.json_filepath}")
-
-        with open(self.json_filepath, 'r') as file:
-            data = json.load(file)
-            self.errors = {int(k): v for k, v in data.get("errors", {}).items()}
-            self.debugs = {int(k): v for k, v in data.get("debugs", {}).items()}
-        
         print("-- Serial init end --")
         
     def toggle_connection(self):
@@ -138,26 +125,6 @@ class SerialAPI():
         try:
             while self.ser_uno.in_waiting > 0:
                 line = self.ser_uno.readline().decode('utf-8').strip()
-                
-                # # Check for error line
-                # if line.startswith("E:"):
-                #     parts = line.strip().split(":", 2)
-                #     code = int(parts[1])
-                #     data = parts[2] if len(parts) > 2 else None
-                #     message = self.get_error_message(code)
-                #     output = message + (f" | Data: {data}" if data else "")
-                #     print(output)
-                #     if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
-                
-                # # Check for debug line
-                # elif line.startswith("D:"):
-                #     parts = line.strip().split(":", 2)
-                #     code = int(parts[1])
-                #     data = parts[2] if len(parts) > 2 else None
-                #     message = self.get_debug_message(code)
-                #     output = message + (f" | Data: {data}" if data else "")
-                #     print(output)
-                #     if self.gui.debug_mode: self.gui.append_output(output, 'UNO')
             
                 # Check for data line
                 feedback_data_line = line.startswith('FB:')
