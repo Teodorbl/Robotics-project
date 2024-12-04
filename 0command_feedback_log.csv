@@ -1,0 +1,1740 @@
+timestamp,event_type,content
+1733328627.776094,command_sent,"<090,035,160,090,120>"
+1733328713.03533,command_sent,"<090,035,160,090,120>"
+1733328799.455594,feedback_received,Nano_Servo5_FB: 402
+1733328799.4575622,feedback_received,"Nano_Current: 527,533,531,531,532"
+1733328799.505761,feedback_received,Nano_Servo5_FB: 401
+1733328799.50631,feedback_received,"Nano_Current: 526,532,530,530,532"
+1733328799.554904,feedback_received,Nano_Servo5_FB: 402
+1733328799.55549,feedback_received,"Nano_Current: 528,533,532,531,532"
+1733328799.605854,feedback_received,"Uno_FB: 342,218,215,339"
+1733328799.606536,feedback_received,"Uno_FB: 341,219,215,340"
+1733328799.606808,feedback_received,Nano_Servo5_FB: 402
+1733328799.607266,feedback_received,"Nano_Current: 528,534,532,531,533"
+1733328799.655877,feedback_received,"Uno_FB: 341,219,215,340"
+1733328799.656363,feedback_received,Nano_Servo5_FB: 402
+1733328799.65679,feedback_received,"Nano_Current: 528,533,531,531,531"
+1733328799.704983,feedback_received,"Uno_FB: 342,218,215,340"
+1733328799.705473,feedback_received,"Uno_FB: 342,219,215,340"
+1733328799.705657,feedback_received,Nano_Servo5_FB: 402
+1733328799.705976,feedback_received,"Nano_Current: 528,535,532,531,533"
+1733328799.755209,feedback_received,"Uno_FB: 341,219,215,339"
+1733328799.755628,feedback_received,Nano_Servo5_FB: 402
+1733328799.756085,feedback_received,"Nano_Current: 528,534,532,532,533"
+1733328799.805266,feedback_received,"Uno_FB: 342,218,215,340"
+1733328799.805769,feedback_received,"Uno_FB: 341,219,214,340"
+1733328799.805962,feedback_received,Nano_Servo5_FB: 402
+1733328799.806308,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328799.855057,feedback_received,"Uno_FB: 342,219,215,340"
+1733328799.855405,feedback_received,Nano_Servo5_FB: 402
+1733328799.8557591,feedback_received,"Nano_Current: 527,533,530,531,533"
+1733328799.905031,feedback_received,"Uno_FB: 342,218,215,339"
+1733328799.905361,feedback_received,Nano_Servo5_FB: 402
+1733328799.905717,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328799.955057,feedback_received,"Uno_FB: 341,219,215,340"
+1733328799.9555578,feedback_received,"Uno_FB: 341,218,215,339"
+1733328799.955758,feedback_received,Nano_Servo5_FB: 402
+1733328799.95611,feedback_received,"Nano_Current: 526,534,531,531,533"
+1733328800.0050519,feedback_received,"Uno_FB: 341,219,215,340"
+1733328800.005397,feedback_received,Nano_Servo5_FB: 402
+1733328800.0058858,feedback_received,"Nano_Current: 528,534,533,532,533"
+1733328800.055778,feedback_received,"Uno_FB: 342,219,215,339"
+1733328800.056331,feedback_received,"Uno_FB: 341,219,215,339"
+1733328800.056581,feedback_received,Nano_Servo5_FB: 402
+1733328800.0569332,feedback_received,"Nano_Current: 526,534,532,531,533"
+1733328800.105104,feedback_received,"Uno_FB: 342,219,215,339"
+1733328800.105459,feedback_received,Nano_Servo5_FB: 402
+1733328800.105812,feedback_received,"Nano_Current: 528,533,532,532,533"
+1733328800.155052,feedback_received,"Uno_FB: 341,219,215,340"
+1733328800.155526,feedback_received,"Uno_FB: 341,219,215,339"
+1733328800.155715,feedback_received,Nano_Servo5_FB: 402
+1733328800.156053,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328800.20517,feedback_received,"Uno_FB: 341,219,215,340"
+1733328800.205591,feedback_received,Nano_Servo5_FB: 402
+1733328800.205952,feedback_received,"Nano_Current: 528,533,532,531,533"
+1733328800.255075,feedback_received,"Uno_FB: 341,219,215,339"
+1733328800.255573,feedback_received,"Uno_FB: 342,218,215,339"
+1733328800.255776,feedback_received,Nano_Servo5_FB: 402
+1733328800.256119,feedback_received,"Nano_Current: 528,534,531,531,533"
+1733328800.305195,feedback_received,"Uno_FB: 341,219,215,340"
+1733328800.305574,feedback_received,Nano_Servo5_FB: 402
+1733328800.305928,feedback_received,"Nano_Current: 528,534,532,531,533"
+1733328800.355057,feedback_received,"Uno_FB: 341,219,215,339"
+1733328800.355647,feedback_received,"Uno_FB: 342,219,215,340"
+1733328800.355865,feedback_received,Nano_Servo5_FB: 402
+1733328800.35695,feedback_received,"Nano_Current: 528,533,531,531,533"
+1733328800.405635,feedback_received,"Uno_FB: 341,219,215,340"
+1733328800.4060318,feedback_received,Nano_Servo5_FB: 402
+1733328800.4064052,feedback_received,"Nano_Current: 527,534,533,531,533"
+1733328800.4547179,feedback_received,"Uno_FB: 342,219,215,339"
+1733328800.4552488,feedback_received,"Uno_FB: 341,219,215,340"
+1733328800.455464,feedback_received,Nano_Servo5_FB: 402
+1733328800.455816,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328800.505041,feedback_received,"Uno_FB: 342,219,215,340"
+1733328800.5054138,feedback_received,Nano_Servo5_FB: 402
+1733328800.505773,feedback_received,"Nano_Current: 527,533,532,532,534"
+1733328800.5551,feedback_received,"Uno_FB: 342,219,215,340"
+1733328800.555655,feedback_received,"Uno_FB: 342,218,215,340"
+1733328800.555875,feedback_received,Nano_Servo5_FB: 402
+1733328800.564647,feedback_received,"Nano_Current: 527,534,531,531,533"
+1733328800.605237,feedback_received,"Uno_FB: 341,218,215,340"
+1733328800.6557598,feedback_received,"Uno_FB: 342,219,215,339"
+1733328800.656298,feedback_received,"Uno_FB: 342,219,216,340"
+1733328800.656511,feedback_received,Nano_Servo5_FB: 402
+1733328800.656854,feedback_received,"Nano_Current: 528,533,533,531,533"
+1733328800.705276,feedback_received,"Uno_FB: 342,219,215,339"
+1733328800.705701,feedback_received,Nano_Servo5_FB: 402
+1733328800.706063,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328800.754462,feedback_received,"Uno_FB: 342,219,215,339"
+1733328800.754932,feedback_received,Nano_Servo5_FB: 403
+1733328800.755316,feedback_received,"Nano_Current: 528,534,532,531,533"
+1733328800.80565,feedback_received,"Uno_FB: 342,219,215,340"
+1733328800.8062341,feedback_received,"Uno_FB: 341,219,215,340"
+1733328800.806465,feedback_received,Nano_Servo5_FB: 402
+1733328800.8068302,feedback_received,"Nano_Current: 527,534,531,531,533"
+1733328800.855815,feedback_received,"Uno_FB: 342,219,215,339"
+1733328800.856243,feedback_received,Nano_Servo5_FB: 402
+1733328800.856608,feedback_received,"Nano_Current: 527,534,531,531,533"
+1733328800.905306,feedback_received,"Uno_FB: 342,219,215,340"
+1733328800.905838,feedback_received,"Uno_FB: 342,219,215,340"
+1733328800.906055,feedback_received,Nano_Servo5_FB: 402
+1733328800.906409,feedback_received,"Nano_Current: 528,534,532,530,534"
+1733328800.955147,feedback_received,"Uno_FB: 341,219,215,339"
+1733328800.955561,feedback_received,Nano_Servo5_FB: 402
+1733328800.955939,feedback_received,"Nano_Current: 526,533,531,531,532"
+1733328801.0053608,feedback_received,"Uno_FB: 342,219,215,339"
+1733328801.005929,feedback_received,"Uno_FB: 341,219,215,340"
+1733328801.00617,feedback_received,Nano_Servo5_FB: 402
+1733328801.006548,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328801.055746,feedback_received,"Uno_FB: 341,219,215,340"
+1733328801.056163,feedback_received,Nano_Servo5_FB: 402
+1733328801.05654,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328801.105362,feedback_received,"Uno_FB: 342,219,215,340"
+1733328801.105927,feedback_received,"Uno_FB: 341,219,215,339"
+1733328801.106154,feedback_received,Nano_Servo5_FB: 402
+1733328801.106511,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328801.1550632,feedback_received,"Uno_FB: 341,219,215,339"
+1733328801.155503,feedback_received,Nano_Servo5_FB: 402
+1733328801.1558661,feedback_received,"Nano_Current: 527,534,532,531,532"
+1733328801.205387,feedback_received,"Uno_FB: 342,219,215,340"
+1733328801.205955,feedback_received,"Uno_FB: 341,219,215,340"
+1733328801.206182,feedback_received,Nano_Servo5_FB: 402
+1733328801.206549,feedback_received,"Nano_Current: 528,535,531,530,533"
+1733328801.255129,feedback_received,"Uno_FB: 341,219,215,340"
+1733328801.255571,feedback_received,Nano_Servo5_FB: 402
+1733328801.255948,feedback_received,"Nano_Current: 527,534,532,532,533"
+1733328801.30544,feedback_received,"Uno_FB: 342,219,215,340"
+1733328801.305855,feedback_received,Nano_Servo5_FB: 402
+1733328801.3062332,feedback_received,"Nano_Current: 528,535,532,531,533"
+1733328801.355107,feedback_received,"Uno_FB: 341,219,215,340"
+1733328801.355704,feedback_received,"Uno_FB: 341,219,215,339"
+1733328801.355937,feedback_received,Nano_Servo5_FB: 402
+1733328801.356298,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328801.4054651,feedback_received,"Uno_FB: 342,219,215,339"
+1733328801.4058619,feedback_received,Nano_Servo5_FB: 402
+1733328801.406235,feedback_received,"Nano_Current: 528,533,533,532,533"
+1733328801.455085,feedback_received,"Uno_FB: 341,218,215,340"
+1733328801.455682,feedback_received,"Uno_FB: 342,219,215,339"
+1733328801.455914,feedback_received,Nano_Servo5_FB: 402
+1733328801.456276,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328801.504936,feedback_received,"Uno_FB: 341,218,215,340"
+1733328801.5053499,feedback_received,Nano_Servo5_FB: 402
+1733328801.505732,feedback_received,"Nano_Current: 528,533,532,532,533"
+1733328801.554444,feedback_received,"Uno_FB: 342,219,215,340"
+1733328801.5550232,feedback_received,"Uno_FB: 341,219,215,340"
+1733328801.555271,feedback_received,Nano_Servo5_FB: 402
+1733328801.555627,feedback_received,"Nano_Current: 528,533,532,531,533"
+1733328801.6048331,feedback_received,"Uno_FB: 342,219,215,340"
+1733328801.605244,feedback_received,Nano_Servo5_FB: 402
+1733328801.605608,feedback_received,"Nano_Current: 528,534,531,531,533"
+1733328801.655391,feedback_received,"Uno_FB: 341,219,215,340"
+1733328801.655979,feedback_received,"Uno_FB: 341,219,215,339"
+1733328801.656221,feedback_received,Nano_Servo5_FB: 402
+1733328801.656594,feedback_received,"Nano_Current: 527,533,532,531,531"
+1733328801.70498,feedback_received,"Uno_FB: 342,218,215,340"
+1733328801.7053912,feedback_received,Nano_Servo5_FB: 402
+1733328801.705761,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328801.755101,feedback_received,"Uno_FB: 342,219,215,340"
+1733328801.75572,feedback_received,"Uno_FB: 341,219,215,339"
+1733328801.7559621,feedback_received,Nano_Servo5_FB: 402
+1733328801.756327,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328801.8045208,feedback_received,"Uno_FB: 342,219,215,339"
+1733328801.8049269,feedback_received,Nano_Servo5_FB: 402
+1733328801.805299,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328801.855093,feedback_received,"Uno_FB: 342,219,215,339"
+1733328801.855714,feedback_received,"Uno_FB: 342,219,215,339"
+1733328801.855977,feedback_received,Nano_Servo5_FB: 402
+1733328801.8578932,feedback_received,"Nano_Current: 527,534,531,532,532"
+1733328801.9054668,feedback_received,"Uno_FB: 341,219,215,339"
+1733328801.905917,feedback_received,Nano_Servo5_FB: 402
+1733328801.906302,feedback_received,"Nano_Current: 527,534,531,530,533"
+1733328801.955134,feedback_received,"Uno_FB: 342,218,215,340"
+1733328801.955762,feedback_received,"Uno_FB: 341,219,215,340"
+1733328801.956007,feedback_received,Nano_Servo5_FB: 402
+1733328801.956374,feedback_received,"Nano_Current: 526,533,531,531,534"
+1733328802.005135,feedback_received,"Uno_FB: 342,219,215,340"
+1733328802.0055912,feedback_received,Nano_Servo5_FB: 402
+1733328802.005976,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328802.05527,feedback_received,"Uno_FB: 342,219,215,340"
+1733328802.055752,feedback_received,Nano_Servo5_FB: 402
+1733328802.0654778,feedback_received,"Nano_Current: 527,533,531,531,532"
+1733328802.105618,feedback_received,"Uno_FB: 341,219,215,340"
+1733328802.106245,feedback_received,"Uno_FB: 341,218,215,339"
+1733328802.11317,feedback_received,Nano_Servo5_FB: 402
+1733328802.113743,feedback_received,"Nano_Current: 528,534,532,532,533"
+1733328802.156071,feedback_received,"Uno_FB: 342,219,215,340"
+1733328802.205081,feedback_received,"Uno_FB: 342,219,215,340"
+1733328802.2057118,feedback_received,"Uno_FB: 341,219,215,340"
+1733328802.205962,feedback_received,Nano_Servo5_FB: 402
+1733328802.206332,feedback_received,"Nano_Current: 527,534,531,530,533"
+1733328802.255598,feedback_received,"Uno_FB: 342,218,215,340"
+1733328802.2561128,feedback_received,Nano_Servo5_FB: 402
+1733328802.2565892,feedback_received,"Nano_Current: 528,532,533,532,533"
+1733328802.305696,feedback_received,"Uno_FB: 341,219,215,339"
+1733328802.306499,feedback_received,"Uno_FB: 341,219,215,339"
+1733328802.306844,feedback_received,Nano_Servo5_FB: 402
+1733328802.307334,feedback_received,"Nano_Current: 527,534,531,532,532"
+1733328802.307497,feedback_received,Nano_Servo5_FB: 402
+1733328802.321084,feedback_received,"Nano_Current: 527,534,533,531,534"
+1733328802.3551989,feedback_received,"Uno_FB: 342,219,215,340"
+1733328802.404962,feedback_received,"Uno_FB: 342,219,215,339"
+1733328802.4057221,feedback_received,"Uno_FB: 342,219,215,339"
+1733328802.406042,feedback_received,Nano_Servo5_FB: 402
+1733328802.4065459,feedback_received,"Nano_Current: 527,532,532,531,534"
+1733328802.455929,feedback_received,"Uno_FB: 342,218,215,339"
+1733328802.456491,feedback_received,Nano_Servo5_FB: 402
+1733328802.457006,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328802.505821,feedback_received,"Uno_FB: 342,218,215,340"
+1733328802.506578,feedback_received,"Uno_FB: 341,219,215,340"
+1733328802.506923,feedback_received,Nano_Servo5_FB: 402
+1733328802.507421,feedback_received,"Nano_Current: 528,534,532,531,534"
+1733328802.556285,feedback_received,"Uno_FB: 342,218,215,339"
+1733328802.556833,feedback_received,Nano_Servo5_FB: 402
+1733328802.557353,feedback_received,"Nano_Current: 528,533,532,532,534"
+1733328802.605036,feedback_received,"Uno_FB: 342,219,215,340"
+1733328802.605752,feedback_received,"Uno_FB: 342,219,215,340"
+1733328802.606049,feedback_received,Nano_Servo5_FB: 402
+1733328802.606507,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328802.654853,feedback_received,"Uno_FB: 341,218,215,339"
+1733328802.655411,feedback_received,Nano_Servo5_FB: 402
+1733328802.65588,feedback_received,"Nano_Current: 528,534,531,530,533"
+1733328802.705784,feedback_received,"Uno_FB: 342,219,215,340"
+1733328802.706363,feedback_received,Nano_Servo5_FB: 402
+1733328802.70685,feedback_received,"Nano_Current: 527,533,532,531,532"
+1733328802.7561998,feedback_received,"Uno_FB: 341,219,215,340"
+1733328802.756904,feedback_received,"Uno_FB: 341,219,215,340"
+1733328802.757209,feedback_received,Nano_Servo5_FB: 402
+1733328802.757656,feedback_received,"Nano_Current: 527,534,531,531,532"
+1733328802.805129,feedback_received,"Uno_FB: 341,219,215,339"
+1733328802.805662,feedback_received,Nano_Servo5_FB: 402
+1733328802.806128,feedback_received,"Nano_Current: 527,533,531,531,534"
+1733328802.854775,feedback_received,"Uno_FB: 342,219,215,339"
+1733328802.855432,feedback_received,"Uno_FB: 342,218,215,339"
+1733328802.855705,feedback_received,Nano_Servo5_FB: 402
+1733328802.856118,feedback_received,"Nano_Current: 527,534,531,531,532"
+1733328802.90536,feedback_received,"Uno_FB: 341,219,215,339"
+1733328802.905924,feedback_received,Nano_Servo5_FB: 402
+1733328802.9064052,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328802.955117,feedback_received,"Uno_FB: 342,218,215,340"
+1733328802.9558542,feedback_received,"Uno_FB: 341,219,215,339"
+1733328802.956165,feedback_received,Nano_Servo5_FB: 402
+1733328802.95662,feedback_received,"Nano_Current: 526,533,531,531,532"
+1733328803.0051992,feedback_received,"Uno_FB: 342,218,215,339"
+1733328803.005725,feedback_received,Nano_Servo5_FB: 402
+1733328803.0061991,feedback_received,"Nano_Current: 527,534,531,530,534"
+1733328803.055874,feedback_received,"Uno_FB: 342,218,215,339"
+1733328803.056583,feedback_received,"Uno_FB: 341,219,215,339"
+1733328803.0568619,feedback_received,Nano_Servo5_FB: 402
+1733328803.05728,feedback_received,"Nano_Current: 527,533,532,532,532"
+1733328803.105771,feedback_received,"Uno_FB: 342,219,215,340"
+1733328803.106318,feedback_received,Nano_Servo5_FB: 402
+1733328803.1067882,feedback_received,"Nano_Current: 527,534,531,531,533"
+1733328803.1550689,feedback_received,"Uno_FB: 342,219,215,340"
+1733328803.155658,feedback_received,"Uno_FB: 341,219,215,340"
+1733328803.155902,feedback_received,Nano_Servo5_FB: 402
+1733328803.156258,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328803.205033,feedback_received,"Uno_FB: 341,218,215,339"
+1733328803.205556,feedback_received,Nano_Servo5_FB: 402
+1733328803.205911,feedback_received,"Nano_Current: 527,533,532,530,534"
+1733328803.254807,feedback_received,"Uno_FB: 341,218,215,339"
+1733328803.25552,feedback_received,"Uno_FB: 342,219,215,340"
+1733328803.255819,feedback_received,Nano_Servo5_FB: 402
+1733328803.256268,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328803.305538,feedback_received,"Uno_FB: 341,218,215,339"
+1733328803.306124,feedback_received,Nano_Servo5_FB: 402
+1733328803.306612,feedback_received,"Nano_Current: 528,533,532,532,533"
+1733328803.355166,feedback_received,"Uno_FB: 341,218,215,340"
+1733328803.355882,feedback_received,"Uno_FB: 342,218,215,340"
+1733328803.35618,feedback_received,Nano_Servo5_FB: 402
+1733328803.356632,feedback_received,"Nano_Current: 528,533,532,531,533"
+1733328803.406077,feedback_received,"Uno_FB: 341,219,215,339"
+1733328803.4066072,feedback_received,Nano_Servo5_FB: 402
+1733328803.407072,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328803.455141,feedback_received,"Uno_FB: 342,219,215,339"
+1733328803.4556549,feedback_received,Nano_Servo5_FB: 402
+1733328803.456126,feedback_received,"Nano_Current: 528,534,532,531,532"
+1733328803.505919,feedback_received,"Uno_FB: 342,219,215,340"
+1733328803.506679,feedback_received,"Uno_FB: 341,219,215,340"
+1733328803.507007,feedback_received,Nano_Servo5_FB: 403
+1733328803.507503,feedback_received,"Nano_Current: 527,534,532,530,534"
+1733328803.554698,feedback_received,"Uno_FB: 341,219,215,340"
+1733328803.555207,feedback_received,Nano_Servo5_FB: 402
+1733328803.55568,feedback_received,"Nano_Current: 528,533,531,531,533"
+1733328803.605154,feedback_received,"Uno_FB: 342,218,215,340"
+1733328803.6058738,feedback_received,"Uno_FB: 341,219,215,339"
+1733328803.6061718,feedback_received,Nano_Servo5_FB: 402
+1733328803.6145122,feedback_received,"Nano_Current: 527,534,533,531,533"
+1733328803.655096,feedback_received,"Uno_FB: 342,218,215,339"
+1733328803.7061849,feedback_received,"Uno_FB: 342,219,215,339"
+1733328803.7070022,feedback_received,"Uno_FB: 341,219,215,340"
+1733328803.7073438,feedback_received,Nano_Servo5_FB: 402
+1733328803.707842,feedback_received,"Nano_Current: 527,535,532,531,534"
+1733328803.755199,feedback_received,"Uno_FB: 342,218,215,339"
+1733328803.7556741,feedback_received,Nano_Servo5_FB: 402
+1733328803.7561998,feedback_received,"Nano_Current: 527,533,532,532,534"
+1733328803.80526,feedback_received,"Uno_FB: 341,219,215,340"
+1733328803.805957,feedback_received,"Uno_FB: 341,219,215,339"
+1733328803.806239,feedback_received,Nano_Servo5_FB: 402
+1733328803.806741,feedback_received,"Nano_Current: 527,534,531,531,533"
+1733328803.806902,feedback_received,Nano_Servo5_FB: 402
+1733328803.822347,feedback_received,"Nano_Current: 528,534,531,532,534"
+1733328803.855566,feedback_received,"Uno_FB: 342,219,215,339"
+1733328803.9061482,feedback_received,"Uno_FB: 342,219,215,339"
+1733328803.9069078,feedback_received,"Uno_FB: 342,218,215,339"
+1733328803.907205,feedback_received,Nano_Servo5_FB: 402
+1733328803.907736,feedback_received,"Nano_Current: 526,534,532,530,533"
+1733328803.955775,feedback_received,"Uno_FB: 342,218,215,339"
+1733328803.956259,feedback_received,Nano_Servo5_FB: 402
+1733328803.956758,feedback_received,"Nano_Current: 528,534,531,531,533"
+1733328804.005182,feedback_received,"Uno_FB: 341,219,215,340"
+1733328804.006279,feedback_received,"Uno_FB: 341,218,215,339"
+1733328804.006562,feedback_received,Nano_Servo5_FB: 402
+1733328804.007027,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328804.055565,feedback_received,"Uno_FB: 342,218,215,340"
+1733328804.055947,feedback_received,Nano_Servo5_FB: 402
+1733328804.0563352,feedback_received,"Nano_Current: 527,533,533,532,534"
+1733328804.1048472,feedback_received,"Uno_FB: 341,219,215,340"
+1733328804.105246,feedback_received,Nano_Servo5_FB: 402
+1733328804.105618,feedback_received,"Nano_Current: 526,534,532,531,533"
+1733328804.15449,feedback_received,"Uno_FB: 342,218,215,339"
+1733328804.155173,feedback_received,"Uno_FB: 341,218,215,340"
+1733328804.155499,feedback_received,Nano_Servo5_FB: 402
+1733328804.1559691,feedback_received,"Nano_Current: 527,534,532,531,534"
+1733328804.205201,feedback_received,"Uno_FB: 342,219,215,340"
+1733328804.2057002,feedback_received,Nano_Servo5_FB: 402
+1733328804.20618,feedback_received,"Nano_Current: 526,534,532,530,532"
+1733328804.255218,feedback_received,"Uno_FB: 342,219,216,340"
+1733328804.2559628,feedback_received,"Uno_FB: 342,219,215,340"
+1733328804.256253,feedback_received,Nano_Servo5_FB: 402
+1733328804.256759,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328804.306147,feedback_received,"Uno_FB: 341,219,215,339"
+1733328804.306668,feedback_received,Nano_Servo5_FB: 402
+1733328804.307199,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328804.355245,feedback_received,"Uno_FB: 342,218,215,340"
+1733328804.356003,feedback_received,"Uno_FB: 341,219,215,340"
+1733328804.356292,feedback_received,Nano_Servo5_FB: 402
+1733328804.356797,feedback_received,"Nano_Current: 528,534,533,531,533"
+1733328804.405236,feedback_received,"Uno_FB: 341,219,215,340"
+1733328804.4058108,feedback_received,Nano_Servo5_FB: 402
+1733328804.4063418,feedback_received,"Nano_Current: 527,533,533,531,532"
+1733328804.4552362,feedback_received,"Uno_FB: 342,219,215,340"
+1733328804.455997,feedback_received,"Uno_FB: 341,219,215,339"
+1733328804.4563022,feedback_received,Nano_Servo5_FB: 402
+1733328804.456815,feedback_received,"Nano_Current: 528,534,532,532,534"
+1733328804.5053172,feedback_received,"Uno_FB: 341,219,215,339"
+1733328804.505874,feedback_received,Nano_Servo5_FB: 402
+1733328804.506408,feedback_received,"Nano_Current: 526,532,532,530,532"
+1733328804.555223,feedback_received,"Uno_FB: 342,218,214,339"
+1733328804.5559459,feedback_received,"Uno_FB: 341,219,215,339"
+1733328804.556235,feedback_received,Nano_Servo5_FB: 402
+1733328804.556742,feedback_received,"Nano_Current: 527,534,532,531,532"
+1733328804.60545,feedback_received,"Uno_FB: 342,218,215,340"
+1733328804.6059241,feedback_received,Nano_Servo5_FB: 402
+1733328804.606297,feedback_received,"Nano_Current: 526,534,532,531,532"
+1733328804.655245,feedback_received,"Uno_FB: 342,218,215,339"
+1733328804.6560261,feedback_received,"Uno_FB: 341,219,215,340"
+1733328804.656331,feedback_received,Nano_Servo5_FB: 402
+1733328804.656846,feedback_received,"Nano_Current: 527,533,532,532,533"
+1733328804.706151,feedback_received,"Uno_FB: 342,218,215,339"
+1733328804.7066932,feedback_received,Nano_Servo5_FB: 402
+1733328804.707221,feedback_received,"Nano_Current: 527,533,531,532,533"
+1733328804.755241,feedback_received,"Uno_FB: 341,219,215,339"
+1733328804.756015,feedback_received,"Uno_FB: 342,218,215,339"
+1733328804.7563179,feedback_received,Nano_Servo5_FB: 402
+1733328804.756825,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328804.8058088,feedback_received,"Uno_FB: 341,219,215,340"
+1733328804.806368,feedback_received,Nano_Servo5_FB: 402
+1733328804.806911,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328804.855936,feedback_received,"Uno_FB: 341,219,215,339"
+1733328804.856482,feedback_received,Nano_Servo5_FB: 402
+1733328804.8570209,feedback_received,"Nano_Current: 527,532,532,532,533"
+1733328804.905192,feedback_received,"Uno_FB: 342,218,215,340"
+1733328804.9058769,feedback_received,"Uno_FB: 342,218,215,340"
+1733328804.906136,feedback_received,Nano_Servo5_FB: 402
+1733328804.907927,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328804.955831,feedback_received,"Uno_FB: 341,218,215,340"
+1733328804.956351,feedback_received,Nano_Servo5_FB: 402
+1733328804.9568372,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328805.00524,feedback_received,"Uno_FB: 342,219,215,340"
+1733328805.005974,feedback_received,"Uno_FB: 341,219,215,340"
+1733328805.006248,feedback_received,Nano_Servo5_FB: 402
+1733328805.006721,feedback_received,"Nano_Current: 527,534,532,531,532"
+1733328805.055258,feedback_received,"Uno_FB: 341,218,215,339"
+1733328805.0558138,feedback_received,Nano_Servo5_FB: 402
+1733328805.056353,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328805.105542,feedback_received,"Uno_FB: 342,219,215,340"
+1733328805.106349,feedback_received,"Uno_FB: 342,219,215,340"
+1733328805.1067379,feedback_received,Nano_Servo5_FB: 402
+1733328805.115606,feedback_received,"Nano_Current: 526,534,532,532,534"
+1733328805.155259,feedback_received,"Uno_FB: 341,218,215,340"
+1733328805.1631029,feedback_received,Nano_Servo5_FB: 402
+1733328805.163739,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328805.205169,feedback_received,"Uno_FB: 341,218,215,340"
+1733328805.205903,feedback_received,"Uno_FB: 341,219,215,339"
+1733328805.255264,feedback_received,"Uno_FB: 342,218,215,339"
+1733328805.255782,feedback_received,Nano_Servo5_FB: 402
+1733328805.256325,feedback_received,"Nano_Current: 527,533,532,531,534"
+1733328805.304703,feedback_received,"Uno_FB: 341,219,215,339"
+1733328805.3054998,feedback_received,"Uno_FB: 341,219,215,339"
+1733328805.305811,feedback_received,Nano_Servo5_FB: 402
+1733328805.306324,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328805.356281,feedback_received,"Uno_FB: 342,218,215,339"
+1733328805.356813,feedback_received,Nano_Servo5_FB: 402
+1733328805.357343,feedback_received,"Nano_Current: 527,533,532,531,534"
+1733328805.357513,feedback_received,Nano_Servo5_FB: 402
+1733328805.371152,feedback_received,"Nano_Current: 527,533,531,530,532"
+1733328805.40486,feedback_received,"Uno_FB: 341,219,215,339"
+1733328805.4070249,feedback_received,"Uno_FB: 341,219,215,339"
+1733328805.4552221,feedback_received,"Uno_FB: 342,218,215,340"
+1733328805.455762,feedback_received,Nano_Servo5_FB: 402
+1733328805.456309,feedback_received,"Nano_Current: 528,534,533,531,533"
+1733328805.505724,feedback_received,"Uno_FB: 341,219,215,339"
+1733328805.5095198,feedback_received,"Uno_FB: 342,219,215,340"
+1733328805.509929,feedback_received,Nano_Servo5_FB: 402
+1733328805.510498,feedback_received,"Nano_Current: 527,534,532,530,532"
+1733328805.555239,feedback_received,"Uno_FB: 341,219,215,339"
+1733328805.5558028,feedback_received,Nano_Servo5_FB: 402
+1733328805.55635,feedback_received,"Nano_Current: 528,534,532,532,533"
+1733328805.605859,feedback_received,"Uno_FB: 341,219,215,339"
+1733328805.606415,feedback_received,Nano_Servo5_FB: 402
+1733328805.6070242,feedback_received,"Nano_Current: 526,532,532,532,534"
+1733328805.655945,feedback_received,"Uno_FB: 341,219,215,340"
+1733328805.656747,feedback_received,"Uno_FB: 342,219,215,339"
+1733328805.657065,feedback_received,Nano_Servo5_FB: 402
+1733328805.657595,feedback_received,"Nano_Current: 528,534,531,532,533"
+1733328805.7055979,feedback_received,"Uno_FB: 341,218,215,339"
+1733328805.706131,feedback_received,Nano_Servo5_FB: 402
+1733328805.7066822,feedback_received,"Nano_Current: 527,534,532,531,532"
+1733328805.755222,feedback_received,"Uno_FB: 342,218,215,340"
+1733328805.756028,feedback_received,"Uno_FB: 342,219,215,339"
+1733328805.756338,feedback_received,Nano_Servo5_FB: 402
+1733328805.756852,feedback_received,"Nano_Current: 527,533,532,532,532"
+1733328805.806585,feedback_received,"Uno_FB: 341,218,215,339"
+1733328805.807148,feedback_received,Nano_Servo5_FB: 402
+1733328805.807691,feedback_received,"Nano_Current: 527,533,532,531,532"
+1733328805.8559082,feedback_received,"Uno_FB: 342,219,215,340"
+1733328805.856728,feedback_received,"Uno_FB: 342,219,215,339"
+1733328805.8570611,feedback_received,Nano_Servo5_FB: 402
+1733328805.8576021,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328805.905628,feedback_received,"Uno_FB: 342,218,215,340"
+1733328805.906184,feedback_received,Nano_Servo5_FB: 402
+1733328805.906719,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328805.9552588,feedback_received,"Uno_FB: 342,218,215,340"
+1733328805.956065,feedback_received,"Uno_FB: 341,219,215,340"
+1733328805.956382,feedback_received,Nano_Servo5_FB: 402
+1733328805.956905,feedback_received,"Nano_Current: 526,533,532,531,533"
+1733328806.005245,feedback_received,"Uno_FB: 342,218,215,340"
+1733328806.0058272,feedback_received,Nano_Servo5_FB: 402
+1733328806.00651,feedback_received,"Nano_Current: 527,533,531,530,533"
+1733328806.0559418,feedback_received,"Uno_FB: 342,219,215,339"
+1733328806.0567439,feedback_received,"Uno_FB: 341,219,215,339"
+1733328806.0570939,feedback_received,Nano_Servo5_FB: 402
+1733328806.057638,feedback_received,"Nano_Current: 526,534,531,531,532"
+1733328806.105574,feedback_received,"Uno_FB: 342,218,215,339"
+1733328806.1061509,feedback_received,Nano_Servo5_FB: 402
+1733328806.106632,feedback_received,"Nano_Current: 527,533,531,530,534"
+1733328806.155287,feedback_received,"Uno_FB: 342,219,215,340"
+1733328806.155809,feedback_received,Nano_Servo5_FB: 402
+1733328806.156205,feedback_received,"Nano_Current: 527,534,531,531,534"
+1733328806.205385,feedback_received,"Uno_FB: 341,219,215,340"
+1733328806.2062101,feedback_received,"Uno_FB: 342,219,215,339"
+1733328806.20654,feedback_received,Nano_Servo5_FB: 402
+1733328806.207068,feedback_received,"Nano_Current: 528,533,532,531,533"
+1733328806.255925,feedback_received,"Uno_FB: 342,218,215,339"
+1733328806.256515,feedback_received,Nano_Servo5_FB: 402
+1733328806.257063,feedback_received,"Nano_Current: 528,533,532,531,533"
+1733328806.30569,feedback_received,"Uno_FB: 342,218,215,340"
+1733328806.306505,feedback_received,"Uno_FB: 342,219,215,340"
+1733328806.3068538,feedback_received,Nano_Servo5_FB: 402
+1733328806.30739,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328806.3553522,feedback_received,"Uno_FB: 341,219,215,339"
+1733328806.3559391,feedback_received,Nano_Servo5_FB: 402
+1733328806.356498,feedback_received,"Nano_Current: 528,533,530,531,533"
+1733328806.405239,feedback_received,"Uno_FB: 342,218,215,340"
+1733328806.406052,feedback_received,"Uno_FB: 341,218,215,339"
+1733328806.40638,feedback_received,Nano_Servo5_FB: 402
+1733328806.406973,feedback_received,"Nano_Current: 527,534,531,531,533"
+1733328806.455945,feedback_received,"Uno_FB: 342,218,215,339"
+1733328806.4565,feedback_received,Nano_Servo5_FB: 402
+1733328806.457047,feedback_received,"Nano_Current: 527,534,532,531,532"
+1733328806.5059059,feedback_received,"Uno_FB: 341,219,215,340"
+1733328806.506736,feedback_received,"Uno_FB: 342,219,215,339"
+1733328806.507105,feedback_received,Nano_Servo5_FB: 402
+1733328806.5076108,feedback_received,"Nano_Current: 527,533,531,531,534"
+1733328806.555376,feedback_received,"Uno_FB: 341,219,215,339"
+1733328806.555933,feedback_received,Nano_Servo5_FB: 402
+1733328806.556491,feedback_received,"Nano_Current: 526,533,532,532,533"
+1733328806.606383,feedback_received,"Uno_FB: 342,218,215,340"
+1733328806.607182,feedback_received,"Uno_FB: 342,219,215,339"
+1733328806.60751,feedback_received,Nano_Servo5_FB: 402
+1733328806.608022,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328806.655437,feedback_received,"Uno_FB: 341,219,215,339"
+1733328806.656029,feedback_received,Nano_Servo5_FB: 402
+1733328806.6643908,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328806.705374,feedback_received,"Uno_FB: 341,219,215,340"
+1733328806.7061388,feedback_received,"Uno_FB: 341,219,215,340"
+1733328806.755213,feedback_received,"Uno_FB: 341,218,215,340"
+1733328806.7557619,feedback_received,Nano_Servo5_FB: 402
+1733328806.756326,feedback_received,"Nano_Current: 527,533,531,530,533"
+1733328806.8051012,feedback_received,"Uno_FB: 341,219,215,340"
+1733328806.807772,feedback_received,"Uno_FB: 341,219,215,339"
+1733328806.8081431,feedback_received,Nano_Servo5_FB: 402
+1733328806.808674,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328806.8088489,feedback_received,Nano_Servo5_FB: 402
+1733328806.8093162,feedback_received,"Nano_Current: 526,533,531,531,532"
+1733328806.8553421,feedback_received,"Uno_FB: 342,219,215,339"
+1733328806.855857,feedback_received,Nano_Servo5_FB: 402
+1733328806.8720489,feedback_received,"Nano_Current: 527,534,531,530,533"
+1733328806.904649,feedback_received,"Uno_FB: 341,219,215,340"
+1733328806.955487,feedback_received,"Uno_FB: 342,219,215,340"
+1733328806.956424,feedback_received,"Uno_FB: 341,219,215,340"
+1733328806.956834,feedback_received,Nano_Servo5_FB: 402
+1733328806.957448,feedback_received,"Nano_Current: 526,534,532,531,532"
+1733328807.004931,feedback_received,"Uno_FB: 342,219,215,340"
+1733328807.0054631,feedback_received,Nano_Servo5_FB: 402
+1733328807.0059688,feedback_received,"Nano_Current: 527,533,532,531,532"
+1733328807.0550568,feedback_received,"Uno_FB: 342,219,215,340"
+1733328807.055813,feedback_received,"Uno_FB: 342,219,215,339"
+1733328807.056111,feedback_received,Nano_Servo5_FB: 402
+1733328807.056592,feedback_received,"Nano_Current: 527,533,533,530,533"
+1733328807.104701,feedback_received,"Uno_FB: 341,218,215,339"
+1733328807.105237,feedback_received,Nano_Servo5_FB: 402
+1733328807.105761,feedback_received,"Nano_Current: 528,533,532,531,533"
+1733328807.155494,feedback_received,"Uno_FB: 341,219,215,340"
+1733328807.156258,feedback_received,"Uno_FB: 341,219,215,340"
+1733328807.156563,feedback_received,Nano_Servo5_FB: 402
+1733328807.157067,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328807.205229,feedback_received,"Uno_FB: 341,219,215,339"
+1733328807.20579,feedback_received,Nano_Servo5_FB: 402
+1733328807.20633,feedback_received,"Nano_Current: 526,534,532,531,532"
+1733328807.25557,feedback_received,"Uno_FB: 342,218,215,339"
+1733328807.256397,feedback_received,"Uno_FB: 341,219,215,339"
+1733328807.256735,feedback_received,Nano_Servo5_FB: 402
+1733328807.2572641,feedback_received,"Nano_Current: 527,533,532,532,533"
+1733328807.305681,feedback_received,"Uno_FB: 342,218,215,339"
+1733328807.306263,feedback_received,Nano_Servo5_FB: 402
+1733328807.3068118,feedback_received,"Nano_Current: 527,532,532,531,532"
+1733328807.3416378,command_sent,"<095,035,160,090,120>"
+1733328807.36292,feedback_received,"Uno_FB: 341,218,215,340"
+1733328807.3635771,feedback_received,"Uno_FB: 342,219,215,340"
+1733328807.363831,feedback_received,Nano_Servo5_FB: 402
+1733328807.364222,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328807.405133,feedback_received,"Uno_FB: 340,219,215,340"
+1733328807.405662,feedback_received,Nano_Servo5_FB: 402
+1733328807.406165,feedback_received,"Nano_Current: 526,534,532,530,532"
+1733328807.4555578,feedback_received,"Uno_FB: 342,218,215,340"
+1733328807.456328,feedback_received,"Uno_FB: 342,219,215,339"
+1733328807.4566379,feedback_received,Nano_Servo5_FB: 402
+1733328807.457129,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328807.505625,feedback_received,"Uno_FB: 342,218,215,340"
+1733328807.506258,feedback_received,Nano_Servo5_FB: 402
+1733328807.506816,feedback_received,"Nano_Current: 526,534,530,530,533"
+1733328807.554386,command_sent,"<096,035,160,090,120>"
+1733328807.57631,feedback_received,"Uno_FB: 343,218,215,340"
+1733328807.576936,feedback_received,"Uno_FB: 344,219,215,339"
+1733328807.577211,feedback_received,Nano_Servo5_FB: 402
+1733328807.577643,feedback_received,"Nano_Current: 526,533,532,531,533"
+1733328807.5940511,command_sent,"<095,035,160,090,120>"
+1733328807.614775,command_sent,"<092,035,160,090,120>"
+1733328807.634725,command_sent,"<090,035,160,090,120>"
+1733328807.635787,feedback_received,"Uno_FB: 344,218,215,339"
+1733328807.636229,feedback_received,"Uno_FB: 346,219,215,340"
+1733328807.636437,feedback_received,Nano_Servo5_FB: 402
+1733328807.6368132,feedback_received,"Nano_Current: 526,534,532,531,533"
+1733328807.6673012,command_sent,"<088,035,160,090,120>"
+1733328807.687009,feedback_received,"Uno_FB: 345,219,215,340"
+1733328807.6874251,feedback_received,Nano_Servo5_FB: 402
+1733328807.687823,feedback_received,"Nano_Current: 528,534,533,531,534"
+1733328807.687946,feedback_received,Nano_Servo5_FB: 402
+1733328807.688291,feedback_received,"Nano_Current: 528,533,532,530,532"
+1733328807.7056699,feedback_received,"Uno_FB: 348,218,215,339"
+1733328807.71572,command_sent,"<087,035,160,090,120>"
+1733328807.755101,feedback_received,"Uno_FB: 346,219,215,340"
+1733328807.755573,feedback_received,Nano_Servo5_FB: 402
+1733328807.756047,feedback_received,"Nano_Current: 528,534,531,530,533"
+1733328807.8053172,feedback_received,"Uno_FB: 346,219,215,339"
+1733328807.806011,feedback_received,"Uno_FB: 339,218,215,339"
+1733328807.8063202,feedback_received,Nano_Servo5_FB: 402
+1733328807.806776,feedback_received,"Nano_Current: 529,534,531,532,533"
+1733328807.855662,feedback_received,"Uno_FB: 337,219,215,339"
+1733328807.856129,feedback_received,Nano_Servo5_FB: 402
+1733328807.856631,feedback_received,"Nano_Current: 527,534,533,532,533"
+1733328807.899435,command_sent,"<085,035,160,090,120>"
+1733328807.921422,feedback_received,"Uno_FB: 334,218,215,339"
+1733328807.922039,feedback_received,"Uno_FB: 333,219,215,339"
+1733328807.922261,feedback_received,Nano_Servo5_FB: 402
+1733328807.922673,feedback_received,"Nano_Current: 526,533,531,531,533"
+1733328807.93755,command_sent,"<084,035,160,090,120>"
+1733328807.957908,command_sent,"<081,035,160,090,120>"
+1733328807.977778,feedback_received,"Uno_FB: 332,219,215,339"
+1733328807.978413,feedback_received,"Uno_FB: 335,219,215,340"
+1733328807.978637,feedback_received,Nano_Servo5_FB: 402
+1733328807.9790258,feedback_received,"Nano_Current: 526,534,532,531,533"
+1733328807.992953,command_sent,"<079,035,160,090,120>"
+1733328808.012963,command_sent,"<078,035,160,090,120>"
+1733328808.033642,feedback_received,"Uno_FB: 335,219,215,340"
+1733328808.034085,feedback_received,Nano_Servo5_FB: 402
+1733328808.0345118,feedback_received,"Nano_Current: 528,533,532,531,532"
+1733328808.055095,feedback_received,"Uno_FB: 335,219,215,340"
+1733328808.05559,feedback_received,Nano_Servo5_FB: 402
+1733328808.056064,feedback_received,"Nano_Current: 532,534,533,531,533"
+1733328808.104909,feedback_received,"Uno_FB: 331,219,215,340"
+1733328808.1060438,feedback_received,"Uno_FB: 322,219,215,340"
+1733328808.106324,feedback_received,Nano_Servo5_FB: 402
+1733328808.106816,feedback_received,"Nano_Current: 528,534,531,532,533"
+1733328808.1241531,command_sent,"<076,035,160,090,120>"
+1733328808.155473,feedback_received,"Uno_FB: 318,219,216,340"
+1733328808.15596,feedback_received,Nano_Servo5_FB: 402
+1733328808.165384,feedback_received,"Nano_Current: 528,534,532,532,532"
+1733328808.205284,feedback_received,"Uno_FB: 316,219,215,340"
+1733328808.208531,feedback_received,"Uno_FB: 314,219,215,339"
+1733328808.213004,feedback_received,Nano_Servo5_FB: 402
+1733328808.213683,feedback_received,"Nano_Current: 527,534,531,530,533"
+1733328808.255646,feedback_received,"Uno_FB: 311,218,215,338"
+1733328808.306129,feedback_received,"Uno_FB: 311,219,215,338"
+1733328808.311077,feedback_received,"Uno_FB: 309,219,215,338"
+1733328808.3116858,feedback_received,Nano_Servo5_FB: 402
+1733328808.3121579,feedback_received,"Nano_Current: 526,534,532,531,533"
+1733328808.3123,feedback_received,Nano_Servo5_FB: 402
+1733328808.312665,feedback_received,"Nano_Current: 526,533,531,531,532"
+1733328808.334184,command_sent,"<074,035,160,090,120>"
+1733328808.359644,feedback_received,"Uno_FB: 308,219,215,338"
+1733328808.360448,feedback_received,Nano_Servo5_FB: 402
+1733328808.360985,feedback_received,"Nano_Current: 526,534,531,531,534"
+1733328808.3821099,command_sent,"<073,035,160,090,120>"
+1733328808.4069262,command_sent,"<071,035,160,090,120>"
+1733328808.432557,command_sent,"<067,035,160,090,120>"
+1733328808.455791,feedback_received,"Uno_FB: 308,219,215,337"
+1733328808.45696,feedback_received,"Uno_FB: 307,219,215,337"
+1733328808.457542,feedback_received,"Uno_FB: 308,219,215,338"
+1733328808.4579241,feedback_received,Nano_Servo5_FB: 402
+1733328808.4585412,feedback_received,"Nano_Current: 527,534,531,531,532"
+1733328808.478739,command_sent,"<064,035,160,090,120>"
+1733328808.5024068,command_sent,"<062,035,160,090,120>"
+1733328808.52669,command_sent,"<061,035,160,090,120>"
+1733328808.547483,feedback_received,"Uno_FB: 307,219,215,338"
+1733328808.548506,feedback_received,"Uno_FB: 308,219,215,338"
+1733328808.549101,feedback_received,"Uno_FB: 301,218,215,338"
+1733328808.5493681,feedback_received,Nano_Servo5_FB: 402
+1733328808.5498,feedback_received,"Nano_Current: 528,533,531,530,533"
+1733328808.549927,feedback_received,Nano_Servo5_FB: 402
+1733328808.5502841,feedback_received,"Nano_Current: 532,533,532,531,532"
+1733328808.569062,command_sent,"<059,035,160,090,120>"
+1733328808.596729,feedback_received,"Uno_FB: 304,219,215,338"
+1733328808.597294,feedback_received,Nano_Servo5_FB: 402
+1733328808.597764,feedback_received,"Nano_Current: 534,533,532,530,532"
+1733328808.618211,feedback_received,"Uno_FB: 289,218,215,338"
+1733328808.618741,feedback_received,Nano_Servo5_FB: 402
+1733328808.62857,feedback_received,"Nano_Current: 526,533,531,531,533"
+1733328808.6556978,feedback_received,"Uno_FB: 283,219,215,337"
+1733328808.705564,feedback_received,"Uno_FB: 278,218,215,337"
+1733328808.706506,feedback_received,Nano_Servo5_FB: 402
+1733328808.70722,feedback_received,"Nano_Current: 526,534,532,530,533"
+1733328808.75513,feedback_received,"Uno_FB: 275,218,215,337"
+1733328808.7558599,feedback_received,"Uno_FB: 275,219,215,337"
+1733328808.756147,feedback_received,Nano_Servo5_FB: 402
+1733328808.75662,feedback_received,"Nano_Current: 526,533,531,530,532"
+1733328808.805131,feedback_received,"Uno_FB: 274,218,215,337"
+1733328808.8056052,feedback_received,Nano_Servo5_FB: 402
+1733328808.806061,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328808.855903,feedback_received,"Uno_FB: 272,219,215,337"
+1733328808.856673,feedback_received,"Uno_FB: 272,219,215,337"
+1733328808.8569741,feedback_received,Nano_Servo5_FB: 402
+1733328808.8574731,feedback_received,"Nano_Current: 526,532,532,530,532"
+1733328808.8765771,command_sent,"<057,035,160,090,120>"
+1733328808.905876,feedback_received,"Uno_FB: 271,218,215,337"
+1733328808.9063628,feedback_received,Nano_Servo5_FB: 402
+1733328808.906816,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328808.923296,command_sent,"<056,035,160,090,120>"
+1733328808.9559228,feedback_received,"Uno_FB: 272,219,215,337"
+1733328808.95646,feedback_received,Nano_Servo5_FB: 402
+1733328808.956945,feedback_received,"Nano_Current: 526,533,532,531,532"
+1733328809.006559,feedback_received,"Uno_FB: 271,219,215,337"
+1733328809.0073442,feedback_received,"Uno_FB: 271,219,215,337"
+1733328809.007648,feedback_received,Nano_Servo5_FB: 402
+1733328809.008163,feedback_received,"Nano_Current: 527,534,531,530,532"
+1733328809.055242,feedback_received,"Uno_FB: 268,219,215,337"
+1733328809.0558012,feedback_received,Nano_Servo5_FB: 402
+1733328809.056323,feedback_received,"Nano_Current: 526,534,532,530,533"
+1733328809.105707,feedback_received,"Uno_FB: 267,218,215,337"
+1733328809.106504,feedback_received,"Uno_FB: 266,219,215,337"
+1733328809.106835,feedback_received,Nano_Servo5_FB: 401
+1733328809.1073432,feedback_received,"Nano_Current: 526,533,531,531,533"
+1733328809.155228,feedback_received,"Uno_FB: 266,218,215,337"
+1733328809.1557791,feedback_received,Nano_Servo5_FB: 402
+1733328809.156308,feedback_received,"Nano_Current: 527,533,532,530,532"
+1733328809.185067,command_sent,"<054,035,160,090,120>"
+1733328809.205559,feedback_received,"Uno_FB: 267,218,215,337"
+1733328809.20627,feedback_received,"Uno_FB: 267,219,215,337"
+1733328809.2065248,feedback_received,Nano_Servo5_FB: 402
+1733328809.206935,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328809.223326,command_sent,"<053,035,160,090,120>"
+1733328809.242959,command_sent,"<051,035,160,090,120>"
+1733328809.261944,command_sent,"<050,035,160,090,120>"
+1733328809.2806358,command_sent,"<048,035,160,090,120>"
+1733328809.281761,feedback_received,"Uno_FB: 268,219,215,337"
+1733328809.282235,feedback_received,"Uno_FB: 269,218,215,337"
+1733328809.282475,feedback_received,Nano_Servo5_FB: 402
+1733328809.282893,feedback_received,"Nano_Current: 528,534,532,531,533"
+1733328809.29887,feedback_received,Nano_Servo5_FB: 402
+1733328809.299511,feedback_received,"Nano_Current: 529,535,532,531,534"
+1733328809.3326662,command_sent,"<047,035,160,090,120>"
+1733328809.333754,feedback_received,"Uno_FB: 270,218,215,337"
+1733328809.357561,command_sent,"<045,035,160,090,120>"
+1733328809.3781812,feedback_received,"Uno_FB: 267,219,215,337"
+1733328809.3787751,feedback_received,"Uno_FB: 263,219,215,337"
+1733328809.379002,feedback_received,Nano_Servo5_FB: 402
+1733328809.379463,feedback_received,"Nano_Current: 534,533,532,530,533"
+1733328809.394589,command_sent,"<043,035,160,090,120>"
+1733328809.4149601,command_sent,"<042,035,160,090,120>"
+1733328809.434186,feedback_received,"Uno_FB: 262,219,215,337"
+1733328809.434604,feedback_received,Nano_Servo5_FB: 402
+1733328809.435054,feedback_received,"Nano_Current: 529,533,532,530,532"
+1733328809.45105,command_sent,"<040,035,160,090,120>"
+1733328809.470786,feedback_received,"Uno_FB: 255,219,215,337"
+1733328809.471443,feedback_received,"Uno_FB: 249,218,215,337"
+1733328809.47169,feedback_received,Nano_Servo5_FB: 402
+1733328809.472094,feedback_received,"Nano_Current: 530,534,533,531,533"
+1733328809.4942899,command_sent,"<039,035,160,090,120>"
+1733328809.5135071,feedback_received,"Uno_FB: 247,219,215,337"
+1733328809.5139132,feedback_received,Nano_Servo5_FB: 402
+1733328809.5143309,feedback_received,"Nano_Current: 528,533,532,531,533"
+1733328809.5486422,command_sent,"<037,035,160,090,120>"
+1733328809.568888,feedback_received,"Uno_FB: 244,218,215,337"
+1733328809.5692852,feedback_received,Nano_Servo5_FB: 402
+1733328809.5697439,feedback_received,"Nano_Current: 527,534,532,531,534"
+1733328809.5940359,command_sent,"<036,035,160,090,120>"
+1733328809.613277,feedback_received,"Uno_FB: 237,219,215,337"
+1733328809.613913,feedback_received,"Uno_FB: 238,219,216,337"
+1733328809.6141639,feedback_received,Nano_Servo5_FB: 402
+1733328809.614597,feedback_received,"Nano_Current: 526,534,532,530,533"
+1733328809.629617,command_sent,"<034,035,160,090,120>"
+1733328809.649665,command_sent,"<033,035,160,090,120>"
+1733328809.669056,feedback_received,"Uno_FB: 234,219,215,337"
+1733328809.6695108,feedback_received,Nano_Servo5_FB: 402
+1733328809.669931,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328809.683947,command_sent,"<031,035,160,090,120>"
+1733328809.70432,command_sent,"<029,035,160,090,120>"
+1733328809.7247841,feedback_received,"Uno_FB: 231,218,215,337"
+1733328809.725495,feedback_received,"Uno_FB: 227,219,215,337"
+1733328809.725759,feedback_received,Nano_Servo5_FB: 402
+1733328809.7261949,feedback_received,"Nano_Current: 529,533,532,531,533"
+1733328809.741306,command_sent,"<028,035,160,090,120>"
+1733328809.7621162,command_sent,"<026,035,160,090,120>"
+1733328809.7815402,feedback_received,"Uno_FB: 228,219,215,337"
+1733328809.7823439,feedback_received,"Uno_FB: 222,219,215,337"
+1733328809.782627,feedback_received,Nano_Servo5_FB: 402
+1733328809.783066,feedback_received,"Nano_Current: 529,534,533,530,534"
+1733328809.7977011,command_sent,"<025,035,160,090,120>"
+1733328809.817881,command_sent,"<023,035,160,090,120>"
+1733328809.837766,feedback_received,"Uno_FB: 219,219,216,337"
+1733328809.8382452,feedback_received,Nano_Servo5_FB: 402
+1733328809.8387,feedback_received,"Nano_Current: 529,534,531,531,534"
+1733328809.8533819,command_sent,"<022,035,160,090,120>"
+1733328809.8736389,command_sent,"<020,035,160,090,120>"
+1733328809.893267,feedback_received,"Uno_FB: 217,218,215,337"
+1733328809.89393,feedback_received,"Uno_FB: 213,219,215,337"
+1733328809.89418,feedback_received,Nano_Servo5_FB: 402
+1733328809.894594,feedback_received,"Nano_Current: 529,533,532,530,533"
+1733328809.909504,command_sent,"<019,035,160,090,120>"
+1733328809.930023,command_sent,"<017,035,160,090,120>"
+1733328809.949701,feedback_received,"Uno_FB: 207,219,215,337"
+1733328809.950367,feedback_received,"Uno_FB: 201,218,215,337"
+1733328809.950625,feedback_received,Nano_Servo5_FB: 402
+1733328809.951036,feedback_received,"Nano_Current: 529,534,533,530,533"
+1733328809.9656808,command_sent,"<016,035,160,090,120>"
+1733328809.985474,command_sent,"<012,035,160,090,120>"
+1733328809.986571,feedback_received,"Uno_FB: 202,219,215,337"
+1733328809.986927,feedback_received,Nano_Servo5_FB: 402
+1733328809.987421,feedback_received,"Nano_Current: 528,533,532,531,533"
+1733328810.018595,command_sent,"<011,035,160,090,120>"
+1733328810.038157,feedback_received,"Uno_FB: 197,219,215,337"
+1733328810.038604,feedback_received,Nano_Servo5_FB: 402
+1733328810.03908,feedback_received,"Nano_Current: 532,533,532,530,532"
+1733328810.0552151,command_sent,"<009,035,160,090,120>"
+1733328810.074728,feedback_received,"Uno_FB: 198,219,215,337"
+1733328810.075202,feedback_received,Nano_Servo5_FB: 403
+1733328810.075663,feedback_received,"Nano_Current: 534,534,532,530,533"
+1733328810.091748,command_sent,"<008,035,160,090,120>"
+1733328810.111543,feedback_received,"Uno_FB: 194,219,215,337"
+1733328810.1200662,command_sent,"<006,035,160,090,120>"
+1733328810.1406798,command_sent,"<005,035,160,090,120>"
+1733328810.16015,command_sent,"<003,035,160,090,120>"
+1733328810.179472,command_sent,"<002,035,160,090,120>"
+1733328810.18051,feedback_received,"Uno_FB: 191,219,216,337"
+1733328810.1809862,feedback_received,"Uno_FB: 197,219,215,338"
+1733328810.181227,feedback_received,Nano_Servo5_FB: 402
+1733328810.181649,feedback_received,"Nano_Current: 535,533,533,531,533"
+1733328810.1817658,feedback_received,Nano_Servo5_FB: 403
+1733328810.182106,feedback_received,"Nano_Current: 540,533,532,531,533"
+1733328810.213965,command_sent,"<000,035,160,090,120>"
+1733328810.2336462,feedback_received,"Uno_FB: 207,219,216,337"
+1733328810.234293,feedback_received,"Uno_FB: 201,219,216,337"
+1733328810.234551,feedback_received,Nano_Servo5_FB: 402
+1733328810.2349598,feedback_received,"Nano_Current: 549,534,532,530,533"
+1733328810.30596,feedback_received,"Uno_FB: 197,219,215,337"
+1733328810.306802,feedback_received,"Uno_FB: 173,219,215,337"
+1733328810.307159,feedback_received,Nano_Servo5_FB: 402
+1733328810.307692,feedback_received,"Nano_Current: 540,533,532,531,534"
+1733328810.355475,feedback_received,"Uno_FB: 160,219,215,337"
+1733328810.356008,feedback_received,Nano_Servo5_FB: 402
+1733328810.356538,feedback_received,"Nano_Current: 529,533,532,531,533"
+1733328810.4048278,feedback_received,"Uno_FB: 154,218,215,336"
+1733328810.4056268,feedback_received,"Uno_FB: 152,218,215,337"
+1733328810.4059389,feedback_received,Nano_Servo5_FB: 402
+1733328810.406473,feedback_received,"Nano_Current: 527,533,532,530,532"
+1733328810.4559581,feedback_received,"Uno_FB: 149,219,215,337"
+1733328810.4565902,feedback_received,Nano_Servo5_FB: 402
+1733328810.457164,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328810.5047722,feedback_received,"Uno_FB: 148,218,215,337"
+1733328810.505499,feedback_received,"Uno_FB: 147,218,215,337"
+1733328810.505823,feedback_received,Nano_Servo5_FB: 402
+1733328810.506342,feedback_received,"Nano_Current: 527,534,531,530,533"
+1733328810.556389,feedback_received,"Uno_FB: 147,219,215,337"
+1733328810.556951,feedback_received,Nano_Servo5_FB: 402
+1733328810.5574982,feedback_received,"Nano_Current: 526,534,533,530,533"
+1733328810.605301,feedback_received,"Uno_FB: 146,218,215,337"
+1733328810.606098,feedback_received,"Uno_FB: 146,218,215,337"
+1733328810.606414,feedback_received,Nano_Servo5_FB: 402
+1733328810.6069272,feedback_received,"Nano_Current: 526,533,533,530,533"
+1733328810.655933,feedback_received,"Uno_FB: 146,218,215,336"
+1733328810.656487,feedback_received,Nano_Servo5_FB: 402
+1733328810.657037,feedback_received,"Nano_Current: 526,534,531,530,533"
+1733328810.704902,feedback_received,"Uno_FB: 146,218,215,337"
+1733328810.705699,feedback_received,"Uno_FB: 145,218,215,337"
+1733328810.705973,feedback_received,Nano_Servo5_FB: 402
+1733328810.706492,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328810.755104,feedback_received,"Uno_FB: 146,219,215,337"
+1733328810.7556129,feedback_received,Nano_Servo5_FB: 402
+1733328810.756067,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328810.80497,feedback_received,"Uno_FB: 146,218,215,337"
+1733328810.805716,feedback_received,"Uno_FB: 146,218,215,337"
+1733328810.805988,feedback_received,Nano_Servo5_FB: 402
+1733328810.806506,feedback_received,"Nano_Current: 526,533,533,530,533"
+1733328810.8559842,feedback_received,"Uno_FB: 146,219,215,336"
+1733328810.856478,feedback_received,Nano_Servo5_FB: 402
+1733328810.857026,feedback_received,"Nano_Current: 527,534,531,530,533"
+1733328810.906368,feedback_received,"Uno_FB: 146,218,215,337"
+1733328810.90759,feedback_received,"Uno_FB: 146,218,215,337"
+1733328810.907878,feedback_received,Nano_Servo5_FB: 402
+1733328810.908416,feedback_received,"Nano_Current: 527,532,533,530,533"
+1733328810.955473,feedback_received,"Uno_FB: 146,219,215,337"
+1733328810.956015,feedback_received,Nano_Servo5_FB: 402
+1733328810.956536,feedback_received,"Nano_Current: 526,533,532,529,533"
+1733328811.005494,feedback_received,"Uno_FB: 146,218,215,337"
+1733328811.009968,feedback_received,"Uno_FB: 146,219,215,337"
+1733328811.0102808,feedback_received,Nano_Servo5_FB: 402
+1733328811.010828,feedback_received,"Nano_Current: 526,533,532,530,534"
+1733328811.055593,feedback_received,"Uno_FB: 146,218,215,337"
+1733328811.056101,feedback_received,Nano_Servo5_FB: 402
+1733328811.056648,feedback_received,"Nano_Current: 527,534,531,530,534"
+1733328811.105037,feedback_received,"Uno_FB: 146,218,215,337"
+1733328811.1055481,feedback_received,Nano_Servo5_FB: 402
+1733328811.1061099,feedback_received,"Nano_Current: 526,533,533,530,534"
+1733328811.156107,feedback_received,"Uno_FB: 145,218,215,337"
+1733328811.156801,feedback_received,"Uno_FB: 146,219,215,337"
+1733328811.1570501,feedback_received,Nano_Servo5_FB: 402
+1733328811.157474,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328811.205888,feedback_received,"Uno_FB: 146,218,215,337"
+1733328811.2063801,feedback_received,Nano_Servo5_FB: 402
+1733328811.21521,feedback_received,"Nano_Current: 526,534,533,530,534"
+1733328811.232519,command_sent,"<002,035,160,090,120>"
+1733328811.255195,command_sent,"<003,035,160,090,120>"
+1733328811.275288,feedback_received,"Uno_FB: 146,219,215,337"
+1733328811.27612,feedback_received,"Uno_FB: 146,218,215,337"
+1733328811.276395,feedback_received,Nano_Servo5_FB: 402
+1733328811.276816,feedback_received,"Nano_Current: 527,534,531,531,534"
+1733328811.291064,command_sent,"<005,035,160,090,120>"
+1733328811.31176,feedback_received,"Uno_FB: 145,219,215,337"
+1733328811.312203,feedback_received,Nano_Servo5_FB: 402
+1733328811.3126478,feedback_received,"Nano_Current: 527,533,533,530,533"
+1733328811.327476,command_sent,"<006,035,160,090,120>"
+1733328811.355168,feedback_received,"Uno_FB: 146,219,215,337"
+1733328811.35583,feedback_received,"Uno_FB: 148,219,215,337"
+1733328811.405046,feedback_received,"Uno_FB: 149,219,215,337"
+1733328811.405566,feedback_received,Nano_Servo5_FB: 402
+1733328811.406116,feedback_received,"Nano_Current: 527,534,533,530,533"
+1733328811.434035,command_sent,"<008,035,160,090,120>"
+1733328811.4550369,feedback_received,"Uno_FB: 151,219,215,337"
+1733328811.455703,feedback_received,"Uno_FB: 152,219,215,337"
+1733328811.455937,feedback_received,Nano_Servo5_FB: 402
+1733328811.4563682,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328811.456495,feedback_received,Nano_Servo5_FB: 402
+1733328811.4707441,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328811.489263,command_sent,"<009,035,160,090,120>"
+1733328811.5093088,feedback_received,"Uno_FB: 154,219,215,337"
+1733328811.517202,command_sent,"<011,035,160,090,120>"
+1733328811.5370948,command_sent,"<012,035,160,090,120>"
+1733328811.557177,feedback_received,"Uno_FB: 154,219,215,337"
+1733328811.557846,feedback_received,"Uno_FB: 157,218,215,337"
+1733328811.5580878,feedback_received,Nano_Servo5_FB: 402
+1733328811.5585122,feedback_received,"Nano_Current: 527,533,532,530,532"
+1733328811.572778,command_sent,"<014,035,160,090,120>"
+1733328811.603651,command_sent,"<016,035,160,090,120>"
+1733328811.62345,feedback_received,"Uno_FB: 159,219,215,337"
+1733328811.623961,feedback_received,Nano_Servo5_FB: 402
+1733328811.624449,feedback_received,"Nano_Current: 530,534,533,530,533"
+1733328811.624602,feedback_received,Nano_Servo5_FB: 402
+1733328811.624979,feedback_received,"Nano_Current: 534,534,533,530,534"
+1733328811.640084,command_sent,"<017,035,160,090,120>"
+1733328811.6599739,command_sent,"<019,035,160,090,120>"
+1733328811.6801238,feedback_received,"Uno_FB: 165,218,215,337"
+1733328811.6807868,feedback_received,"Uno_FB: 167,219,215,337"
+1733328811.6810932,feedback_received,Nano_Servo5_FB: 402
+1733328811.681537,feedback_received,"Nano_Current: 530,534,532,530,533"
+1733328811.69568,command_sent,"<020,035,160,090,120>"
+1733328811.715453,feedback_received,"Uno_FB: 169,219,215,337"
+1733328811.75572,feedback_received,"Uno_FB: 171,219,215,337"
+1733328811.756267,feedback_received,Nano_Servo5_FB: 402
+1733328811.756835,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328811.773111,command_sent,"<022,035,160,090,120>"
+1733328811.798186,command_sent,"<023,035,160,090,120>"
+1733328811.817565,feedback_received,"Uno_FB: 176,218,215,337"
+1733328811.8182242,feedback_received,"Uno_FB: 178,219,215,337"
+1733328811.818465,feedback_received,Nano_Servo5_FB: 402
+1733328811.818885,feedback_received,"Nano_Current: 528,534,533,530,533"
+1733328811.8460858,command_sent,"<025,035,160,090,120>"
+1733328811.866246,feedback_received,"Uno_FB: 184,219,215,337"
+1733328811.866913,feedback_received,"Uno_FB: 186,219,215,337"
+1733328811.8671842,feedback_received,Nano_Servo5_FB: 402
+1733328811.86762,feedback_received,"Nano_Current: 528,532,531,529,533"
+1733328811.8828218,command_sent,"<026,035,160,090,120>"
+1733328811.904615,feedback_received,"Uno_FB: 188,219,216,337"
+1733328811.90507,feedback_received,Nano_Servo5_FB: 402
+1733328811.905531,feedback_received,"Nano_Current: 532,533,532,529,533"
+1733328811.9256608,command_sent,"<028,035,160,090,120>"
+1733328811.955224,feedback_received,"Uno_FB: 192,219,215,337"
+1733328811.95575,feedback_received,Nano_Servo5_FB: 402
+1733328811.956248,feedback_received,"Nano_Current: 534,533,532,531,532"
+1733328811.970541,command_sent,"<029,035,160,090,120>"
+1733328811.992361,command_sent,"<031,035,160,090,120>"
+1733328812.0112991,feedback_received,"Uno_FB: 190,219,215,337"
+1733328812.011976,feedback_received,"Uno_FB: 193,219,215,337"
+1733328812.01223,feedback_received,Nano_Servo5_FB: 402
+1733328812.012685,feedback_received,"Nano_Current: 528,534,533,530,533"
+1733328812.0275688,command_sent,"<033,035,160,090,120>"
+1733328812.052735,command_sent,"<034,035,160,090,120>"
+1733328812.071687,feedback_received,"Uno_FB: 196,219,215,337"
+1733328812.072384,feedback_received,"Uno_FB: 199,219,215,337"
+1733328812.0726578,feedback_received,Nano_Servo5_FB: 402
+1733328812.0730932,feedback_received,"Nano_Current: 528,533,532,529,533"
+1733328812.097548,command_sent,"<036,035,160,090,120>"
+1733328812.1168141,feedback_received,"Uno_FB: 205,219,215,337"
+1733328812.117287,feedback_received,Nano_Servo5_FB: 402
+1733328812.117733,feedback_received,"Nano_Current: 528,534,532,530,533"
+1733328812.137557,command_sent,"<037,035,160,090,120>"
+1733328812.1572359,feedback_received,"Uno_FB: 205,218,215,337"
+1733328812.157699,feedback_received,Nano_Servo5_FB: 402
+1733328812.158137,feedback_received,"Nano_Current: 528,533,531,531,533"
+1733328812.173548,command_sent,"<039,035,160,090,120>"
+1733328812.205317,feedback_received,"Uno_FB: 208,219,215,337"
+1733328812.206016,feedback_received,"Uno_FB: 212,219,215,337"
+1733328812.2062762,feedback_received,Nano_Servo5_FB: 403
+1733328812.206701,feedback_received,"Nano_Current: 529,533,532,531,533"
+1733328812.2214432,command_sent,"<040,035,160,090,120>"
+1733328812.2558248,feedback_received,"Uno_FB: 216,218,215,337"
+1733328812.256347,feedback_received,Nano_Servo5_FB: 402
+1733328812.2568371,feedback_received,"Nano_Current: 527,533,532,531,534"
+1733328812.271782,command_sent,"<042,035,160,090,120>"
+1733328812.305307,feedback_received,"Uno_FB: 220,219,215,336"
+1733328812.308447,feedback_received,"Uno_FB: 221,219,215,337"
+1733328812.3087842,feedback_received,Nano_Servo5_FB: 403
+1733328812.309304,feedback_received,"Nano_Current: 527,534,533,530,532"
+1733328812.3250508,command_sent,"<043,035,160,090,120>"
+1733328812.3552651,feedback_received,"Uno_FB: 223,219,215,337"
+1733328812.3557189,feedback_received,Nano_Servo5_FB: 402
+1733328812.356221,feedback_received,"Nano_Current: 527,533,533,530,534"
+1733328812.3720372,command_sent,"<045,035,160,090,120>"
+1733328812.3926442,command_sent,"<047,035,160,090,120>"
+1733328812.4122539,feedback_received,"Uno_FB: 226,218,215,337"
+1733328812.412977,feedback_received,"Uno_FB: 228,219,215,337"
+1733328812.413235,feedback_received,Nano_Servo5_FB: 402
+1733328812.413661,feedback_received,"Nano_Current: 528,534,532,530,533"
+1733328812.4289541,command_sent,"<048,035,160,090,120>"
+1733328812.455122,feedback_received,"Uno_FB: 231,219,215,337"
+1733328812.455586,feedback_received,Nano_Servo5_FB: 402
+1733328812.4560452,feedback_received,"Nano_Current: 528,535,532,531,533"
+1733328812.4703739,command_sent,"<050,035,160,090,120>"
+1733328812.5009332,command_sent,"<051,035,160,090,120>"
+1733328812.520755,feedback_received,"Uno_FB: 238,219,215,337"
+1733328812.521517,feedback_received,"Uno_FB: 241,219,215,337"
+1733328812.521792,feedback_received,Nano_Servo5_FB: 402
+1733328812.522231,feedback_received,"Nano_Current: 531,534,532,530,533"
+1733328812.537075,command_sent,"<053,035,160,090,120>"
+1733328812.557051,command_sent,"<054,035,160,090,120>"
+1733328812.576639,feedback_received,"Uno_FB: 242,220,215,338"
+1733328812.5770812,feedback_received,Nano_Servo5_FB: 402
+1733328812.5775402,feedback_received,"Nano_Current: 530,535,533,530,533"
+1733328812.5957701,command_sent,"<056,035,160,090,120>"
+1733328812.6163242,command_sent,"<057,035,160,090,120>"
+1733328812.635591,feedback_received,"Uno_FB: 244,219,215,337"
+1733328812.636322,feedback_received,"Uno_FB: 247,219,215,337"
+1733328812.63663,feedback_received,Nano_Servo5_FB: 402
+1733328812.637107,feedback_received,"Nano_Current: 528,533,532,531,533"
+1733328812.652035,command_sent,"<059,035,160,090,120>"
+1733328812.672649,command_sent,"<061,035,160,090,120>"
+1733328812.6923342,feedback_received,"Uno_FB: 251,219,215,337"
+1733328812.693006,feedback_received,"Uno_FB: 254,219,215,337"
+1733328812.69325,feedback_received,Nano_Servo5_FB: 402
+1733328812.693665,feedback_received,"Nano_Current: 528,533,532,531,533"
+1733328812.70847,command_sent,"<062,035,160,090,120>"
+1733328812.7285278,feedback_received,"Uno_FB: 259,219,215,337"
+1733328812.728998,feedback_received,Nano_Servo5_FB: 402
+1733328812.729444,feedback_received,"Nano_Current: 526,534,532,530,532"
+1733328812.7433238,command_sent,"<064,035,160,090,120>"
+1733328812.7641091,feedback_received,"Uno_FB: 264,219,215,337"
+1733328812.764556,feedback_received,Nano_Servo5_FB: 402
+1733328812.7649899,feedback_received,"Nano_Current: 530,534,532,531,533"
+1733328812.779187,command_sent,"<065,035,160,090,120>"
+1733328812.8000152,command_sent,"<067,035,160,090,120>"
+1733328812.819993,feedback_received,"Uno_FB: 266,219,215,337"
+1733328812.820692,feedback_received,"Uno_FB: 270,219,215,337"
+1733328812.8209732,feedback_received,Nano_Servo5_FB: 402
+1733328812.821435,feedback_received,"Nano_Current: 528,534,532,529,532"
+1733328812.835001,command_sent,"<068,035,160,090,120>"
+1733328812.8567529,feedback_received,"Uno_FB: 274,219,215,337"
+1733328812.864398,command_sent,"<070,035,160,090,120>"
+1733328812.897492,command_sent,"<071,035,160,090,120>"
+1733328812.917432,feedback_received,"Uno_FB: 278,219,215,337"
+1733328812.917902,feedback_received,Nano_Servo5_FB: 402
+1733328812.918386,feedback_received,"Nano_Current: 528,534,532,530,532"
+1733328812.918554,feedback_received,Nano_Servo5_FB: 402
+1733328812.919042,feedback_received,"Nano_Current: 527,532,533,530,533"
+1733328812.9333289,command_sent,"<073,035,160,090,120>"
+1733328812.955764,feedback_received,"Uno_FB: 280,219,215,337"
+1733328812.956516,feedback_received,"Uno_FB: 286,221,215,337"
+1733328812.956791,feedback_received,Nano_Servo5_FB: 402
+1733328812.971884,feedback_received,"Nano_Current: 531,535,532,530,533"
+1733328812.987259,command_sent,"<074,035,160,090,120>"
+1733328813.007346,command_sent,"<076,035,160,090,120>"
+1733328813.008429,feedback_received,"Uno_FB: 288,219,215,337"
+1733328813.0195122,feedback_received,Nano_Servo5_FB: 402
+1733328813.020153,feedback_received,"Nano_Current: 525,534,532,531,533"
+1733328813.0530062,command_sent,"<078,035,160,090,120>"
+1733328813.071373,command_sent,"<079,035,160,090,120>"
+1733328813.09266,feedback_received,"Uno_FB: 290,219,215,337"
+1733328813.093317,feedback_received,"Uno_FB: 294,219,215,337"
+1733328813.094748,feedback_received,"Uno_FB: 298,219,215,337"
+1733328813.095197,feedback_received,Nano_Servo5_FB: 402
+1733328813.095685,feedback_received,"Nano_Current: 526,534,533,531,534"
+1733328813.10932,command_sent,"<081,035,160,090,120>"
+1733328813.1298282,command_sent,"<082,035,160,090,120>"
+1733328813.148951,feedback_received,"Uno_FB: 304,219,215,337"
+1733328813.1493828,feedback_received,Nano_Servo5_FB: 402
+1733328813.1498282,feedback_received,"Nano_Current: 528,533,531,530,533"
+1733328813.163706,command_sent,"<084,035,160,090,120>"
+1733328813.184062,command_sent,"<085,035,160,090,120>"
+1733328813.203886,feedback_received,"Uno_FB: 308,219,215,337"
+1733328813.204659,feedback_received,"Uno_FB: 309,219,215,337"
+1733328813.204934,feedback_received,Nano_Servo5_FB: 402
+1733328813.2053661,feedback_received,"Nano_Current: 532,534,532,531,533"
+1733328813.219193,command_sent,"<087,035,160,090,120>"
+1733328813.239147,command_sent,"<088,035,160,090,120>"
+1733328813.258613,feedback_received,"Uno_FB: 309,219,215,337"
+1733328813.259077,feedback_received,Nano_Servo5_FB: 402
+1733328813.25952,feedback_received,"Nano_Current: 528,534,532,529,534"
+1733328813.274252,command_sent,"<090,035,160,090,120>"
+1733328813.2942111,command_sent,"<092,035,160,090,120>"
+1733328813.314166,command_sent,"<093,035,160,090,120>"
+1733328813.3331058,feedback_received,"Uno_FB: 316,218,215,337"
+1733328813.333765,feedback_received,"Uno_FB: 320,219,215,337"
+1733328813.3342001,feedback_received,"Uno_FB: 325,219,215,337"
+1733328813.3344052,feedback_received,Nano_Servo5_FB: 402
+1733328813.3348322,feedback_received,"Nano_Current: 528,534,533,530,533"
+1733328813.334954,feedback_received,Nano_Servo5_FB: 402
+1733328813.3353229,feedback_received,"Nano_Current: 527,534,531,531,533"
+1733328813.3492491,command_sent,"<095,035,160,090,120>"
+1733328813.3692942,command_sent,"<096,035,160,090,120>"
+1733328813.389279,command_sent,"<098,035,160,090,120>"
+1733328813.408169,feedback_received,"Uno_FB: 328,219,215,337"
+1733328813.408829,feedback_received,"Uno_FB: 335,218,215,337"
+1733328813.409083,feedback_received,Nano_Servo5_FB: 402
+1733328813.409544,feedback_received,"Nano_Current: 531,533,532,530,533"
+1733328813.423907,command_sent,"<099,035,160,090,120>"
+1733328813.444355,command_sent,"<101,035,160,090,120>"
+1733328813.466002,command_sent,"<102,035,160,090,120>"
+1733328813.485525,command_sent,"<104,035,160,090,120>"
+1733328813.504349,feedback_received,"Uno_FB: 337,219,215,337"
+1733328813.504979,feedback_received,"Uno_FB: 343,218,215,337"
+1733328813.505516,feedback_received,"Uno_FB: 346,219,215,338"
+1733328813.505793,feedback_received,Nano_Servo5_FB: 402
+1733328813.5062468,feedback_received,"Nano_Current: 525,533,532,530,533"
+1733328813.506401,feedback_received,Nano_Servo5_FB: 403
+1733328813.506919,feedback_received,"Nano_Current: 528,534,532,531,533"
+1733328813.528051,command_sent,"<106,035,160,090,120>"
+1733328813.550103,command_sent,"<107,035,160,090,120>"
+1733328813.568917,feedback_received,"Uno_FB: 355,218,215,337"
+1733328813.569348,feedback_received,Nano_Servo5_FB: 402
+1733328813.569835,feedback_received,"Nano_Current: 530,533,532,530,533"
+1733328813.5846,command_sent,"<109,035,160,090,120>"
+1733328813.604637,command_sent,"<110,035,160,090,120>"
+1733328813.605709,feedback_received,"Uno_FB: 357,218,215,337"
+1733328813.6066492,feedback_received,"Uno_FB: 362,219,215,337"
+1733328813.606942,feedback_received,Nano_Servo5_FB: 402
+1733328813.6073852,feedback_received,"Nano_Current: 529,534,532,530,534"
+1733328813.6390688,command_sent,"<113,035,160,090,120>"
+1733328813.658845,feedback_received,"Uno_FB: 363,219,215,337"
+1733328813.659282,feedback_received,Nano_Servo5_FB: 402
+1733328813.659722,feedback_received,"Nano_Current: 526,533,531,530,534"
+1733328813.674701,command_sent,"<115,035,160,090,120>"
+1733328813.695806,command_sent,"<116,035,160,090,120>"
+1733328813.714394,feedback_received,"Uno_FB: 367,218,215,337"
+1733328813.715084,feedback_received,"Uno_FB: 376,219,215,338"
+1733328813.715327,feedback_received,Nano_Servo5_FB: 402
+1733328813.715761,feedback_received,"Nano_Current: 526,534,533,531,534"
+1733328813.731267,command_sent,"<118,035,160,090,120>"
+1733328813.752278,command_sent,"<119,035,160,090,120>"
+1733328813.782911,feedback_received,"Uno_FB: 379,219,215,337"
+1733328813.783633,feedback_received,"Uno_FB: 384,219,215,337"
+1733328813.783895,feedback_received,Nano_Servo5_FB: 402
+1733328813.78433,feedback_received,"Nano_Current: 528,534,532,530,533"
+1733328813.799829,command_sent,"<121,035,160,090,120>"
+1733328813.819681,feedback_received,"Uno_FB: 386,219,215,337"
+1733328813.82017,feedback_received,Nano_Servo5_FB: 403
+1733328813.820695,feedback_received,"Nano_Current: 534,533,532,531,533"
+1733328813.8360178,command_sent,"<123,035,160,090,120>"
+1733328813.85626,command_sent,"<124,035,160,090,120>"
+1733328813.8758268,feedback_received,"Uno_FB: 390,219,215,337"
+1733328813.876296,feedback_received,Nano_Servo5_FB: 402
+1733328813.8767512,feedback_received,"Nano_Current: 529,533,532,530,534"
+1733328813.8975549,command_sent,"<126,035,160,090,120>"
+1733328813.9179342,feedback_received,"Uno_FB: 393,219,215,337"
+1733328813.9186938,feedback_received,"Uno_FB: 398,219,215,337"
+1733328813.919075,feedback_received,Nano_Servo5_FB: 402
+1733328813.9196851,feedback_received,"Nano_Current: 528,533,533,531,533"
+1733328813.9344761,command_sent,"<127,035,160,090,120>"
+1733328813.954874,feedback_received,"Uno_FB: 403,219,215,337"
+1733328813.955442,feedback_received,Nano_Servo5_FB: 402
+1733328813.956063,feedback_received,"Nano_Current: 526,534,532,530,533"
+1733328813.970081,command_sent,"<129,035,160,090,120>"
+1733328813.994642,command_sent,"<130,035,160,090,120>"
+1733328814.014001,feedback_received,"Uno_FB: 406,219,215,338"
+1733328814.0164301,feedback_received,"Uno_FB: 408,219,215,337"
+1733328814.016824,feedback_received,Nano_Servo5_FB: 402
+1733328814.0172951,feedback_received,"Nano_Current: 528,534,532,530,533"
+1733328814.0327868,command_sent,"<132,035,160,090,120>"
+1733328814.052864,command_sent,"<133,035,160,090,120>"
+1733328814.072767,feedback_received,"Uno_FB: 412,218,215,337"
+1733328814.073226,feedback_received,Nano_Servo5_FB: 402
+1733328814.0736809,feedback_received,"Nano_Current: 528,534,532,530,532"
+1733328814.087975,command_sent,"<135,035,160,090,120>"
+1733328814.1083982,command_sent,"<137,035,160,090,120>"
+1733328814.128043,feedback_received,"Uno_FB: 415,219,215,337"
+1733328814.128729,feedback_received,"Uno_FB: 419,219,215,337"
+1733328814.1289952,feedback_received,Nano_Servo5_FB: 402
+1733328814.1294222,feedback_received,"Nano_Current: 528,533,532,530,533"
+1733328814.143258,command_sent,"<138,035,160,090,120>"
+1733328814.163431,command_sent,"<140,035,160,090,120>"
+1733328814.1838489,feedback_received,"Uno_FB: 425,219,215,337"
+1733328814.188229,feedback_received,"Uno_FB: 428,219,215,337"
+1733328814.188666,feedback_received,Nano_Servo5_FB: 402
+1733328814.189122,feedback_received,"Nano_Current: 528,534,532,530,533"
+1733328814.2029219,command_sent,"<141,035,160,090,120>"
+1733328814.22321,command_sent,"<143,035,160,090,120>"
+1733328814.243496,feedback_received,"Uno_FB: 432,219,216,337"
+1733328814.24402,feedback_received,Nano_Servo5_FB: 402
+1733328814.24452,feedback_received,"Nano_Current: 529,533,531,530,534"
+1733328814.258917,command_sent,"<144,035,160,090,120>"
+1733328814.2792199,command_sent,"<146,035,160,090,120>"
+1733328814.298792,feedback_received,"Uno_FB: 434,219,215,337"
+1733328814.299527,feedback_received,"Uno_FB: 437,219,215,337"
+1733328814.299808,feedback_received,Nano_Servo5_FB: 402
+1733328814.3002849,feedback_received,"Nano_Current: 528,534,532,530,533"
+1733328814.312795,feedback_received,Nano_Servo5_FB: 402
+1733328814.313447,feedback_received,"Nano_Current: 526,533,532,532,533"
+1733328814.3286111,command_sent,"<147,035,160,090,120>"
+1733328814.348567,command_sent,"<149,035,160,090,120>"
+1733328814.3495848,feedback_received,"Uno_FB: 443,218,215,337"
+1733328814.374877,command_sent,"<151,035,160,090,120>"
+1733328814.394318,feedback_received,"Uno_FB: 446,219,215,337"
+1733328814.394974,feedback_received,"Uno_FB: 448,219,215,337"
+1733328814.395216,feedback_received,Nano_Servo5_FB: 402
+1733328814.395649,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328814.410549,command_sent,"<152,035,160,090,120>"
+1733328814.430688,feedback_received,"Uno_FB: 457,219,215,337"
+1733328814.4311402,feedback_received,Nano_Servo5_FB: 403
+1733328814.431602,feedback_received,"Nano_Current: 533,533,532,531,533"
+1733328814.4457269,command_sent,"<154,035,160,090,120>"
+1733328814.466215,command_sent,"<155,035,160,090,120>"
+1733328814.4859688,feedback_received,"Uno_FB: 458,219,215,338"
+1733328814.4864771,feedback_received,Nano_Servo5_FB: 402
+1733328814.486946,feedback_received,"Nano_Current: 529,534,531,531,533"
+1733328814.501259,command_sent,"<157,035,160,090,120>"
+1733328814.521604,command_sent,"<158,035,160,090,120>"
+1733328814.541248,feedback_received,"Uno_FB: 461,219,215,337"
+1733328814.542006,feedback_received,"Uno_FB: 465,219,216,338"
+1733328814.542305,feedback_received,Nano_Servo5_FB: 403
+1733328814.542783,feedback_received,"Nano_Current: 529,534,532,530,533"
+1733328814.5577338,command_sent,"<160,035,160,090,120>"
+1733328814.577255,feedback_received,"Uno_FB: 467,219,215,337"
+1733328814.5776918,feedback_received,Nano_Servo5_FB: 402
+1733328814.578228,feedback_received,"Nano_Current: 526,534,533,529,533"
+1733328814.5938828,command_sent,"<161,035,160,090,120>"
+1733328814.614369,command_sent,"<163,035,160,090,120>"
+1733328814.6341891,feedback_received,"Uno_FB: 473,219,215,337"
+1733328814.6349618,feedback_received,"Uno_FB: 475,219,215,337"
+1733328814.635232,feedback_received,Nano_Servo5_FB: 403
+1733328814.63568,feedback_received,"Nano_Current: 528,533,532,530,533"
+1733328814.649902,command_sent,"<164,035,160,090,120>"
+1733328814.6702049,command_sent,"<166,035,160,090,120>"
+1733328814.688392,command_sent,"<168,035,160,090,120>"
+1733328814.708992,feedback_received,"Uno_FB: 481,219,215,337"
+1733328814.709675,feedback_received,"Uno_FB: 482,219,215,337"
+1733328814.7099352,feedback_received,Nano_Servo5_FB: 402
+1733328814.710378,feedback_received,"Nano_Current: 530,534,531,531,532"
+1733328814.724044,command_sent,"<169,035,160,090,120>"
+1733328814.744561,command_sent,"<171,035,160,090,120>"
+1733328814.764819,feedback_received,"Uno_FB: 491,219,215,337"
+1733328814.765345,feedback_received,Nano_Servo5_FB: 402
+1733328814.7657988,feedback_received,"Nano_Current: 530,534,531,530,533"
+1733328814.77985,command_sent,"<172,035,160,090,120>"
+1733328814.799907,command_sent,"<174,035,160,090,120>"
+1733328814.819572,feedback_received,"Uno_FB: 493,219,215,337"
+1733328814.820239,feedback_received,"Uno_FB: 497,219,215,337"
+1733328814.820504,feedback_received,Nano_Servo5_FB: 402
+1733328814.820971,feedback_received,"Nano_Current: 529,533,531,530,533"
+1733328814.834626,command_sent,"<175,035,160,090,120>"
+1733328814.855149,command_sent,"<177,035,160,090,120>"
+1733328814.874727,feedback_received,"Uno_FB: 500,219,215,337"
+1733328814.875529,feedback_received,"Uno_FB: 504,220,215,337"
+1733328814.875854,feedback_received,Nano_Servo5_FB: 402
+1733328814.876322,feedback_received,"Nano_Current: 529,533,531,530,533"
+1733328814.876468,feedback_received,Nano_Servo5_FB: 402
+1733328814.87697,feedback_received,"Nano_Current: 529,534,532,531,534"
+1733328814.8919191,command_sent,"<178,035,160,090,120>"
+1733328814.911561,feedback_received,"Uno_FB: 510,219,216,337"
+1733328814.9204202,command_sent,"<180,035,160,090,120>"
+1733328814.955154,feedback_received,"Uno_FB: 514,219,215,337"
+1733328814.9556549,feedback_received,Nano_Servo5_FB: 402
+1733328814.956127,feedback_received,"Nano_Current: 529,534,532,529,533"
+1733328815.004967,feedback_received,"Uno_FB: 517,219,215,337"
+1733328815.0074291,feedback_received,"Uno_FB: 520,219,215,337"
+1733328815.007787,feedback_received,Nano_Servo5_FB: 402
+1733328815.008346,feedback_received,"Nano_Current: 529,534,532,530,533"
+1733328815.055082,feedback_received,"Uno_FB: 521,219,215,337"
+1733328815.0556319,feedback_received,Nano_Servo5_FB: 402
+1733328815.0561988,feedback_received,"Nano_Current: 527,534,531,530,533"
+1733328815.1054232,feedback_received,"Uno_FB: 524,219,215,337"
+1733328815.109838,feedback_received,"Uno_FB: 526,219,215,337"
+1733328815.110204,feedback_received,Nano_Servo5_FB: 402
+1733328815.110802,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328815.155256,feedback_received,"Uno_FB: 526,219,215,337"
+1733328815.15581,feedback_received,Nano_Servo5_FB: 402
+1733328815.156404,feedback_received,"Nano_Current: 526,534,532,529,533"
+1733328815.2060668,feedback_received,"Uno_FB: 527,219,215,337"
+1733328815.206615,feedback_received,Nano_Servo5_FB: 402
+1733328815.2071838,feedback_received,"Nano_Current: 526,534,532,531,533"
+1733328815.2559092,feedback_received,"Uno_FB: 527,219,215,337"
+1733328815.256618,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.256879,feedback_received,Nano_Servo5_FB: 402
+1733328815.257308,feedback_received,"Nano_Current: 526,534,532,530,533"
+1733328815.305807,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.30637,feedback_received,Nano_Servo5_FB: 402
+1733328815.306975,feedback_received,"Nano_Current: 527,533,532,531,534"
+1733328815.356556,feedback_received,"Uno_FB: 528,218,215,337"
+1733328815.35741,feedback_received,"Uno_FB: 527,218,215,337"
+1733328815.357743,feedback_received,Nano_Servo5_FB: 402
+1733328815.358315,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328815.4061592,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.4067478,feedback_received,Nano_Servo5_FB: 402
+1733328815.4073348,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328815.455297,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.4561799,feedback_received,"Uno_FB: 528,218,215,337"
+1733328815.4565141,feedback_received,Nano_Servo5_FB: 402
+1733328815.457071,feedback_received,"Nano_Current: 525,533,532,530,533"
+1733328815.506148,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.5066931,feedback_received,Nano_Servo5_FB: 402
+1733328815.5072482,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328815.55616,feedback_received,"Uno_FB: 528,218,215,337"
+1733328815.557012,feedback_received,"Uno_FB: 528,218,215,337"
+1733328815.557339,feedback_received,Nano_Servo5_FB: 402
+1733328815.557914,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328815.606231,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.606823,feedback_received,Nano_Servo5_FB: 402
+1733328815.607413,feedback_received,"Nano_Current: 526,534,532,530,534"
+1733328815.6560209,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.656916,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.657252,feedback_received,Nano_Servo5_FB: 402
+1733328815.657829,feedback_received,"Nano_Current: 526,532,532,531,533"
+1733328815.7062259,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.706789,feedback_received,Nano_Servo5_FB: 402
+1733328815.7073832,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328815.756143,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.756587,feedback_received,Nano_Servo5_FB: 402
+1733328815.757059,feedback_received,"Nano_Current: 526,533,532,530,534"
+1733328815.805355,feedback_received,"Uno_FB: 528,218,215,337"
+1733328815.806187,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.806468,feedback_received,Nano_Servo5_FB: 402
+1733328815.814124,feedback_received,"Nano_Current: 527,534,532,530,534"
+1733328815.855336,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.905515,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.9064891,feedback_received,"Uno_FB: 528,218,215,337"
+1733328815.906858,feedback_received,Nano_Servo5_FB: 402
+1733328815.907496,feedback_received,"Nano_Current: 526,533,531,530,532"
+1733328815.955277,feedback_received,"Uno_FB: 528,219,215,337"
+1733328815.955879,feedback_received,Nano_Servo5_FB: 402
+1733328815.956532,feedback_received,"Nano_Current: 528,534,532,530,533"
+1733328816.0053551,feedback_received,"Uno_FB: 528,218,215,337"
+1733328816.006249,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.006582,feedback_received,Nano_Servo5_FB: 402
+1733328816.007149,feedback_received,"Nano_Current: 526,534,532,530,533"
+1733328816.0073202,feedback_received,Nano_Servo5_FB: 402
+1733328816.021663,feedback_received,"Nano_Current: 527,534,532,530,532"
+1733328816.056031,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.105313,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.1062882,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.1066759,feedback_received,Nano_Servo5_FB: 402
+1733328816.1073122,feedback_received,"Nano_Current: 526,534,531,531,534"
+1733328816.155215,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.155784,feedback_received,Nano_Servo5_FB: 402
+1733328816.1563709,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328816.205409,feedback_received,"Uno_FB: 528,218,215,337"
+1733328816.20629,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.2065809,feedback_received,Nano_Servo5_FB: 402
+1733328816.2071521,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328816.2559638,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.256452,feedback_received,Nano_Servo5_FB: 402
+1733328816.257036,feedback_received,"Nano_Current: 526,533,532,531,532"
+1733328816.306323,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.307194,feedback_received,"Uno_FB: 528,218,215,337"
+1733328816.307503,feedback_received,Nano_Servo5_FB: 402
+1733328816.308115,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328816.355288,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.355787,feedback_received,Nano_Servo5_FB: 402
+1733328816.356388,feedback_received,"Nano_Current: 527,534,532,529,533"
+1733328816.405201,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.4082,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.408536,feedback_received,Nano_Servo5_FB: 402
+1733328816.409163,feedback_received,"Nano_Current: 526,534,532,530,533"
+1733328816.456022,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.4565609,feedback_received,Nano_Servo5_FB: 402
+1733328816.457165,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328816.506291,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.510543,feedback_received,"Uno_FB: 528,218,215,337"
+1733328816.5109031,feedback_received,Nano_Servo5_FB: 402
+1733328816.511533,feedback_received,"Nano_Current: 525,533,532,531,533"
+1733328816.5564601,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.556981,feedback_received,Nano_Servo5_FB: 402
+1733328816.5575721,feedback_received,"Nano_Current: 526,533,532,530,532"
+1733328816.573764,command_sent,"<178,035,160,090,120>"
+1733328816.5944378,command_sent,"<177,035,160,090,120>"
+1733328816.613618,command_sent,"<175,035,160,090,120>"
+1733328816.614744,feedback_received,"Uno_FB: 528,218,215,337"
+1733328816.6152508,feedback_received,"Uno_FB: 528,219,215,338"
+1733328816.615476,feedback_received,Nano_Servo5_FB: 402
+1733328816.615953,feedback_received,"Nano_Current: 525,535,532,530,532"
+1733328816.647406,command_sent,"<174,035,160,090,120>"
+1733328816.666228,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.6666381,feedback_received,Nano_Servo5_FB: 402
+1733328816.667114,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328816.681451,command_sent,"<172,035,160,090,120>"
+1733328816.701805,command_sent,"<171,035,160,090,120>"
+1733328816.7209759,feedback_received,"Uno_FB: 528,219,215,337"
+1733328816.7216582,feedback_received,"Uno_FB: 525,219,215,337"
+1733328816.721921,feedback_received,Nano_Servo5_FB: 402
+1733328816.722378,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328816.735329,command_sent,"<169,035,160,090,120>"
+1733328816.755337,command_sent,"<168,035,160,090,120>"
+1733328816.7736,command_sent,"<166,035,160,090,120>"
+1733328816.793893,feedback_received,"Uno_FB: 522,219,215,337"
+1733328816.794577,feedback_received,"Uno_FB: 518,219,215,337"
+1733328816.794842,feedback_received,Nano_Servo5_FB: 402
+1733328816.7952929,feedback_received,"Nano_Current: 525,533,532,530,533"
+1733328816.795423,feedback_received,Nano_Servo5_FB: 402
+1733328816.795808,feedback_received,"Nano_Current: 527,533,533,531,533"
+1733328816.809769,command_sent,"<164,035,160,090,120>"
+1733328816.810696,command_sent,"<163,035,160,090,120>"
+1733328816.8308868,feedback_received,"Uno_FB: 518,219,215,337"
+1733328816.837883,command_sent,"<161,035,160,090,120>"
+1733328816.838644,command_sent,"<160,035,160,090,120>"
+1733328816.858637,feedback_received,"Uno_FB: 508,219,215,337"
+1733328816.8590798,feedback_received,Nano_Servo5_FB: 402
+1733328816.859565,feedback_received,"Nano_Current: 527,533,531,531,532"
+1733328816.873798,command_sent,"<158,035,160,090,120>"
+1733328816.8950012,command_sent,"<157,035,160,090,120>"
+1733328816.914662,feedback_received,"Uno_FB: 505,219,215,338"
+1733328816.915118,feedback_received,Nano_Servo5_FB: 402
+1733328816.915593,feedback_received,"Nano_Current: 526,535,532,531,533"
+1733328816.929638,command_sent,"<155,035,160,090,120>"
+1733328816.9507,command_sent,"<154,035,160,090,120>"
+1733328816.951497,command_sent,"<152,035,160,090,120>"
+1733328816.9701629,feedback_received,"Uno_FB: 502,219,215,337"
+1733328816.970879,feedback_received,"Uno_FB: 498,219,215,337"
+1733328816.971141,feedback_received,Nano_Servo5_FB: 402
+1733328816.971593,feedback_received,"Nano_Current: 528,534,531,530,534"
+1733328816.9858172,command_sent,"<151,035,160,090,120>"
+1733328817.0060108,feedback_received,"Uno_FB: 495,219,215,337"
+1733328817.006467,feedback_received,Nano_Servo5_FB: 402
+1733328817.00694,feedback_received,"Nano_Current: 529,534,533,530,533"
+1733328817.02119,command_sent,"<149,035,160,090,120>"
+1733328817.042655,command_sent,"<147,035,160,090,120>"
+1733328817.062231,feedback_received,"Uno_FB: 487,218,215,337"
+1733328817.062985,feedback_received,"Uno_FB: 482,219,215,337"
+1733328817.063257,feedback_received,Nano_Servo5_FB: 402
+1733328817.063724,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328817.078261,command_sent,"<146,035,160,090,120>"
+1733328817.1026042,command_sent,"<144,035,160,090,120>"
+1733328817.121988,feedback_received,"Uno_FB: 479,219,215,338"
+1733328817.124984,feedback_received,"Uno_FB: 475,219,215,337"
+1733328817.125358,feedback_received,Nano_Servo5_FB: 402
+1733328817.125957,feedback_received,"Nano_Current: 529,533,533,531,534"
+1733328817.146952,command_sent,"<143,035,160,090,120>"
+1733328817.167447,feedback_received,"Uno_FB: 467,219,215,337"
+1733328817.16797,feedback_received,Nano_Servo5_FB: 402
+1733328817.168619,feedback_received,"Nano_Current: 527,533,532,531,533"
+1733328817.1839979,command_sent,"<141,035,160,090,120>"
+1733328817.205415,feedback_received,"Uno_FB: 466,219,215,337"
+1733328817.205935,feedback_received,Nano_Servo5_FB: 402
+1733328817.206414,feedback_received,"Nano_Current: 528,534,533,530,534"
+1733328817.221746,command_sent,"<140,035,160,090,120>"
+1733328817.242769,command_sent,"<138,035,160,090,120>"
+1733328817.262351,feedback_received,"Uno_FB: 460,218,215,337"
+1733328817.26308,feedback_received,"Uno_FB: 454,219,215,337"
+1733328817.263347,feedback_received,Nano_Servo5_FB: 402
+1733328817.2638159,feedback_received,"Nano_Current: 527,532,531,530,532"
+1733328817.27873,command_sent,"<137,035,160,090,120>"
+1733328817.297578,command_sent,"<135,035,160,090,120>"
+1733328817.318222,feedback_received,"Uno_FB: 453,219,215,337"
+1733328817.31872,feedback_received,Nano_Servo5_FB: 402
+1733328817.3192132,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328817.3346891,command_sent,"<133,035,160,090,120>"
+1733328817.3554251,feedback_received,"Uno_FB: 449,219,215,337"
+1733328817.362598,feedback_received,Nano_Servo5_FB: 402
+1733328817.3633149,feedback_received,"Nano_Current: 526,533,532,529,533"
+1733328817.377859,command_sent,"<132,035,160,090,120>"
+1733328817.4054458,command_sent,"<130,035,160,090,120>"
+1733328817.424669,feedback_received,"Uno_FB: 446,219,215,337"
+1733328817.425343,feedback_received,"Uno_FB: 445,219,215,337"
+1733328817.425581,feedback_received,Nano_Servo5_FB: 402
+1733328817.426052,feedback_received,"Nano_Current: 529,534,532,530,534"
+1733328817.44066,command_sent,"<129,035,160,090,120>"
+1733328817.460636,feedback_received,"Uno_FB: 441,219,215,337"
+1733328817.461097,feedback_received,Nano_Servo5_FB: 402
+1733328817.461578,feedback_received,"Nano_Current: 527,534,532,531,534"
+1733328817.477372,command_sent,"<127,035,160,090,120>"
+1733328817.5025752,command_sent,"<126,035,160,090,120>"
+1733328817.521861,feedback_received,"Uno_FB: 437,219,215,337"
+1733328817.522532,feedback_received,"Uno_FB: 432,219,215,337"
+1733328817.522774,feedback_received,Nano_Servo5_FB: 402
+1733328817.523241,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328817.538047,command_sent,"<124,035,160,090,120>"
+1733328817.558311,command_sent,"<123,035,160,090,120>"
+1733328817.5781891,feedback_received,"Uno_FB: 427,218,215,337"
+1733328817.578905,feedback_received,"Uno_FB: 423,219,215,337"
+1733328817.579147,feedback_received,Nano_Servo5_FB: 402
+1733328817.579618,feedback_received,"Nano_Current: 525,534,532,530,533"
+1733328817.594935,command_sent,"<121,035,160,090,120>"
+1733328817.614739,feedback_received,"Uno_FB: 424,220,215,337"
+1733328817.622242,command_sent,"<119,035,160,090,120>"
+1733328817.642359,command_sent,"<118,035,160,090,120>"
+1733328817.661834,feedback_received,"Uno_FB: 419,219,215,337"
+1733328817.6622841,feedback_received,Nano_Servo5_FB: 403
+1733328817.6627579,feedback_received,"Nano_Current: 530,534,533,531,534"
+1733328817.677851,command_sent,"<116,035,160,090,120>"
+1733328817.7025769,command_sent,"<115,035,160,090,120>"
+1733328817.721996,feedback_received,"Uno_FB: 418,219,215,337"
+1733328817.7226949,feedback_received,"Uno_FB: 411,219,215,337"
+1733328817.722938,feedback_received,Nano_Servo5_FB: 402
+1733328817.723403,feedback_received,"Nano_Current: 529,534,531,530,533"
+1733328817.7235441,feedback_received,Nano_Servo5_FB: 402
+1733328817.723944,feedback_received,"Nano_Current: 528,534,532,530,533"
+1733328817.738784,command_sent,"<113,035,160,090,120>"
+1733328817.75894,command_sent,"<112,035,160,090,120>"
+1733328817.7788732,feedback_received,"Uno_FB: 409,219,215,337"
+1733328817.779624,feedback_received,"Uno_FB: 404,219,215,338"
+1733328817.7798982,feedback_received,Nano_Servo5_FB: 402
+1733328817.780371,feedback_received,"Nano_Current: 526,534,531,530,533"
+1733328817.7947352,command_sent,"<110,035,160,090,120>"
+1733328817.81483,command_sent,"<109,035,160,090,120>"
+1733328817.835016,feedback_received,"Uno_FB: 401,219,215,337"
+1733328817.8354812,feedback_received,Nano_Servo5_FB: 402
+1733328817.8359501,feedback_received,"Nano_Current: 529,533,532,530,533"
+1733328817.850095,command_sent,"<107,035,160,090,120>"
+1733328817.870016,command_sent,"<106,035,160,090,120>"
+1733328817.8902268,feedback_received,"Uno_FB: 400,219,215,337"
+1733328817.8909628,feedback_received,"Uno_FB: 394,219,216,337"
+1733328817.891212,feedback_received,Nano_Servo5_FB: 402
+1733328817.891693,feedback_received,"Nano_Current: 528,533,532,530,534"
+1733328817.905898,command_sent,"<104,035,160,090,120>"
+1733328817.926295,command_sent,"<102,035,160,090,120>"
+1733328817.944552,command_sent,"<101,035,160,090,120>"
+1733328817.965058,feedback_received,"Uno_FB: 391,219,215,337"
+1733328817.965729,feedback_received,"Uno_FB: 382,219,215,337"
+1733328817.965983,feedback_received,Nano_Servo5_FB: 402
+1733328817.966462,feedback_received,"Nano_Current: 528,534,532,530,534"
+1733328817.980465,command_sent,"<099,035,160,090,120>"
+1733328818.000782,command_sent,"<098,035,160,090,120>"
+1733328818.021034,command_sent,"<096,035,160,090,120>"
+1733328818.055582,feedback_received,"Uno_FB: 382,219,215,337"
+1733328818.0564759,feedback_received,"Uno_FB: 374,219,215,337"
+1733328818.057058,feedback_received,"Uno_FB: 371,219,215,337"
+1733328818.0573409,feedback_received,Nano_Servo5_FB: 402
+1733328818.057861,feedback_received,"Nano_Current: 528,534,532,530,533"
+1733328818.058012,feedback_received,Nano_Servo5_FB: 402
+1733328818.058845,feedback_received,"Nano_Current: 527,534,533,530,532"
+1733328818.078642,command_sent,"<095,035,160,090,120>"
+1733328818.0797179,command_sent,"<093,035,160,090,120>"
+1733328818.102783,command_sent,"<092,035,160,090,120>"
+1733328818.1300108,command_sent,"<090,035,160,090,120>"
+1733328818.163688,feedback_received,"Uno_FB: 370,219,215,337"
+1733328818.1646879,feedback_received,"Uno_FB: 359,219,215,337"
+1733328818.165285,feedback_received,"Uno_FB: 360,219,215,337"
+1733328818.16558,feedback_received,Nano_Servo5_FB: 402
+1733328818.1661172,feedback_received,"Nano_Current: 531,533,531,530,534"
+1733328818.1667242,feedback_received,Nano_Servo5_FB: 402
+1733328818.168566,feedback_received,"Nano_Current: 526,535,533,531,534"
+1733328818.189544,command_sent,"<088,035,160,090,120>"
+1733328818.212929,command_sent,"<087,035,160,090,120>"
+1733328818.2364202,command_sent,"<085,035,160,090,120>"
+1733328818.2560189,command_sent,"<084,035,160,090,120>"
+1733328818.258629,feedback_received,"Uno_FB: 356,219,215,337"
+1733328818.259448,feedback_received,"Uno_FB: 350,219,215,337"
+1733328818.2600498,feedback_received,"Uno_FB: 346,219,215,337"
+1733328818.2603421,feedback_received,Nano_Servo5_FB: 402
+1733328818.2608798,feedback_received,"Nano_Current: 526,534,532,530,532"
+1733328818.261034,feedback_received,Nano_Servo5_FB: 402
+1733328818.261467,feedback_received,"Nano_Current: 525,534,532,530,534"
+1733328818.296191,command_sent,"<082,035,160,090,120>"
+1733328818.33088,command_sent,"<081,035,160,090,120>"
+1733328818.3594,command_sent,"<079,035,160,090,120>"
+1733328818.381227,feedback_received,"Uno_FB: 349,219,215,337"
+1733328818.3819919,feedback_received,"Uno_FB: 339,219,215,337"
+1733328818.382515,feedback_received,"Uno_FB: 340,218,215,337"
+1733328818.3827672,feedback_received,Nano_Servo5_FB: 402
+1733328818.3832462,feedback_received,"Nano_Current: 533,534,532,529,533"
+1733328818.383384,feedback_received,Nano_Servo5_FB: 402
+1733328818.3837929,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328818.39966,command_sent,"<078,035,160,090,120>"
+1733328818.400511,command_sent,"<076,035,160,090,120>"
+1733328818.424793,command_sent,"<074,035,160,090,120>"
+1733328818.445354,command_sent,"<073,035,160,090,120>"
+1733328818.4692202,feedback_received,"Uno_FB: 331,218,215,337"
+1733328818.470452,feedback_received,"Uno_FB: 329,219,215,337"
+1733328818.471475,feedback_received,"Uno_FB: 331,219,216,337"
+1733328818.471999,feedback_received,Nano_Servo5_FB: 402
+1733328818.4727821,feedback_received,"Nano_Current: 528,533,532,530,533"
+1733328818.4730701,feedback_received,Nano_Servo5_FB: 402
+1733328818.4736588,feedback_received,"Nano_Current: 532,534,533,530,533"
+1733328818.4889128,command_sent,"<071,035,160,090,120>"
+1733328818.5092108,command_sent,"<070,035,160,090,120>"
+1733328818.5293171,feedback_received,"Uno_FB: 321,219,215,337"
+1733328818.53009,feedback_received,"Uno_FB: 318,219,215,337"
+1733328818.5303612,feedback_received,Nano_Servo5_FB: 402
+1733328818.530841,feedback_received,"Nano_Current: 528,534,532,530,533"
+1733328818.545486,command_sent,"<068,035,160,090,120>"
+1733328818.5657668,command_sent,"<067,035,160,090,120>"
+1733328818.566866,feedback_received,"Uno_FB: 309,219,215,337"
+1733328818.567143,feedback_received,Nano_Servo5_FB: 402
+1733328818.5676181,feedback_received,"Nano_Current: 528,534,532,530,532"
+1733328818.599468,command_sent,"<065,035,160,090,120>"
+1733328818.619227,feedback_received,"Uno_FB: 310,219,215,337"
+1733328818.6196852,feedback_received,Nano_Servo5_FB: 402
+1733328818.6201658,feedback_received,"Nano_Current: 531,533,532,531,533"
+1733328818.646552,feedback_received,"Uno_FB: 302,219,215,337"
+1733328818.647039,feedback_received,Nano_Servo5_FB: 402
+1733328818.656296,feedback_received,"Nano_Current: 527,533,533,531,533"
+1733328818.693546,feedback_received,"Uno_FB: 301,218,215,337"
+1733328818.694349,feedback_received,"Uno_FB: 295,218,215,337"
+1733328818.745766,feedback_received,"Uno_FB: 289,219,215,337"
+1733328818.746322,feedback_received,Nano_Servo5_FB: 402
+1733328818.747006,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328818.7973828,feedback_received,"Uno_FB: 287,219,215,337"
+1733328818.798259,feedback_received,"Uno_FB: 286,218,215,337"
+1733328818.7985768,feedback_received,Nano_Servo5_FB: 402
+1733328818.799188,feedback_received,"Nano_Current: 526,534,531,530,533"
+1733328818.848906,feedback_received,"Uno_FB: 286,219,215,337"
+1733328818.849479,feedback_received,Nano_Servo5_FB: 402
+1733328818.8500988,feedback_received,"Nano_Current: 526,533,532,530,534"
+1733328818.8502772,feedback_received,Nano_Servo5_FB: 402
+1733328818.863982,feedback_received,"Nano_Current: 527,534,530,530,532"
+1733328818.901433,feedback_received,"Uno_FB: 286,218,215,337"
+1733328818.902316,feedback_received,"Uno_FB: 285,219,215,337"
+1733328818.952964,feedback_received,"Uno_FB: 285,219,215,337"
+1733328818.95354,feedback_received,Nano_Servo5_FB: 402
+1733328818.954217,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328819.005402,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.006266,feedback_received,"Uno_FB: 284,218,215,337"
+1733328819.006578,feedback_received,Nano_Servo5_FB: 402
+1733328819.0072808,feedback_received,"Nano_Current: 525,534,532,529,534"
+1733328819.007519,feedback_received,Nano_Servo5_FB: 402
+1733328819.0080938,feedback_received,"Nano_Current: 527,533,531,531,533"
+1733328819.055667,feedback_received,"Uno_FB: 285,218,215,337"
+1733328819.0562189,feedback_received,Nano_Servo5_FB: 402
+1733328819.0717068,feedback_received,"Nano_Current: 527,534,531,531,533"
+1733328819.106,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.107266,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.155651,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.156227,feedback_received,Nano_Servo5_FB: 402
+1733328819.1569002,feedback_received,"Nano_Current: 527,534,532,530,534"
+1733328819.205985,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.209735,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.210099,feedback_received,Nano_Servo5_FB: 402
+1733328819.2107809,feedback_received,"Nano_Current: 526,533,532,531,533"
+1733328819.2559931,feedback_received,"Uno_FB: 284,218,215,337"
+1733328819.2565088,feedback_received,Nano_Servo5_FB: 402
+1733328819.257117,feedback_received,"Nano_Current: 527,534,532,531,534"
+1733328819.30598,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.306544,feedback_received,Nano_Servo5_FB: 402
+1733328819.3072178,feedback_received,"Nano_Current: 526,533,532,530,533"
+1733328819.355395,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.3563,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.35662,feedback_received,Nano_Servo5_FB: 402
+1733328819.3572228,feedback_received,"Nano_Current: 527,534,533,531,533"
+1733328819.405129,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.405691,feedback_received,Nano_Servo5_FB: 402
+1733328819.406312,feedback_received,"Nano_Current: 526,533,532,531,533"
+1733328819.455679,feedback_received,"Uno_FB: 284,218,215,336"
+1733328819.4565609,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.456888,feedback_received,Nano_Servo5_FB: 402
+1733328819.457487,feedback_received,"Nano_Current: 526,534,533,531,534"
+1733328819.5057778,feedback_received,"Uno_FB: 284,218,215,337"
+1733328819.506329,feedback_received,Nano_Servo5_FB: 402
+1733328819.506967,feedback_received,"Nano_Current: 527,534,531,531,533"
+1733328819.555773,feedback_received,"Uno_FB: 284,218,215,337"
+1733328819.5566552,feedback_received,"Uno_FB: 284,218,215,337"
+1733328819.556986,feedback_received,Nano_Servo5_FB: 402
+1733328819.5575922,feedback_received,"Nano_Current: 526,533,532,530,532"
+1733328819.605361,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.605918,feedback_received,Nano_Servo5_FB: 402
+1733328819.606551,feedback_received,"Nano_Current: 527,534,531,531,533"
+1733328819.655668,feedback_received,"Uno_FB: 284,219,215,336"
+1733328819.6565702,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.6569002,feedback_received,Nano_Servo5_FB: 402
+1733328819.657509,feedback_received,"Nano_Current: 526,535,531,530,532"
+1733328819.7056808,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.706238,feedback_received,Nano_Servo5_FB: 402
+1733328819.7068732,feedback_received,"Nano_Current: 526,534,531,530,532"
+1733328819.7558248,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.756754,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.757077,feedback_received,Nano_Servo5_FB: 402
+1733328819.7576919,feedback_received,"Nano_Current: 527,533,532,530,533"
+1733328819.8066869,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.807296,feedback_received,Nano_Servo5_FB: 402
+1733328819.807938,feedback_received,"Nano_Current: 526,534,532,530,533"
+1733328819.855816,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.85643,feedback_received,Nano_Servo5_FB: 402
+1733328819.857107,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328819.9058728,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.906831,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.907197,feedback_received,Nano_Servo5_FB: 402
+1733328819.907858,feedback_received,"Nano_Current: 526,534,532,530,532"
+1733328819.955709,feedback_received,"Uno_FB: 284,219,215,337"
+1733328819.956279,feedback_received,Nano_Servo5_FB: 402
+1733328819.956909,feedback_received,"Nano_Current: 527,533,531,531,532"
+1733328820.005335,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.00624,feedback_received,"Uno_FB: 283,219,215,337"
+1733328820.006573,feedback_received,Nano_Servo5_FB: 402
+1733328820.007193,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328820.055851,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.056421,feedback_received,Nano_Servo5_FB: 402
+1733328820.0570529,feedback_received,"Nano_Current: 526,534,532,531,533"
+1733328820.1060429,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.106957,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.107285,feedback_received,Nano_Servo5_FB: 402
+1733328820.10789,feedback_received,"Nano_Current: 526,533,532,531,533"
+1733328820.155937,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.156619,feedback_received,Nano_Servo5_FB: 402
+1733328820.157355,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328820.2055428,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.206518,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.206932,feedback_received,Nano_Servo5_FB: 402
+1733328820.2076008,feedback_received,"Nano_Current: 526,534,532,530,533"
+1733328820.255296,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.255888,feedback_received,Nano_Servo5_FB: 402
+1733328820.2565298,feedback_received,"Nano_Current: 526,534,531,530,532"
+1733328820.306695,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.3077319,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.308104,feedback_received,Nano_Servo5_FB: 402
+1733328820.30877,feedback_received,"Nano_Current: 526,534,531,530,533"
+1733328820.356029,feedback_received,"Uno_FB: 283,219,215,337"
+1733328820.356582,feedback_received,Nano_Servo5_FB: 402
+1733328820.364953,feedback_received,"Nano_Current: 527,534,531,530,533"
+1733328820.4059362,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.406873,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.412247,feedback_received,Nano_Servo5_FB: 402
+1733328820.4128819,feedback_received,"Nano_Current: 527,534,532,529,533"
+1733328820.454714,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.5055292,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.50652,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.506887,feedback_received,Nano_Servo5_FB: 402
+1733328820.50756,feedback_received,"Nano_Current: 526,534,531,530,534"
+1733328820.555337,feedback_received,"Uno_FB: 283,219,215,337"
+1733328820.555945,feedback_received,Nano_Servo5_FB: 402
+1733328820.556643,feedback_received,"Nano_Current: 528,533,531,530,533"
+1733328820.556841,feedback_received,Nano_Servo5_FB: 402
+1733328820.55741,feedback_received,"Nano_Current: 525,533,532,531,533"
+1733328820.6055229,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.610451,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.610878,feedback_received,Nano_Servo5_FB: 402
+1733328820.620642,feedback_received,"Nano_Current: 526,533,533,531,533"
+1733328820.655324,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.705276,feedback_received,"Uno_FB: 283,219,215,337"
+1733328820.705919,feedback_received,Nano_Servo5_FB: 402
+1733328820.706629,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328820.756035,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.75698,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.7573278,feedback_received,Nano_Servo5_FB: 402
+1733328820.757948,feedback_received,"Nano_Current: 526,534,531,531,533"
+1733328820.8060002,feedback_received,"Uno_FB: 283,218,215,337"
+1733328820.806614,feedback_received,Nano_Servo5_FB: 402
+1733328820.807246,feedback_received,"Nano_Current: 526,534,532,530,534"
+1733328820.855294,feedback_received,"Uno_FB: 283,219,215,337"
+1733328820.8562298,feedback_received,"Uno_FB: 284,218,215,337"
+1733328820.856607,feedback_received,Nano_Servo5_FB: 402
+1733328820.857235,feedback_received,"Nano_Current: 527,534,531,530,532"
+1733328820.906432,feedback_received,"Uno_FB: 283,219,215,337"
+1733328820.907073,feedback_received,Nano_Servo5_FB: 402
+1733328820.9077618,feedback_received,"Nano_Current: 526,533,531,531,533"
+1733328820.95615,feedback_received,"Uno_FB: 284,219,215,337"
+1733328820.957231,feedback_received,"Uno_FB: 284,218,215,337"
+1733328820.957621,feedback_received,Nano_Servo5_FB: 402
+1733328820.958285,feedback_received,"Nano_Current: 526,534,531,531,534"
+1733328821.006731,feedback_received,"Uno_FB: 283,218,215,337"
+1733328821.007317,feedback_received,Nano_Servo5_FB: 402
+1733328821.007943,feedback_received,"Nano_Current: 526,533,531,531,533"
+1733328821.056177,feedback_received,"Uno_FB: 283,219,215,337"
+1733328821.0572019,feedback_received,"Uno_FB: 284,218,215,337"
+1733328821.0575612,feedback_received,Nano_Servo5_FB: 402
+1733328821.058178,feedback_received,"Nano_Current: 526,534,532,531,534"
+1733328821.1066072,feedback_received,"Uno_FB: 284,218,215,337"
+1733328821.107235,feedback_received,Nano_Servo5_FB: 402
+1733328821.107902,feedback_received,"Nano_Current: 526,533,531,529,534"
+1733328821.155394,feedback_received,"Uno_FB: 284,218,215,337"
+1733328821.1564002,feedback_received,"Uno_FB: 283,219,215,337"
+1733328821.156779,feedback_received,Nano_Servo5_FB: 402
+1733328821.157446,feedback_received,"Nano_Current: 527,534,532,531,533"
+1733328821.205436,feedback_received,"Uno_FB: 283,219,215,337"
+1733328821.206024,feedback_received,Nano_Servo5_FB: 402
+1733328821.206576,feedback_received,"Nano_Current: 527,533,531,528,533"
+1733328821.2561831,feedback_received,"Uno_FB: 284,219,215,337"
+1733328821.2567859,feedback_received,Nano_Servo5_FB: 402
+1733328821.257441,feedback_received,"Nano_Current: 527,534,532,530,533"
+1733328821.3142002,feedback_received,"Uno_FB: 283,219,215,337"
+1733328821.315021,feedback_received,"Uno_FB: 284,218,215,337"
+1733328821.315331,feedback_received,Nano_Servo5_FB: 402
+1733328821.315868,feedback_received,"Nano_Current: 525,534,531,531,532"
+1733328821.355357,feedback_received,"Uno_FB: 284,219,215,337"
+1733328821.355934,feedback_received,Nano_Servo5_FB: 402
+1733328821.356577,feedback_received,"Nano_Current: 527,534,532,531,534"
+1733328821.3945768,command_sent,"<090,035,160,090,120>"
+1733328822.972832,command_sent,"<090,035,160,090,120>"

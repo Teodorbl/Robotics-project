@@ -3,11 +3,11 @@ import serial
 import time
 import os
 import json
-
+import csv  # For CSV operations
 from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from ..frontend.gui import GUI as GUIType
-
 
 
 class SerialAPI():
@@ -20,7 +20,6 @@ class SerialAPI():
         # Initialize Serial Connections
         self.ser_uno = None  # Serial connection to Arduino Uno
         self.ser_nano = None  # Serial connection to Arduino Nano
-        self.connection_start_time = None
         
         self.serial_lock = threading.Lock()  # To synchronize access to serial ports
         
@@ -28,7 +27,29 @@ class SerialAPI():
         self.servo_pos_init = configs.SERVO_DEFAULT_ANGLES
         self.servo_positions = self.servo_pos_init.copy()
         
+        # Initialize Logging
+        self.log_file = "command_feedback_log.csv"
+        self.log_lock = threading.Lock()
+        
+        if not os.path.exists(self.log_file):
+            with open(self.log_file, mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["timestamp", "event_type", "content"])
+        
         print("-- Serial init end --")
+
+    def log_event(self, event_type, content):
+        """
+        Log an event to the CSV file.
+        
+        :param event_type: Type of event ('command_sent', 'feedback_received')
+        :param content: The content of the event (command or feedback)
+        """
+        timestamp = time.time()
+        with self.log_lock:
+            with open(self.log_file, mode='a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([timestamp, event_type, content])
         
     def toggle_connection(self):
         if self.ser_uno and self.ser_uno.is_open and self.ser_nano and self.ser_nano.is_open:
@@ -41,8 +62,6 @@ class SerialAPI():
                 self.ser_uno = None
                 self.ser_nano = None
             
-            self.connection_start_time = None
-            
             is_connected = False
             error_msg = None
 
@@ -53,14 +72,16 @@ class SerialAPI():
                     self.ser_uno = serial.Serial(self.configs.SERIAL_PORT_UNO, self.configs.BAUD_RATE_UNO, timeout=1)
                     self.ser_nano = serial.Serial(self.configs.SERIAL_PORT_NANO, self.configs.BAUD_RATE_NANO, timeout=1)
                 
-                self.connection_start_time = time.time()
+                if self.gui:
+                    self.gui.reset_iterations()
+                
                 self.servo_positions = self.servo_pos_init.copy()
                 
                 is_connected = True
                 error_msg = None
             
             except serial.SerialException as e:
-                self.reset_servos()
+                #self.reset_servos()
                 self.ser_uno = None
                 self.ser_nano = None
                 
@@ -76,14 +97,14 @@ class SerialAPI():
         if isinstance(servo_index, list):
             for idx, deg in zip(servo_index, degree):
                 self.servo_positions[idx] = int(deg)
-        
         else:
             self.servo_positions[servo_index] = int(degree)
         
-        
         pos = self.servo_positions
-        
         command = f"<{pos[0]:03d},{pos[1]:03d},{pos[2]:03d},{pos[3]:03d},{pos[4]:03d}>"
+        
+        # Log the command with timestamp
+        self.log_event("command_sent", command)
         
         self.gui.append_output(f"Sending command: {command}", 'serial_api')
         
@@ -92,31 +113,13 @@ class SerialAPI():
                 if self.ser_uno and self.ser_uno.is_open:
                     self.ser_uno.write((command + '\n').encode('utf-8'))
             except Exception as e:
-                self.gui.append_output(f"Error writing to serial port: {e}", 'serial_api')
-    
+                self.gui.append_output(f"Error writing to serial port: {e}", 'serial_api') 
+                   
     def reset_servos(self):
         default_pos = self.servo_pos_init.copy()
         servo_indices = list(range(self.configs.NUM_SERVOS))
         
         self.servo_command(servo_indices, default_pos)
-
-    def get_error_message(self, code):
-        error = self.errors.get(code)
-        if error:
-            message = error["message"]
-            data = error["data"]
-            return f"Error {code}: {message}" + (f" | Data: {data}" if data else "")
-        else:
-            raise ValueError(f"Unknown Error Code: {code}")
-
-    def get_debug_message(self, code):
-        debug = self.debugs.get(code)
-        if debug:
-            message = debug["message"]
-            data = debug["data"]
-            return f"Debug {code}: {message}" + (f" | Data: {data}" if data else "")
-        else:
-            raise ValueError(f"Unknown Debug Code: {code}")
                 
     def read_uno(self):
         if not (self.ser_uno and self.ser_uno.is_open and self.ser_uno.in_waiting > 0):
@@ -132,29 +135,35 @@ class SerialAPI():
                 
                 if feedback_data_line:
                     # Process data line
-                    
                     data = line[3:]
                     values = list(map(float, data.split(',')))
                     
                     if len(values) != self.configs.NUM_SERVOS-1:
-                        raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from UNO serial line, but got {len(values)}")
+                        raise ValueError(f"Expected {self.configs.NUM_SERVOS-1} values from UNO serial line, but got {len(values)}")
                     
                     self.gui.plot_servo_pos(values)
+                    
+                    # Log the feedback
+                    self.log_event("feedback_received", f"Uno_FB: {data}")
                 
                 if (not feedback_data_line) or debug_on:
                     # Process non-data line
-                    
                     self.gui.append_output(line, 'UNO')
+                    
+                    if not feedback_data_line:
+                        # Log the non-data feedback
+                        self.log_event("feedback_received", f"Uno_Non_FB: {line}")
     
         except serial.SerialException as e:
-            self.gui.append_output(f"Serial error with UNO: {e}")
+            self.gui.append_output(f"Serial error with UNO: {e}", 'serial_api')
             self.toggle_connection()
     
         except Exception as e:
             self.gui.append_output("Error during read of UNO serial", 'serial_api')
             self.gui.append_output(f"Line: {line}", 'serial_api')
             self.gui.append_output(f"Error: {e}", 'serial_api')
-
+            self.log_event("error", f"Uno_Error: {e}")
+    
     def read_nano(self):
         if not (self.ser_nano and self.ser_nano.is_open and self.ser_nano.in_waiting > 0):
             return
@@ -164,7 +173,7 @@ class SerialAPI():
                 line = self.ser_nano.readline().decode('utf-8').strip()
                 
                 current_data_line = line.startswith('A:')       # Current readings
-                servo5_data_line = line.startswith('FB5:')       # Current readings
+                servo5_data_line = line.startswith('FB5:')      # Servo 5 feedback
                 debug_on = self.gui.debug_mode
                 
                 if current_data_line:
@@ -177,37 +186,33 @@ class SerialAPI():
                     
                     self.gui.plot_servo_currents(values)
                     
+                    # Log the feedback
+                    self.log_event("feedback_received", f"Nano_Current: {data}")
+                
                 elif servo5_data_line:
                     value = int(line[4:])
                     
                     self.gui.plot_servo5_pos(value)
                     
-                
-                # if data_line and self.gui.knob_mode:
-                #     # Process data line
-                    
-                #     data = line[1:]
-                #     values = list(map(float, data.split(',')))
-                #     num_values = len(values)
-                    
-                #     if num_values != self.configs.NUM_SERVOS:
-                #         raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from NANO knobs, but got {len(values)}")
-                    
-                #     indices = list(range(num_values))
-                #     degrees = [self.knob_to_degree(val, idx) for val, idx in zip(values, indices)]
-                #     self.servo_command(indices, degrees)
+                    # Log the feedback
+                    self.log_event("feedback_received", f"Nano_Servo5_FB: {value}")
                 
                 elif debug_on:
                     self.gui.append_output(line, 'NANO')
+                    
+                    if not current_data_line and not servo5_data_line:
+                        # Log the non-data feedback
+                        self.log_event("feedback_received", f"Nano_Non_FB: {line}")
     
         except serial.SerialException as e:
             self.gui.append_output(f"Serial error NANO: {e}", 'serial_api')
             self.toggle_connection()
-    
-        # except Exception as e:
-        #     self.gui.append_output("Error during read of NANO serial", 'serial_api')
-        #     self.gui.append_output(f"Line: {line}", 'serial_api')
-        #     self.gui.append_output(f"Error: {e}", 'serial_api')
+        
+        except Exception as e:
+            self.gui.append_output("Error during read of NANO serial", 'serial_api')
+            self.gui.append_output(f"Line: {line}", 'serial_api')
+            self.gui.append_output(f"Error: {e}", 'serial_api')
+            self.log_event("error", f"Nano_Error: {e}")
                 
     def knob_to_degree(self, raw_knob, servo_index):
         """

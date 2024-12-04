@@ -231,6 +231,11 @@ class GUI():
             slider_label = slider_layout.itemAt(2).widget()
             slider_label.setText(f"{default_angle}°")
     
+    def reset_iterations(self):
+        self.servo_pos_iteration = 0
+        self.servo5_pos_iteration = 0
+        self.servo_current_iteration = 0
+        
     def close(self):
         # Perform necessary cleanup
         try:
