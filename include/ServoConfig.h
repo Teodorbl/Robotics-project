@@ -26,7 +26,7 @@ const uint16_t SERVO_MAX_PULSE_WIDTH = 430;  // Corresponds to 2100 µsec
 
 // Define baud rate constants
 //const uint32_t BAUD_RATE_UNO = 115200;
-const uint32_t BAUD_RATE_UNO = 57600;
+const uint32_t BAUD_RATE_UNO = 115200;
 const uint32_t BAUD_RATE_NANO = 57600;
 
 const uint8_t PWM_FREQ = 50;

@@ -4,8 +4,9 @@
 #include <Adafruit_PWMServoDriver.h>
 #include <Arduino_FreeRTOS.h>
 #include <semphr.h>
+#include <SPI.h>
 
-// #define DEBUG_PRINTS
+#define DEBUG_PRINTS
 #ifdef DEBUG_PRINTS
 #define DEBUG_PRINT(x)    Serial.print(x)
 #define DEBUG_PRINTLN(x)  Serial.println(x)
@@ -29,10 +30,10 @@
 
 // Task interval and delays
 #define CONTROL_INTERVAL_MS 100
-#define COMS_INTERVAL_MS 50
+#define COMS_INTERVAL_MS 100
 
-// const uint8_t MAIN_NANO_PIN = 10;
-// const uint8_t AUX_NANO_PIN = 9;
+const uint8_t MAIN_NANO_PIN = 10;
+const uint8_t AUX_NANO_PIN = 9;
 
 // Servo constants
 const uint8_t NUM_SERVOS = 5;
@@ -55,10 +56,10 @@ const TickType_t xTimeIncrementComs = pdMS_TO_TICKS(COMS_INTERVAL_MS);
 const char* controlTaskName = "ctrl";
 const char* comsTaskName = "coms";
 
-// // Global variable to store analog feedback values
+// Global variable to store analog feedback values
 uint16_t feedbackValues[NUM_SERVOS] = {0};
-// uint16_t currentLevels[NUM_SERVOS] = {0};
-// bool stopFlag = false;          // Signal to stop because of overcurrent
+uint16_t currentLevels[NUM_SERVOS] = {0};
+bool stopFlag = false;          // Signal to stop because of overcurrent
 
 // Whenever serial parsing goes wrong
 bool invalidCommand = false;
@@ -72,8 +73,8 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(I2C_ADDRESS_PWMDRV);
 // Define separate mutexes for feedbackValues
 SemaphoreHandle_t xFeedbackValuesMutex;
 
-// // Test variable
-// uint8_t auxValue = 0;
+// Test variable
+uint8_t auxValue = 0;
 
 // Function prototypes
 void vControlTask(void *pvParameters);
@@ -84,9 +85,9 @@ void ComputeControl();
 void UpdateServos();
 void ProcessSerialCommands();
 void SendDataToComputer();
-// void RequestSPIDataMain(uint8_t *data, size_t length);
-// void RequestSPIDataAux(uint8_t *data);
-// void ProcessSPIData(uint8_t *data);
+void RequestSPIDataMain(uint8_t *data, size_t length);
+void RequestSPIDataAux(uint8_t *data);
+void ProcessSPIData(uint8_t *data);
 
 #ifdef DEBUG_PRINTS
 void PrintStackUsage(const char* taskName, TaskHandle_t xHandle);
@@ -123,13 +124,13 @@ void setup() {
     while (!Serial) {
         ;  // Wait for serial port to connect (needed for native USB)
     }
-    // pinMode(MAIN_NANO_PIN, OUTPUT); // Set SS as output
-    // digitalWrite(MAIN_NANO_PIN, HIGH); // Deselect the NANO initially
+    pinMode(MAIN_NANO_PIN, OUTPUT); // Set SS as output
+    digitalWrite(MAIN_NANO_PIN, HIGH); // Deselect the NANO initially
 
-    // pinMode(AUX_NANO_PIN, OUTPUT); // Set SS as output
-    // digitalWrite(AUX_NANO_PIN, HIGH); // Deselect the NANO initially
+    pinMode(AUX_NANO_PIN, OUTPUT); // Set SS as output
+    digitalWrite(AUX_NANO_PIN, HIGH); // Deselect the NANO initially
 
-    // SPI.begin(); // Initialize SPI as Master
+    SPI.begin(); // Initialize SPI as Master
 
 
     pwm.begin();
@@ -200,10 +201,10 @@ void vControlTask(void *pvParameters) {
         // Perform computations (e.g., Kalman filter)
         ComputeControl();
 
-        // uint8_t auxData = 0;
-        // RequestSPIDataAux(&auxData);
-        // Serial.print(F("Aux value: "));
-        // Serial.println(auxValue);
+        uint8_t auxData = 0;
+        RequestSPIDataAux(&auxData);
+        Serial.print(F("Aux value: "));
+        Serial.println(auxValue);
 
 
         // Send commands to servos
@@ -223,7 +224,7 @@ void vComsTask(void *pvParameters) {
     DEBUG_PRINTLN(F("Coms task: Init"));
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
-    // uint8_t spiData[13]; // Declare spiData array of appropriate size
+    uint8_t spiData[13]; // Declare spiData array of appropriate size
 
     for (;;) {
         // Wait for the next cycle
@@ -234,10 +235,10 @@ void vComsTask(void *pvParameters) {
             DEBUG_PRINTLN(F("Coms task: Overtime"));
         }
 
-        // // Retrieve data from the slave via SPI
-        // DEBUG_PRINTLN(F("Requesting SPI data from slave"));
-        // RequestSPIDataMain(spiData, sizeof(spiData));
-        // DEBUG_PRINTLN(F("SPI data received from slave"));
+        // Retrieve data from the slave via SPI
+        DEBUG_PRINTLN(F("Requesting SPI data from slave"));
+        RequestSPIDataMain(spiData, sizeof(spiData));
+        DEBUG_PRINTLN(F("SPI data received from slave"));
 
         // uint8_t auxData = 0;
         // RequestSPIDataAux(&auxData);
@@ -245,8 +246,8 @@ void vComsTask(void *pvParameters) {
         // Serial.println(auxValue);
 
 
-        // // Process received SPI data
-        // ProcessSPIData(spiData);
+        // Process received SPI data
+        ProcessSPIData(spiData);
 
         // Send data back to the computer over serial
         SendDataToComputer();
@@ -370,41 +371,41 @@ void ProcessSerialCommands() {
     }
 }
 
-// void RequestSPIDataMain(uint8_t *data, size_t length) {
-//     DEBUG_PRINTLN(F("Starting SPI data request"));
+void RequestSPIDataMain(uint8_t *data, size_t length) {
+    DEBUG_PRINTLN(F("Starting SPI data request"));
 
-//     SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0)); // Start transaction
-//     digitalWrite(MAIN_NANO_PIN, LOW); // Select the slave
-//     for (size_t i = 0; i < length; i++) {
-//         data[i] = SPI.transfer(0x00); // Send dummy data to receive data from slave
-//     }
+    SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0)); // Start transaction
+    digitalWrite(MAIN_NANO_PIN, LOW); // Select the slave
+    for (size_t i = 0; i < length; i++) {
+        data[i] = SPI.transfer(0x00); // Send dummy data to receive data from slave
+    }
 
-//     digitalWrite(MAIN_NANO_PIN, HIGH); // Deselect the slave
-//     SPI.endTransaction(); // End transaction
-// }
+    digitalWrite(MAIN_NANO_PIN, HIGH); // Deselect the slave
+    SPI.endTransaction(); // End transaction
+}
 
-// void RequestSPIDataAux(uint8_t *data) {
-//     DEBUG_PRINTLN(F("Starting SPI data request to Auxiliary Slave"));
+void RequestSPIDataAux(uint8_t *data) {
+    DEBUG_PRINTLN(F("Starting SPI data request to Auxiliary Slave"));
 
-//     // Begin SPI transaction with specified settings
-//     SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
+    // Begin SPI transaction with specified settings
+    SPI.beginTransaction(SPISettings(1000000, MSBFIRST, SPI_MODE0));
 
-//     // Select the Auxiliary Slave by pulling SS pin LOW
-//     digitalWrite(AUX_NANO_PIN, LOW);
+    // Select the Auxiliary Slave by pulling SS pin LOW
+    digitalWrite(AUX_NANO_PIN, LOW);
 
-//     // Transfer a dummy byte to initiate SPI communication and receive the response
-//     *data = SPI.transfer(0x00); // Sending 0x00 as a dummy byte
+    // Transfer a dummy byte to initiate SPI communication and receive the response
+    *data = SPI.transfer(0x00); // Sending 0x00 as a dummy byte
 
-//     // Deselect the Auxiliary Slave by pulling SS pin HIGH
-//     digitalWrite(AUX_NANO_PIN, HIGH);
+    // Deselect the Auxiliary Slave by pulling SS pin HIGH
+    digitalWrite(AUX_NANO_PIN, HIGH);
 
-//     // End the SPI transaction
-//     SPI.endTransaction();
+    // End the SPI transaction
+    SPI.endTransaction();
 
-//     // Debug: Print the received auxValue
-//     DEBUG_PRINT(F("Received auxValue from Auxiliary Slave: "));
-//     DEBUG_PRINTLN(*data);
-// }
+    // Debug: Print the received auxValue
+    DEBUG_PRINT(F("Received auxValue from Auxiliary Slave: "));
+    DEBUG_PRINTLN(*data);
+}
 
 
 // // Function to request a single uint8_t value from the Auxiliary Slave (Nano)
@@ -431,45 +432,45 @@ void ProcessSerialCommands() {
 //     DEBUG_PRINTLN(*data);
 // }
 
-// // ONLY FOR MAIN NANO, NOT AUX
-// void ProcessSPIData(uint8_t *data) {
-//     DEBUG_PRINTLN(F("Processing received SPI data"));
-
-//     // Parse received data
-//     size_t index = 0;
-//     stopFlag = data[index++] != 0;
-//     DEBUG_PRINT(F("stopFlag: "));
-//     DEBUG_PRINTLN(stopFlag);
-
-//     uint16_t fifthFeedbackValue = data[index++];
-//     fifthFeedbackValue |= ((uint16_t)data[index++]) << 8;
-//     DEBUG_PRINT(F("fifthFeedbackValue: "));
-//     DEBUG_PRINTLN(fifthFeedbackValue);
-
-//     DEBUG_PRINT(F("currentLevels: "));
-//     uint16_t currentLevels[NUM_SERVOS];
-//     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-//         currentLevels[i] = data[index++];
-//         currentLevels[i] |= ((uint16_t)data[index++]) << 8;
-//         DEBUG_PRINT(currentLevels[i]);
-//         DEBUG_PRINT(F(" "));
-//     }
-//     DEBUG_PRINTLN();
-
-
-//     // Acquire mutex and update shared variables if necessary
-//     if (xSemaphoreTake(xFeedbackValuesMutex, pdMS_TO_TICKS(100))) {
-//         feedbackValues[4] = fifthFeedbackValue; // Update the fifth servo feedback
-//         memcpy(::currentLevels, currentLevels, sizeof(currentLevels));
-//         Serial.print("BASE CURRENT: ");
-//         Serial.println(currentLevels[0]);
-//         xSemaphoreGive(xFeedbackValuesMutex);
-//     } else {
-//         DEBUG_PRINTLN(F("Failed to acquire feedback values mutex"));
-//     }
+// ONLY FOR MAIN NANO, NOT AUX
+void ProcessSPIData(uint8_t *data) {
+    DEBUG_PRINTLN(F("Processing received SPI data"));
     
-//     DEBUG_PRINTLN(F("SPI data processing completed"));
-// }
+    // Parse received data
+    size_t index = 0;
+    stopFlag = data[index++] != 0;
+    DEBUG_PRINT(F("stopFlag: "));
+    DEBUG_PRINTLN(stopFlag);
+
+    uint16_t fifthFeedbackValue = data[index++];
+    fifthFeedbackValue |= ((uint16_t)data[index++]) << 8;
+    DEBUG_PRINT(F("fifthFeedbackValue: "));
+    DEBUG_PRINTLN(fifthFeedbackValue);
+
+    DEBUG_PRINT(F("currentLevels: "));
+    uint16_t currentLevels[NUM_SERVOS];
+    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+        currentLevels[i] = data[index++];
+        currentLevels[i] |= ((uint16_t)data[index++]) << 8;
+        DEBUG_PRINT(currentLevels[i]);
+        DEBUG_PRINT(F(" "));
+    }
+    DEBUG_PRINTLN();
+
+
+    // Acquire mutex and update shared variables if necessary
+    if (xSemaphoreTake(xFeedbackValuesMutex, pdMS_TO_TICKS(100))) {
+        feedbackValues[4] = fifthFeedbackValue; // Update the fifth servo feedback
+        memcpy(::currentLevels, currentLevels, sizeof(currentLevels));
+        Serial.print("BASE CURRENT: ");
+        Serial.println(currentLevels[0]);
+        xSemaphoreGive(xFeedbackValuesMutex);
+    } else {
+        DEBUG_PRINTLN(F("Failed to acquire feedback values mutex"));
+    }
+    
+    DEBUG_PRINTLN(F("SPI data processing completed"));
+}
 
 void SendDataToComputer() {
     if (xSemaphoreTake(xFeedbackValuesMutex, portMAX_DELAY)) {

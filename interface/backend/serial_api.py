@@ -192,41 +192,45 @@ class SerialAPI():
             return
         
         try:
-            line = self.ser_nano.readline().decode('utf-8').strip()
-            
-            data_line = line.startswith('A:')       # Current readings
-            debug_on = self.gui.debug_mode
-            
-            if data_line:
-                data = line[2:]
-                values = list(map(float, data.split(',')))
-                num_values = len(values)
+            while self.ser_nano.in_waiting > 0:
+                line = self.ser_nano.readline().decode('utf-8').strip()
                 
-                if num_values != self.configs.NUM_SERVOS:
-                    raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from NANO current sensors, but got {len(values)}")
+                current_data_line = line.startswith('A:')       # Current readings
+                servo5_data_line = line.startswith('FB5:')       # Current readings
+                debug_on = self.gui.debug_mode
                 
-                self.gui.plot_servo_currents(values)
+                if current_data_line:
+                    data = line[2:]
+                    values = list(map(float, data.split(',')))
+                    num_values = len(values)
+                    
+                    if num_values != self.configs.NUM_SERVOS:
+                        raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from NANO current sensors, but got {len(values)}")
+                    
+                    self.gui.plot_servo_currents(values)
+                    
+                elif servo5_data_line:
+                    value = int(line[4:])
+                    
+                    self.gui.plot_servo5_pos(value)
+                    
                 
-            
-            # if data_line and self.gui.knob_mode:
-            #     # Process data line
+                # if data_line and self.gui.knob_mode:
+                #     # Process data line
+                    
+                #     data = line[1:]
+                #     values = list(map(float, data.split(',')))
+                #     num_values = len(values)
+                    
+                #     if num_values != self.configs.NUM_SERVOS:
+                #         raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from NANO knobs, but got {len(values)}")
+                    
+                #     indices = list(range(num_values))
+                #     degrees = [self.knob_to_degree(val, idx) for val, idx in zip(values, indices)]
+                #     self.servo_command(indices, degrees)
                 
-            #     data = line[1:]
-            #     values = list(map(float, data.split(',')))
-            #     num_values = len(values)
-                
-            #     if num_values != self.configs.NUM_SERVOS:
-            #         raise ValueError(f"Expected {self.configs.NUM_SERVOS} values from NANO knobs, but got {len(values)}")
-                
-            #     indices = list(range(num_values))
-            #     degrees = [self.knob_to_degree(val, idx) for val, idx in zip(values, indices)]
-            #     self.servo_command(indices, degrees)
-            
-            
-            if (not data_line) or debug_on:
-                # Process non-data line
-                
-                self.gui.append_output(line, 'NANO')
+                elif debug_on:
+                    self.gui.append_output(line, 'NANO')
     
         except serial.SerialException as e:
             self.gui.append_output(f"Serial error NANO: {e}", 'serial_api')
