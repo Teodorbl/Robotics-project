@@ -24,9 +24,6 @@ const uint8_t SERVO_MAX_DEGREE = 180;
 const uint16_t SERVO_MIN_PULSE_WIDTH = 184;  // Corresponds to 900 µsec
 const uint16_t SERVO_MAX_PULSE_WIDTH = 430;  // Corresponds to 2100 µsec
 
-const uint8_t I2C_ADDRESS_PWMDRV = 0x40;   // I2C address for PWM Servo Driver (default 0x40)
-const uint8_t I2C_ADDRESS_NANO = 0x08;     // I2C address for Arduino Nano
-
 // Define baud rate constants
 //const uint32_t BAUD_RATE_UNO = 115200;
 const uint32_t BAUD_RATE_UNO = 57600;

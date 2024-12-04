@@ -2,7 +2,6 @@
 
 #include <Arduino.h>
 #include <Arduino_FreeRTOS.h>
-#include <Wire.h>
 #include <SPI.h>  // Add SPI library
 
 // #define DEBUG_PRINTS
@@ -31,17 +30,23 @@
 #define MAIN_INTERVAL_MS 100
 
 // Analog pins for current readings
-const uint8_t CURRENT_SENSOR_PINS[5] = {A0, A1, A2, A3, A6};
+const uint8_t CURRENT_SENSOR_PINS[5] = {A0, A1, A2, A3, A4};
 const uint8_t FIFTH_FEEDBACK_PIN = A7;
+
+// Max apms allowed
+#define MAX_AMPS 2
 
 // Shared variables to be sent to master
 volatile uint16_t fifthFeedbackValue = 0;
 volatile uint16_t currentLevels[NUM_SERVOS] = {0};
 volatile bool stopFlag = false;          // Signal to stop because of overcurrent
 
-volatile bool spiDataReady = false;
-volatile uint8_t receivedData[13];
-volatile uint8_t dataIndex = 0;
+// volatile bool spiDataReady = false;
+// volatile uint8_t receivedData[13];
+// volatile uint8_t dataIndex = 0;
+
+volatile uint8_t txBuffer[13];      // Buffer to hold data to send to master
+volatile uint8_t txIndex = 0;       // Index for the next byte to send
 
 const char* mainTaskName = "main";
 const TickType_t xTimeIncrementMain = pdMS_TO_TICKS(MAIN_INTERVAL_MS);
@@ -53,7 +58,8 @@ TaskHandle_t xMainTaskHandle = NULL;
 void vMainTask(void* pvParameters);
 void ReadAnalogInputs();
 void CheckOvercurrent();
-void RequestEvent();
+void LoadSPIBuffer();
+//void RequestEvent();
 
 #ifdef DEBUG_PRINTS
 void PrintStackUsage(const char* taskName, TaskHandle_t xHandle);
@@ -89,7 +95,6 @@ void setup() {
 
     pinMode(MISO, OUTPUT); // Set MISO as output
     SPCR |= _BV(SPE); // Enable SPI as Slave
-
     SPI.attachInterrupt(); // Enable SPI interrupt
 
     // Create the Main Task
@@ -111,10 +116,10 @@ void setup() {
 }
 
 ISR(SPI_STC_vect) {
-    receivedData[dataIndex++] = SPDR;
-    if (dataIndex >= 13) {
-        spiDataReady = true;
-        dataIndex = 0;
+    // Load the next byte to send into SPDR
+    SPDR = txBuffer[txIndex++];
+    if (txIndex >= sizeof(txBuffer)) {
+        txIndex = 0;
     }
 }
 
@@ -132,19 +137,17 @@ void vMainTask(void* pvParameters) {
             DEBUG_PRINTLN(F("Main task: Overtime"));
         }
 
-        // Read analog inputs (feedback)
+        // Read analog inputs
         DEBUG_PRINTLN(F("Main task: Reading analog"));
         ReadAnalogInputs();
 
-        // Perform computations (e.g., Kalman filter)
+        // Perform computations
         DEBUG_PRINTLN(F("Main task: Checking current"));
         CheckOvercurrent();
 
-        if (spiDataReady) {
-            // Process received SPI data
-            spiDataReady = false;
-            // ...handle receivedData...
-        }
+        // Prepare to send data
+        DEBUG_PRINTLN(F("Main task: Loading SPI buffer"));
+        LoadSPIBuffer();
 
         // Monitor stack usage periodically
         #ifdef DEBUG_PRINTS
@@ -183,24 +186,24 @@ void CheckOvercurrent() {
     // }
 }
 
-void RequestEvent() {
-    // Ensure data consistency if needed
-    bool localStopFlag = stopFlag;
-    uint16_t localFifthFeedback = fifthFeedbackValue;
-    uint16_t localCurrentLevels[NUM_SERVOS];
-    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-        localCurrentLevels[i] = currentLevels[i];
-    }
+void LoadSPIBuffer() {
+        // Disable interrupts to safely copy data
+        noInterrupts();
 
-    // Send data
-    Wire.write((uint8_t)(localStopFlag ? 1 : 0));
-    Wire.write(lowByte(localFifthFeedback));
-    Wire.write(highByte(localFifthFeedback));
-    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-        Wire.write(lowByte(localCurrentLevels[i]));
-        Wire.write(highByte(localCurrentLevels[i]));
-    }
+        txBuffer[0] = stopFlag ? 1 : 0;
+        txBuffer[1] = lowByte(fifthFeedbackValue);
+        txBuffer[2] = highByte(fifthFeedbackValue);
+
+        for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+            txBuffer[3 + i * 2] = lowByte(currentLevels[i]);
+            txBuffer[4 + i * 2] = highByte(currentLevels[i]);
+        }
+
+        // Enable interrupts
+        interrupts();
 }
+
+
 
 void loop() {
     // Empty. All work is done in tasks.

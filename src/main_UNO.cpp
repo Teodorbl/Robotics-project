@@ -1,17 +1,12 @@
 // src/main_UNO.cpp
-// PRUNED VERSION
 
 #include <Arduino.h>
 #include <Adafruit_PWMServoDriver.h>
 #include <Arduino_FreeRTOS.h>
 #include <semphr.h>
-#include <Wire.h>
-#include <SPI.h>  // Add SPI library
-
-
+#include <SPI.h>
 
 // #define DEBUG_PRINTS
-
 #ifdef DEBUG_PRINTS
 #define DEBUG_PRINT(x)    Serial.print(x)
 #define DEBUG_PRINTLN(x)  Serial.println(x)
@@ -20,12 +15,9 @@
 #define DEBUG_PRINTLN(x)
 #endif
 
-
-#define I2C_ADDRESS_PWMDRV 0x40
-#define I2C_ADDRESS_NANO 0x08     // I2C address for Arduino Nano
-
 #define BAUD_RATE_UNO 57600
 
+#define I2C_ADDRESS_PWMDRV 0x40
 #define PWM_FREQ 50
 
 // Task priority levels
@@ -38,22 +30,25 @@
 
 // Task interval and delays
 #define CONTROL_INTERVAL_MS 100
-#define COMS_DELAY_MS 100
+#define COMS_INTERVAL_MS 200
 
+// Servo constants
 const uint8_t NUM_SERVOS = 5;
 
 const uint8_t SERVO_MIN_ANGLES[NUM_SERVOS]     = {  0,  35,  30,   0,  40};
 const uint8_t SERVO_DEFAULT_ANGLES[NUM_SERVOS] = { 90,  35, 160,  90, 120};
 const uint8_t SERVO_MAX_ANGLES[NUM_SERVOS]     = {180, 115, 165, 180, 135};
 const bool SERVO_INVERT_MASK[NUM_SERVOS] = {false, false, true, true, false};
-
-const uint8_t FEEDBACK_PINS[NUM_SERVOS] = {A0, A1, A2, A3};
+const uint8_t SERVO_INDICES[NUM_SERVOS] = {0, 4, 8, 12, 15};
 
 const uint16_t SERVO_MIN_PULSE_WIDTH = 184;  // Corresponds to 900 µsec
 const uint16_t SERVO_MAX_PULSE_WIDTH = 430;  // Corresponds to 2100 µsec
 
+const uint8_t FEEDBACK_PINS[NUM_SERVOS] = {A0, A1, A2, A3};
+
+// Task constants
 const TickType_t xTimeIncrementControl = pdMS_TO_TICKS(CONTROL_INTERVAL_MS);
-const TickType_t xTimeIncrementComs = pdMS_TO_TICKS(COMS_DELAY_MS);
+const TickType_t xTimeIncrementComs = pdMS_TO_TICKS(COMS_INTERVAL_MS);
 
 const char* controlTaskName = "ctrl";
 const char* comsTaskName = "coms";
@@ -65,7 +60,7 @@ uint16_t currentLevels[NUM_SERVOS] = {0};
 // Signal to stop because of overcurrent
 bool stopFlag = false;
 
-// Array for commanded servo angles
+// Array for commanded servo angles from computer
 uint8_t servoCommandAngles[NUM_SERVOS];
 
 // Servo driver instance
@@ -83,9 +78,10 @@ void ComputeControl();
 void UpdateServos();
 void ProcessSerialCommands();
 void SendDataToComputer();
-void RequestI2CData();
-void ProcessI2CData();
-void SendSPIData(uint8_t *data, size_t length);
+// void RequestI2CData();
+// void ProcessI2CData();
+void RequestSPIData(uint8_t *data, size_t length);
+void ProcessSPIData(uint8_t *data);
 
 #ifdef DEBUG_PRINTS
 void PrintStackUsage(const char* taskName, TaskHandle_t xHandle);
@@ -123,7 +119,10 @@ void setup() {
         ;  // Wait for serial port to connect (needed for native USB)
     }
 
-    Wire.begin();
+    //Wire.begin();
+
+    pinMode(SS, OUTPUT);        // Set SS as output
+    digitalWrite(SS, HIGH);     // Deselect the NANO initially
 
     pwm.begin();
     pwm.setPWMFreq(PWM_FREQ);
@@ -135,7 +134,7 @@ void setup() {
     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
         servoCommandAngles[i] = SERVO_DEFAULT_ANGLES[i];
         uint16_t pulseWidth = DegreeToPulseWidth(servoCommandAngles[i], i);
-        pwm.setPWM(i, 0, pulseWidth);
+        pwm.setPWM(SERVO_INDICES[i], 0, pulseWidth);
     }
 
     // Create separate mutexes
@@ -144,17 +143,17 @@ void setup() {
         while (1); // Halt if mutex creation fails
     }
 
+    DEBUG_PRINTLN(F("Creating control task"));
     xTaskCreate(
         vControlTask,               // Task function
-        controlTaskName,              // Task name
+        controlTaskName,            // Task name
         CONTROL_STACK_SIZE,         // Stack size
         NULL,                       // Task parameters
         PRIORITY_CONTROL_TASK,      // Priority
         &xControlTaskHandle         // Task handle
     );
-    
-    DEBUG_PRINTLN(F("Control task created"));
 
+    DEBUG_PRINTLN(F("Creating communication task"));
     xTaskCreate(
         vComsTask,
         comsTaskName,
@@ -165,6 +164,7 @@ void setup() {
     );
 
     DEBUG_PRINTLN(F("Setup done"));
+
     vTaskStartScheduler();
 
     while (1);
@@ -206,11 +206,11 @@ void vControlTask(void *pvParameters) {
 }
 
 
-
-
 void vComsTask(void *pvParameters) {
     DEBUG_PRINTLN(F("Coms task: Init"));
     TickType_t xLastWakeTime = xTaskGetTickCount();
+
+    uint8_t spiData[13]; // Declare spiData array of appropriate size
 
     for (;;) {
         // Wait for the next cycle
@@ -221,10 +221,11 @@ void vComsTask(void *pvParameters) {
             DEBUG_PRINTLN(F("Coms task: Overtime"));
         }
 
-        // Replace I2C communication with SPI
-        uint8_t spiData[13];
-        // Populate spiData with necessary information
-        SendSPIData(spiData, 13);
+        // Retrieve data from the slave via SPI
+        RequestSPIData(spiData, sizeof(spiData));
+
+        // Process received SPI data
+        ProcessSPIData(spiData);
 
         // Send data back to the computer over serial
         SendDataToComputer();
@@ -277,7 +278,7 @@ void UpdateServos() {
     // Directly update servos
     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
         uint16_t pulseWidth = DegreeToPulseWidth(servoCommandAngles[i], i);
-        pwm.setPWM(i, 0, pulseWidth);
+        pwm.setPWM(SERVO_INDICES[i], 0, pulseWidth);
     }
 }
 
@@ -330,6 +331,38 @@ void ProcessSerialCommands() {
     }
 }
 
+void RequestSPIData(uint8_t *data, size_t length) {
+    digitalWrite(SS, LOW); // Select the slave
+    for (size_t i = 0; i < length; i++) {
+        data[i] = SPI.transfer(0x00); // Send dummy data to receive data from slave
+    }
+    digitalWrite(SS, HIGH); // Deselect the slave
+}
+
+void ProcessSPIData(uint8_t *data) {
+    // Parse received data
+    size_t index = 0;
+    stopFlag = data[index++] != 0;
+
+    uint16_t fifthFeedbackValue = data[index++];
+    fifthFeedbackValue |= ((uint16_t)data[index++]) << 8;
+
+    uint16_t currentLevels[NUM_SERVOS];
+    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+        currentLevels[i] = data[index++];
+        currentLevels[i] |= ((uint16_t)data[index++]) << 8;
+    }
+
+    // Acquire mutex and update shared variables if necessary
+    if (xSemaphoreTake(xFeedbackValuesMutex, pdMS_TO_TICKS(100))) {
+        feedbackValues[4] = fifthFeedbackValue; // Update the fifth servo feedback
+        memcpy(::currentLevels, currentLevels, sizeof(currentLevels));
+        xSemaphoreGive(xFeedbackValuesMutex);
+    } else {
+        DEBUG_PRINTLN(F("Failed to acquire feedback values mutex"));
+    }
+}
+
 void SendDataToComputer() {
     if (xSemaphoreTake(xFeedbackValuesMutex, portMAX_DELAY)) {
 
@@ -344,53 +377,6 @@ void SendDataToComputer() {
         Serial.println();
 
         xSemaphoreGive(xFeedbackValuesMutex);
-    }
-}
-
-void RequestI2CData() {
-    // Request 13 bytes: 2 (servo feedback) + 10 (5 current levels) + 1 (stop flag)
-    Wire.requestFrom(I2C_ADDRESS_NANO, 13);
-}
-
-void ProcessI2CData() {
-    if (Wire.available() >= 13) {
-        // Acquire feedback values mutex with timeout
-        if (xSemaphoreTake(xFeedbackValuesMutex, pdMS_TO_TICKS(100))) {
-            DEBUG_PRINTLN(F("Received I2C data"));
-
-            // Read stop flag
-            stopFlag = Wire.read() != 0;
-
-            // Read servo analog feedback (the fifth one is read by the NANO)
-            int byte1 = Wire.read();
-            int byte2 = Wire.read();
-            if (byte1 != -1 && byte2 != -1) {
-                feedbackValues[4] = static_cast<uint16_t>(byte1) | (static_cast<uint16_t>(byte2) << 8);
-            } else {
-                DEBUG_PRINTLN(F("Error reading servo analog feedback"));
-            }
-
-            // Read 5 current level readings
-            for (uint8_t i = 0; i < 5; i++) {
-                int cl_byte1 = Wire.read();
-                int cl_byte2 = Wire.read();
-                if (cl_byte1 != -1 && cl_byte2 != -1) {
-                    currentLevels[i] = static_cast<uint16_t>(cl_byte1) | (static_cast<uint16_t>(cl_byte2) << 8);
-                } else {
-                    DEBUG_PRINTLN(F("Error reading current level"));
-                }
-            }
-
-            xSemaphoreGive(xFeedbackValuesMutex);
-        } else {
-            DEBUG_PRINTLN(F("Failed to acquire feedback values mutex"));
-        }
-    }
-}
-
-void SendSPIData(uint8_t *data, size_t length) {
-    for (size_t i = 0; i < length; i++) {
-        SPI.transfer(data[i]);
     }
 }
 

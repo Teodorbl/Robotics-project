@@ -125,11 +125,11 @@ class Window():
                 axisItems={'bottom': TimeAxisItem(orientation='bottom')}
             )
             
-            current_plot_widget.setLabel('left', 'Value')
+            current_plot_widget.setLabel('left', 'Amps')
             current_plot_widget.setLabel('bottom', 'Elapsed Time', units='s')
             
             current_plot_widget.showGrid(x=True, y=True)  # Show grid
-            current_curve = current_plot_widget.plot(pen=pen_colors[i], name=f'{configs.SERVO_NAMES[i].capitalize()} Current')
+            current_curve = current_plot_widget.plot(pen=pen_colors[i])
             self.current_curves.append(current_curve)
             
             # Electrical Current Value Label

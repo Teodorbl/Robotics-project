@@ -83,15 +83,18 @@ class GUI():
             
         for i in range(self.configs.NUM_SERVOS):
             analog_read = values[i]
-            self.servo_current_buffers[i].append((current_time, analog_read))
+            
+            amps = 5 * (analog_read - 532)/(1023 * 0.185)
+            
+            self.servo_current_buffers[i].append((current_time, amps))
             
             # Update plot data
-            times, analog_reads = zip(*self.servo_current_buffers[i][-100:])
-            self.window.current_curves[i].setData(times, analog_reads)
+            times, all_amps = zip(*self.servo_current_buffers[i][-100:])
+            self.window.current_curves[i].setData(times, all_amps)
             
             # Update current value label
             servo_name = self.servo_names[i]
-            self.window.current_labels[i].setText(f"{servo_name}: {analog_read:.2f}")
+            self.window.current_labels[i].setText(f"{servo_name}: {amps:.2f} A")
         
     
     def uno_text_command(self):
@@ -131,7 +134,7 @@ class GUI():
             self.window.connect_button.setText("Disconnect")
             
             # Clear data buffers upon connection
-            for buffer in self.servo_pos_buffers:
+            for buffer in self.servo_pos_buffers + self.servo_current_buffers:
                 buffer.clear()
             
             # Reset all current value labels
