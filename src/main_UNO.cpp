@@ -16,16 +16,21 @@
 #define BAUD_RATE_UNO 115200
 
 #define I2C_ADDRESS_PWMDRV 0x40
-#define PWM_FREQ 50
+//#define PWM_FREQ 150
+#define PWM_FREQ 100
 
 // Task priority levels
 #define PRIORITY_CONTROL_TASK 1
 
 // Define stack sizes for each task
-#define CONTROL_STACK_SIZE 258
+#define CONTROL_STACK_SIZE 512
 
 // Task interval and delays
-#define CONTROL_INTERVAL_MS 40
+#define CONTROL_INTERVAL_MS 30
+
+// To prevent servo damage. Computed from command input
+#define MAX_ANGULAR_SPEED 30  // degrees per second
+const float MAX_DELTA_ANGLE = (MAX_ANGULAR_SPEED / 1000.0) * CONTROL_INTERVAL_MS; // degrees per interval
 
 
 // const uint8_t MAIN_NANO_PIN = 10;
@@ -40,8 +45,11 @@ const uint8_t SERVO_MAX_ANGLES[NUM_SERVOS]     = {180, 115, 165, 180, 135};
 const bool SERVO_INVERT_MASK[NUM_SERVOS] = {false, false, true, true, false};
 const uint8_t SERVO_INDICES[NUM_SERVOS] = {0, 4, 8, 12, 15};
 
-const uint16_t SERVO_MIN_PULSE_WIDTH = 184;  // Corresponds to 900 µsec
-const uint16_t SERVO_MAX_PULSE_WIDTH = 430;  // Corresponds to 2100 µsec
+// const uint16_t SERVO_MIN_PULSE_WIDTH = 184;  // Corresponds to 900 µsec
+// const uint16_t SERVO_MAX_PULSE_WIDTH = 430;  // Corresponds to 2100 µsec
+
+const uint16_t SERVO_MIN_PULSE_WIDTH = 92;  // Corresponds to 900 µsec
+const uint16_t SERVO_MAX_PULSE_WIDTH = 215;  // Corresponds to 2100 µsec
 
 const uint8_t FEEDBACK_PINS[NUM_SERVOS] = {A0, A1, A2, A3};
 
@@ -59,7 +67,9 @@ uint16_t feedbackValues[NUM_SERVOS-1] = {0};
 bool invalidCommand = false;
 
 // Array for commanded servo angles from computer
-uint8_t servoCommandAngles[NUM_SERVOS];
+uint8_t commandAngles[NUM_SERVOS];
+float currentPwmAngles[NUM_SERVOS];
+
 
 // Servo driver instance
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(I2C_ADDRESS_PWMDRV);
@@ -112,10 +122,13 @@ void setup() {
     pwm.begin();
     pwm.setPWMFreq(PWM_FREQ);
 
+
+
     // Initialize servos to desired positions using ServoConfig.h
     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-        servoCommandAngles[i] = SERVO_DEFAULT_ANGLES[i];
-        uint16_t pulseWidth = DegreeToPulseWidth(servoCommandAngles[i], i);
+        commandAngles[i] = SERVO_DEFAULT_ANGLES[i];
+        currentPwmAngles[i] = SERVO_DEFAULT_ANGLES[i];
+        uint16_t pulseWidth = DegreeToPulseWidth(currentPwmAngles[i], i);
         pwm.setPWM(SERVO_INDICES[i], 0, pulseWidth);
     }
 
@@ -161,13 +174,13 @@ void vControlTask(void *pvParameters) {
         // Perform computations (e.g., Kalman filter)
         ComputeControl();
 
-        // Write to serial
-        SendDataToComputer();
-
         // Send commands to servos
         if (!invalidCommand) {
             UpdateServos();
         }
+
+        // Write to serial
+        SendDataToComputer();
 
         // Monitor 
         #ifdef DEBUG_PRINTS
@@ -197,9 +210,9 @@ void ProcessSerialCommands() {
                 inputBuffer[bufferIndex] = '\0';
                 // Process the command
                 int parsed = sscanf(inputBuffer, "<%3hhu,%3hhu,%3hhu,%3hhu,%3hhu>",
-                    &servoCommandAngles[0], &servoCommandAngles[1],
-                    &servoCommandAngles[2], &servoCommandAngles[3],
-                    &servoCommandAngles[4]);
+                    &commandAngles[0], &commandAngles[1],
+                    &commandAngles[2], &commandAngles[3],
+                    &commandAngles[4]);
 
                 if (parsed == 5) {
                     invalidCommand = false;
@@ -214,7 +227,7 @@ void ProcessSerialCommands() {
                     if (i != 0) {
                         DEBUG_PRINT(",");
                     }
-                    DEBUG_PRINT(servoCommandAngles[i]);
+                    DEBUG_PRINT(commandAngles[i]);
                 }
                 DEBUG_PRINTLN();
 
@@ -234,21 +247,33 @@ void ReadAnalogInputs() {
     }
 }
 
-void ComputeControl() {
-    // TODO: Implement control algorithms (e.g., Kalman filter)
 
-    // Example error condition after implementing control algorithms
-    // if (controlAlgorithmFailed) {
-    //     #ifdef LOG_ERROR
-    //     LOG_ERROR(F("Control algorithm failed."));
-    //     #endif
-    // }
+void ComputeControl() {
+
+
+
+    // Limit angular speed
+    for (uint8_t i = 0; i < NUM_SERVOS; i++) {
+        float delta = commandAngles[i] - currentPwmAngles[i];
+        if (delta > MAX_DELTA_ANGLE) {
+            currentPwmAngles[i] += MAX_DELTA_ANGLE;
+
+        } else if (delta < -MAX_DELTA_ANGLE) {
+            currentPwmAngles[i] -= MAX_DELTA_ANGLE;
+
+        } else {
+            currentPwmAngles[i] = commandAngles[i];
+        }
+    }
+
+    
 }
+
 
 void UpdateServos() {
     // Directly update servos
     for (uint8_t i = 0; i < NUM_SERVOS; i++) {
-        uint16_t pulseWidth = DegreeToPulseWidth(servoCommandAngles[i], i);
+        uint16_t pulseWidth = DegreeToPulseWidth(currentPwmAngles[i], i);
         pwm.setPWM(SERVO_INDICES[i], 0, pulseWidth);
     }
 }
